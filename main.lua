@@ -108,7 +108,7 @@ function love.load(argv)
 
 	love.graphics.origin()
 	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,127,127)
+	love.graphics.setScissor(0,0,128,128)
 
 	__shader_palette_data = love.image.newImageData(16,1)
 	__shader_palette = love.graphics.newImage(__shader_palette_data)
@@ -131,12 +131,12 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 
 	-- load the cart
-	cart = load_p8(argv[2])
 	clip()
 	camera()
 	pal()
 	color(0)
-	if cart._init then cart._init() end
+	load(argv[2])
+	run()
 end
 
 function load_p8(filename)
@@ -478,9 +478,8 @@ function love.run()
 end
 
 function love.draw()
-	love.graphics.clear()
 	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,127,127)
+	love.graphics.setScissor(0,0,128,128)
 	love.graphics.origin()
 	love.graphics.translate(__pico_camera_x,__pico_camera_y)
 	if cart._draw then cart._draw() end
@@ -489,6 +488,8 @@ function love.draw()
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 	love.graphics.draw(__screen,xpadding,ypadding,0,scale,scale)
+	love.graphics.setCanvas(__screen)
+	love.graphics.setScissor(0,0,128,128)
 end
 
 function love.keypressed(key)
@@ -534,7 +535,7 @@ function clip(x,y,w,h)
 	if x then
 		love.graphics.setScissor(x,y,w,h)
 	else
-		love.graphics.setScissor(0,0,127,127)
+		love.graphics.setScissor(0,0,128,128)
 	end
 end
 
@@ -590,7 +591,16 @@ function fset(n,f,v)
 end
 
 function flip()
+	love.graphics.setCanvas()
+	love.graphics.origin()
+	love.graphics.setColor(255,255,255,255)
+	love.graphics.setScissor()
+	love.graphics.draw(__screen,xpadding,ypadding,0,scale,scale)
 	love.graphics.present()
+
+	love.graphics.setCanvas(__screen)
+	love.graphics.setScissor(0,0,128,128)
+
 	love.timer.sleep(1/30)
 end
 
@@ -702,7 +712,7 @@ end
 
 function load(cartname)
 	-- FIXME: should only load, not run the cart
-	love.load({'.',cartname})
+	cart = load_p8(cartname)
 end
 
 function rect(x0,y0,x1,y1,col)
@@ -718,7 +728,7 @@ function rectfill(x0,y0,x1,y1,col)
 end
 
 function run()
-	love.load(love_args)
+	if cart._init then cart._init() end
 end
 
 function reload()
@@ -869,15 +879,20 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	sy = flr(sy)
 	cel_w = flr(cel_w)
 	cel_h = flr(cel_h)
-	for y=cel_y,cel_y+cel_h do
+	for y=cel_y,cel_y+cel_h-1 do
 		if y < 64 and y >= 0 then
-			for x=cel_x,cel_x+cel_w do
+			for x=cel_x,cel_x+cel_w-1 do
 				if x < 128 and x >= 0 then
 					local v = __pico_map[y][x]
-					assert(v,string.format("v = nil, %d,%d",x,y))
-					if bitmask == nil or (bitmask and band(__pico_spriteflags[v],bitmask) ~= 0) then
-						--love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx-__pico_camera_x+8*x,sy-__pico_camera_y+8*y)
-						love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
+					if v > 0 then
+						if bitmask == nil then
+							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
+						else
+							if band(__pico_spriteflags[v],bitmask) ~= 0 then
+								love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
+							else
+							end
+						end
 					end
 				end
 			end
@@ -949,6 +964,10 @@ sgn = function(x)
 		return 0
 	end
 end
+
+assert(sgn(-10) == -1)
+assert(sgn(10) == 1)
+assert(sgn(0) == 0)
 
 local bit = require("bit")
 

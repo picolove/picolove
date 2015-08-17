@@ -105,7 +105,7 @@ function love.load(argv)
 	__screen:clear(0,0,0,255)
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<> ")
+	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+ ")
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -130,9 +130,9 @@ function love.load(argv)
 extern Image palette;
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*16.0);
+	int index = int(color.r*16.0);
 	// lookup the colour in the palette by index
-	return Texel(palette,vec2(float(index)/16.0,0)) * color;
+	return Texel(palette,vec2(float(index)/16.0,0));
 }]])
 	__draw_shader:send('palette',__draw_palette)
 
@@ -330,6 +330,9 @@ function load_p8(filename)
 	__pico_quads = {}
 	for y=0,63 do
 		__pico_map[y] = {}
+		for x=0,127 do
+			__pico_map[y][x] = 0
+		end
 	end
 	__pico_spritesheet_data = love.image.newImageData(128,128)
 
@@ -342,19 +345,7 @@ function load_p8(filename)
 		for i=1,#line do
 			local v = line:sub(i,i)
 			v = tonumber(v,16)
-			__pico_spritesheet_data:setPixel(col,row,v*16,0,0,255)
-
-			if row >= 64 and i%2 == 0 then
-				local v = line:sub(i,i+1)
-				v = tonumber(v,16)
-				__pico_map[tile_row][tile_col] = v
-				shared = shared + 1
-				tile_col = tile_col + 1
-				if tile_col == 128 then
-					tile_col = 0
-					tile_row = tile_row + 1
-				end
-			end
+			__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
 
 			col = col + 1
 			if col == 128 then
@@ -363,6 +354,23 @@ function load_p8(filename)
 			end
 		end
 		next_line = gfxdata:find("\n",end_of_line)+1
+	end
+
+	local tx,ty = 0,32
+	for sy=64,127 do
+		for sx=0,127,2 do
+			-- get the two pixel values and merge them
+			local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
+			local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+			local v = bor(shl(hi,4),lo)
+			__pico_map[ty][tx] = v
+			shared = shared + 1
+			tx = tx + 1
+			if tx == 128 then
+				tx = 0
+				ty = ty + 1
+			end
+		end
 	end
 
 	for y=0,15 do
@@ -449,11 +457,21 @@ function load_p8(filename)
 	assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 	-- check all the data is there
+	love.graphics.setScissor()
+	mapimage = love.graphics.newCanvas(1024,512)
+	mapimage:clear(0,0,0,255)
+	love.graphics.setCanvas(mapimage)
+	love.graphics.setShader(__display_shader)
 	for y=0,63 do
 		for x=0,127 do
 			assert(__pico_map[y][x],string.format("missing map data: %d,%d",x,y))
+			local n = mget(x,y)
+			love.graphics.draw(__pico_spritesheet,__pico_quads[n],x*8,y*8)
 		end
 	end
+	love.graphics.setShader()
+	love.graphics.setCanvas()
+	mapimage:getImageData():encode('map.png')
 
 	log("finished loading cart",filename)
 
@@ -466,6 +484,7 @@ function love.update(dt)
 end
 
 function love.resize(w,h)
+	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
 		scale = h/(128+ypadding*2)
@@ -538,25 +557,33 @@ function love.draw()
 	love.graphics.setScissor(0,0,128,128)
 	love.graphics.origin()
 	love.graphics.translate(__pico_camera_x,__pico_camera_y)
-	--love.graphics.setShader(__draw_shader)
-	--__draw_shader:send('palette',__draw_palette)
+
+	love.graphics.setShader(__draw_shader)
+	__draw_shader:send('palette',__draw_palette)
+	__text_shader:send('palette',__draw_palette)
+	__sprite_shader:send('palette',__draw_palette)
+
+	-- run the cart's draw function
 	if cart._draw then cart._draw() end
+
+	-- draw the contents of pico screen to our screen
 	love.graphics.setShader(__display_shader)
 	__display_shader:send('palette',__display_palette)
 	love.graphics.setCanvas()
 	love.graphics.origin()
+
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
-	local screen_w,screen_h = love.graphics.getDimensions()
-	love.graphics.clear()
 
+	local screen_w,screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
 		love.graphics.draw(__screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
 	else
 		love.graphics.draw(__screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
 	end
-	love.graphics.setShader()
-	--love.graphics.setShader(__draw_shader)
+
+	-- get ready for next time
+	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
 end
@@ -791,15 +818,22 @@ function rectfill(x0,y0,x1,y1,col)
 end
 
 function run()
+	love.graphics.setCanvas(__screen)
+	love.graphics.setShader(__draw_shader)
+	love.graphics.setScissor(0,0,128,128)
 	if cart._init then cart._init() end
 end
 
 function reload()
+	love.graphics.setCanvas(__screen)
+	love.graphics.setShader(__draw_shader)
+	love.graphics.setScissor(0,0,128,128)
 	load(cartname)
 	run()
 end
 
 function pal(c0,c1,p)
+	love.graphics.setShader()
 	if c0 == nil then
 		for i=0,15 do
 			__draw_palette:renderTo(function()
@@ -807,18 +841,21 @@ function pal(c0,c1,p)
 				love.graphics.point(i,0)
 			end)
 			__display_palette:renderTo(function()
-				love.graphics.setColor(unpack(__pico_palette[i]))
+				love.graphics.setColor(__pico_palette[i] or 0)
 				love.graphics.point(i,0)
 			end)
-			__draw_shader:send('palette',__draw_palette)
-			__sprite_shader:send('palette',__draw_palette)
-			__display_shader:send('palette',__display_palette)
 		end
-		return
-	end
-	if p == 1 then
+		__draw_shader:send('palette',__draw_palette)
+		__sprite_shader:send('palette',__draw_palette)
+		__text_shader:send('palette',__draw_palette)
+		__display_shader:send('palette',__display_palette)
+	elseif p == 1 then
 		__display_palette:renderTo(function()
-			love.graphics.setColor(unpack(__pico_palette[c1]))
+			if __pico_palette[c1] then
+				love.graphics.setColor(__pico_palette[c1])
+			else
+				love.graphics.setColor(0,0,0,255)
+			end
 			love.graphics.point(c0,0)
 		end)
 		__display_shader:send('palette',__display_palette)
@@ -829,7 +866,9 @@ function pal(c0,c1,p)
 		end)
 		__draw_shader:send('palette',__draw_palette)
 		__sprite_shader:send('palette',__draw_palette)
+		__text_shader:send('palette',__draw_palette)
 	end
+	love.graphics.setShader(__draw_shader)
 end
 
 function palt(c,t)

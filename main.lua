@@ -132,6 +132,10 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	-- load the cart
 	cart = load_p8(argv[2])
+	clip()
+	camera()
+	pal()
+	color(0)
 	if cart._init then cart._init() end
 end
 
@@ -180,6 +184,7 @@ function load_p8(filename)
 	--end)
 
 	local cart_G = {
+		-- extra functions provided by picolove
 		assert=assert,
 		error=error,
 		log=log,
@@ -200,6 +205,7 @@ function load_p8(filename)
 		circ=circ,
 		circfill=circfill,
 		line=line,
+		load=load,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -543,7 +549,7 @@ end
 function pset(x,y,c)
 	if not c then return end
 	color(c)
-	__screen:renderTo(function() love.graphics.point(x,y,unpack(__pico_palette[flr(c)%16])) end)
+	love.graphics.point(x,y,unpack(__pico_palette[flr(c)%16]))
 end
 
 function sget(x,y)
@@ -559,10 +565,18 @@ function fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
-		return band(__pico_spriteflags[n],shl(1,f)) ~= 0
+		return band(__pico_spriteflags[flr(n)],shl(1,flr(f))) ~= 0
 	end
-	return __pico_spriteflags[n]
+	return __pico_spriteflags[flr(n)]
 end
+
+assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
+assert(bit.band(0x02,bit.lshift(1,1)) ~= 0)
+assert(bit.band(0x04,bit.lshift(1,2)) ~= 0)
+
+assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
+assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
+assert(bit.band(0x05,bit.lshift(1,3)) == 0)
 
 function fset(n,f,v)
 	if v == nil then
@@ -603,14 +617,14 @@ end
 
 function camera(x,y)
 	if x ~= nil then
-		love.graphics.origin()
-		love.graphics.translate(-flr(x),-flr(y))
 		__pico_camera_x = flr(x)
 		__pico_camera_y = flr(y)
-	else
 		love.graphics.origin()
+		love.graphics.translate(-flr(x),-flr(y))
+	else
 		__pico_camera_x = 0
 		__pico_camera_y = 0
+		love.graphics.origin()
 	end
 end
 
@@ -652,14 +666,14 @@ function line(x0,y0,x1,y1,col)
 	else
 		stepy = 1
 	end
-	
+
 	if dx < 0 then
 		dx = -dx
 		stepx = -1
 	else
 		stepx = 1
 	end
-	
+
 	love.graphics.point(x0,y0)
 	if dx > dy then
 		local fraction = dy - bit.rshift(dx, 1)
@@ -686,16 +700,21 @@ function line(x0,y0,x1,y1,col)
 	end
 end
 
+function load(cartname)
+	-- FIXME: should only load, not run the cart
+	love.load({'.',cartname})
+end
+
 function rect(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	love.graphics.rectangle("line",x0,y0,x1-x0+1,y1-y0+1)
+	love.graphics.rectangle("line",flr(x0),flr(y0),flr(x1-x0)+1,flr(y1-y0)+1)
 end
 
 function rectfill(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	love.graphics.rectangle("fill",x0,y0,x1-x0+1,y1-y0+1)
+	love.graphics.rectangle("fill",flr(x0),flr(y0),flr(x1-x0)+1,flr(y1-y0)+1)
 end
 
 function run()
@@ -844,6 +863,12 @@ end
 function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	love.graphics.setShader(__sprite_shader)
 	love.graphics.setColor(255,255,255,255)
+	cel_x = flr(cel_x)
+	cel_y = flr(cel_y)
+	sx = flr(sx)
+	sy = flr(sy)
+	cel_w = flr(cel_w)
+	cel_h = flr(cel_h)
 	for y=cel_y,cel_y+cel_h do
 		if y < 64 and y >= 0 then
 			for x=cel_x,cel_x+cel_w do

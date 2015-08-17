@@ -857,7 +857,7 @@ function pal(c0,c1,p)
 		__text_shader:send('palette',__draw_palette)
 		__display_shader:send('palette',__display_palette)
 		__palette_modified = false
-	elseif p == 1 then
+	elseif p == 1 and c1 ~= nil then
 		__display_palette:renderTo(function()
 			if __pico_palette[flr(c1)] then
 				love.graphics.setColor(__pico_palette[flr(c1)])
@@ -868,7 +868,7 @@ function pal(c0,c1,p)
 		end)
 		__display_shader:send('palette',__display_palette)
 		__palette_modified = true
-	else
+	elseif c1 ~= nil then
 		__draw_palette:renderTo(function()
 			love.graphics.setColor(flr(c1)*16,0,0,255)
 			love.graphics.point(flr(c0),0)

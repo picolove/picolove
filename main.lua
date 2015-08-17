@@ -93,6 +93,7 @@ function love.load(argv)
 	love.window.setMode(128*scale+xpadding*2,128*scale+ypadding*2)
 	love.graphics.setDefaultFilter('nearest','nearest')
 	__screen = love.graphics.newCanvas(128,128)
+	__screen:clear(0,0,0,255)
 
 	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<> ")
 	love.graphics.setFont(font)
@@ -130,8 +131,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 
 	-- load the cart
-	load_p8(argv[2])
-	if _init then _init() end
+	cart = load_p8(argv[2])
+	if cart._init then cart._init() end
 end
 
 function load_p8(filename)
@@ -178,78 +179,79 @@ function load_p8(filename)
 	--	end
 	--end)
 
+	local cart_G = {
+		assert=assert,
+		error=error,
+		log=log,
+		-- pico8 api functions go here
+		clip=clip,
+		pget=pget,
+		pset=pset,
+		sget=sget,
+		sset=sset,
+		fget=fget,
+		fset=fset,
+		flip=flip,
+		print=print,
+		cursor=cursor,
+		color=color,
+		cls=cls,
+		camera=camera,
+		circ=circ,
+		circfill=circfill,
+		line=line,
+		rect=rect,
+		rectfill=rectfill,
+		run=run,
+		reload=reload,
+		pal=pal,
+		palt=palt,
+		spr=spr,
+		sspr=sspr,
+		add=add,
+		del=del,
+		foreach=foreach,
+		count=count,
+		all=all,
+		btn=btn,
+		btnp=btnp,
+		sfx=sfx,
+		music=music,
+		mget=mget,
+		mset=mset,
+		map=map,
+		memcpy=memcpy,
+		peek=peek,
+		poke=poke,
+		max=max,
+		min=min,
+		mid=mid,
+		flr=flr,
+		cos=cos,
+		sin=sin,
+		atan2=atan2,
+		sqrt=sqrt,
+		abs=abs,
+		rnd=rnd,
+		srand=srand,
+		sgn=sgn,
+		band=band,
+		bor=bor,
+		bxor=bxor,
+		bnot=bnot,
+		shl=shl,
+		shr=shr,
+		sub=sub,
+		-- deprecated pico-8 function aliases
+		mapdraw=map
+	}
+
 	local ok,f,e = pcall(loadstring,lua)
 	if not ok or f==nil then
 		error("Error loading lua: "..tostring(e))
 	else
 		local result
-		setfenv(f,{
-			-- picolove extra api functions go here
-			assert=assert,
-			error=error,
-			log=log,
-			-- pico8 api functions go here
-			clip=clip,
-			pget=pget,
-			pset=pset,
-			sget=sget,
-			sset=sset,
-			fget=fget,
-			fset=fset,
-			flip=flip,
-			print=print,
-			cursor=cursor,
-			color=color,
-			cls=cls,
-			camera=camera,
-			circ=circ,
-			circfill=circfill,
-			line=line,
-			rect=rect,
-			rectfill=rectfill,
-			run=run,
-			reload=reload,
-			pal=pal,
-			palt=palt,
-			spr=spr,
-			sspr=sspr,
-			add=add,
-			del=del,
-			foreach=foreach,
-			count=count,
-			all=all,
-			btn=btn,
-			btnp=btnp,
-			sfx=sfx,
-			music=music,
-			mget=mget,
-			mset=mset,
-			map=map,
-			memcpy=memcpy,
-			peek=peek,
-			poke=poke,
-			max=max,
-			min=min,
-			mid=mid,
-			flr=flr,
-			cos=cos,
-			sin=sin,
-			atan2=atan2,
-			sqrt=sqrt,
-			abs=abs,
-			rnd=rnd,
-			srand=srand,
-			sgn=sgn,
-			band=band,
-			bor=bor,
-			bxor=bxor,
-			bnot=bnot,
-			shl=shl,
-			shr=shr,
-			sub=sub,
-			-- deprecated pico-8 function aliases
-			mapdraw=map
-		})
+		setfenv(f,cart_G)
 		ok,result = pcall(f)
 		if not ok then
 			error("Error running lua: "..tostring(result))
@@ -400,13 +402,14 @@ function load_p8(filename)
 			assert(__pico_map[y][x],string.format("missing map data: %d,%d",x,y))
 		end
 	end
+
+	log("finished loading cart",filename)
+
+	return cart_G
 end
 
 function love.update(dt)
-	__accum = __accum + dt
-	if __accum > 1/30 then
-		if _update then _update() end
-	end
+	if cart._update then cart._update() end
 end
 
 function love.run()
@@ -469,18 +472,12 @@ function love.run()
 end
 
 function love.draw()
+	love.graphics.clear()
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,127,127)
 	love.graphics.origin()
 	love.graphics.translate(__pico_camera_x,__pico_camera_y)
-	if _draw then _draw() end
---	local i = 0
---	for y=0,15 do
---		for x=0,15 do
---			spr(i,x,y)
---			i=i+1
---		end
---	end
+	if cart._draw then cart._draw() end
 	love.graphics.setCanvas()
 	love.graphics.origin()
 	love.graphics.setColor(255,255,255,255)

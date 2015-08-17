@@ -1,5 +1,52 @@
 --[[
 Implementation of PICO8 API for LOVE
+
+What it is:
+
+ * An implementation of pico-8's api in love
+
+Why:
+
+ * For a fun challenge!
+ * Allow standalone publishing of pico-8 games on other platforms
+  * should work on mobile devices
+ * Configurable controls
+ * No arbitrary cpu or memory limitations
+ * No arbitrary code size limitations
+ * Betting debugging tools available
+ * Open source
+
+What it isn't:
+
+ * A replacement for Pico-8
+ * A perfect replica
+ * No dev tools, no image editor, map editor, sfx editor, music editor
+ * No modifying or saving carts
+
+Not Yet Implemented:
+
+ * Palette mapping
+ * Memory modification/reading
+ * Sound/music
+ * if (foo) bar=1 shorthand
+ * Resizing window
+
+Not working:
+
+ * Camera stuff is broken with tilemap
+
+Differences:
+
+ * Uses floating point numbers not fixed point
+ * sqrt doesn't freeze
+ * Uses luajit not lua 5.2
+
+Extra features:
+
+ * log(...) function prints to console for debugging
+ * assert(expr,message) if expr is not true then errors with message
+ * error(message) bluescreens with an error message
+
 ]]
 
 local scale = 4
@@ -88,7 +135,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 end
 
 function load_p8(filename)
-	loveprint("Opening",filename)
+	log("Opening",filename)
 	local f = love.filesystem.newFile(filename,'r')
 	if not f then
 		error("Unable to open",filename)
@@ -109,7 +156,7 @@ function load_p8(filename)
 	local next_line = data:find("\n",start+#header)
 	local version_str = data:sub(start+#header,next_line-1)
 	local version = tonumber(version_str)
-	loveprint("version",version)
+	log("version",version)
 	-- extract the lua
 	local lua_start = data:find("__lua__") + 8
 	local lua_end = data:find("__gfx__") - 1
@@ -123,7 +170,7 @@ function load_p8(filename)
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	--lua = lua:gsub("if%s*%(([^\n]+)%)%s+([^\n]+)\n",function(a,b)
 	--	local c = b:sub(1,5)
-	--	loveprint("'"..c.."'")
+	--	log("'"..c.."'")
 	--	if c == "then " or c == "then" or c == "then\t" then
 	--		return "if "..a.." "..b.."\n"
 	--	else
@@ -136,11 +183,78 @@ function load_p8(filename)
 		error("Error loading lua: "..tostring(e))
 	else
 		local result
+		setfenv(f,{
+			-- picolove extra api functions go here
+			assert=assert,
+			error=error,
+			log=log,
+			-- pico8 api functions go here
+			clip=clip,
+			pget=pget,
+			pset=pset,
+			sget=sget,
+			sset=sset,
+			fget=fget,
+			fset=fset,
+			flip=flip,
+			print=print,
+			cursor=cursor,
+			color=color,
+			cls=cls,
+			camera=camera,
+			circ=circ,
+			circfill=circfill,
+			line=line,
+			rect=rect,
+			rectfill=rectfill,
+			run=run,
+			reload=reload,
+			pal=pal,
+			palt=palt,
+			spr=spr,
+			sspr=sspr,
+			add=add,
+			del=del,
+			foreach=foreach,
+			count=count,
+			all=all,
+			btn=btn,
+			btnp=btnp,
+			sfx=sfx,
+			music=music,
+			mget=mget,
+			mset=mset,
+			map=map,
+			memcpy=memcpy,
+			peek=peek,
+			poke=poke,
+			max=max,
+			min=min,
+			mid=mid,
+			flr=flr,
+			cos=cos,
+			sin=sin,
+			atan2=atan2,
+			sqrt=sqrt,
+			abs=abs,
+			rnd=rnd,
+			srand=srand,
+			sgn=sgn,
+			band=band,
+			bor=bor,
+			bxor=bxor,
+			bnot=bnot,
+			shl=shl,
+			shr=shr,
+			sub=sub,
+			-- deprecated pico-8 function aliases
+			mapdraw=map
+		})
 		ok,result = pcall(f)
 		if not ok then
 			error("Error running lua: "..tostring(result))
 		else
-			loveprint("Ran lua")
+			log("Ran lua")
 		end
 	end
 
@@ -258,7 +372,7 @@ function load_p8(filename)
 	while next_line do
 		local end_of_line = mapdata:find("\n",next_line)
 		if end_of_line == nil then
-			loveprint("reached end of map data")
+			log("reached end of map data")
 			break
 		end
 		end_of_line = end_of_line - 1
@@ -441,6 +555,7 @@ function sget(x,y)
 end
 
 function sset(x,y,c)
+	error("sset not yet implemented")
 end
 
 function fget(n,f)
@@ -464,9 +579,11 @@ function fset(n,f,v)
 end
 
 function flip()
+	love.graphics.present()
+	love.timer.sleep(1/30)
 end
 
-loveprint = print
+log = print
 function print(str,x,y,col)
 	if col then color(col) end
 	love.graphics.print(str,flr(x),flr(y))
@@ -509,7 +626,6 @@ end
 function circfill(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
-	--love.graphics.circle("fill",flr(x),flr(y)+0.5,flr(r)+0.5,32)
 	local r2 = r*r
 	for y=-r,r do
 		for x=-r,r do
@@ -521,15 +637,6 @@ function circfill(ox,oy,r,col)
 end
 
 function line(x0,y0,x1,y1,col)
-	col = col or __pico_color
-	color(col)
-	--love.graphics.line(flr(x0),flr(y0),flr(x1),flr(y1))
-	--love.graphics.line(flr(x0)+0.375,flr(y0)+0.375,flr(x1)+0.375,flr(y1)+0.375)
-	--love.graphics.line(flr(x0)+0.5,flr(y0)+0.5,flr(x1)+0.5,flr(y1)+0.5)
-	_line(x0,y0,x1,y1,col)
-end
-
-function _line(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
 
@@ -599,6 +706,7 @@ function run()
 end
 
 function reload()
+	-- doesn't do anything since carts can't be modified
 end
 
 function pal(c0,c1,p)
@@ -830,5 +938,3 @@ shl = bit.lshift
 shr = bit.rshift
 
 sub = string.sub
-
-mapdraw = map

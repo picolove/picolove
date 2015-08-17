@@ -50,8 +50,8 @@ Extra features:
 ]]
 
 local scale = 4
-local xpadding = 34
-local ypadding = 14
+local xpadding = 8.5
+local ypadding = 3.5
 local __accum = 0
 
 local __pico_pal_draw = {
@@ -88,12 +88,22 @@ local __pico_palette = {
 local __pico_camera_x = 0
 local __pico_camera_y = 0
 
+local host_time = 0
+
+local retro_mode = false
+
 function love.load(argv)
 	love_args = argv
-	love.window.setMode(128*scale+xpadding*2,128*scale+ypadding*2)
+	if love.system.getOS() == "Android" then
+		--love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
+		love.resize(love.window.getDimensions())
+	else
+		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
+	end
 	love.graphics.setDefaultFilter('nearest','nearest')
 	__screen = love.graphics.newCanvas(128,128)
 	__screen:clear(0,0,0,255)
+	__screen:setFilter('linear','nearest')
 
 	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<> ")
 	love.graphics.setFont(font)
@@ -110,32 +120,68 @@ function love.load(argv)
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
 
-	__shader_palette_data = love.image.newImageData(16,1)
-	__shader_palette = love.graphics.newImage(__shader_palette_data)
+	__draw_palette = love.graphics.newCanvas(16,1)
+	__display_palette = love.graphics.newCanvas(16,1)
 
-	for i=0,15 do
-		__shader_palette_data:setPixel(i,0,unpack(__pico_palette[i]))
-	end
+	__draw_palette:setFilter('nearest','nearest')
+	__display_palette:setFilter('nearest','nearest')
+
+	__draw_shader = love.graphics.newShader([[
+extern Image palette;
+
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+	int index = int(Texel(texture, texture_coords).r*16.0);
+	// lookup the colour in the palette by index
+	return Texel(palette,vec2(float(index)/16.0,0)) * color;
+}]])
+	__draw_shader:send('palette',__draw_palette)
+
 	__sprite_shader = love.graphics.newShader([[
-//extern Image palette;
+extern Image palette;
+
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+	int index = int(Texel(texture, texture_coords).r*16.0);
+	if(index == 0) {
+		return vec4(0.0,0.0,0.0,0.0);
+	}
+	// lookup the colour in the palette by index
+	return Texel(palette,vec2(float(index)/16.0,0));
+}]])
+	__sprite_shader:send('palette',__draw_palette)
+
+	__text_shader = love.graphics.newShader([[
+extern Image palette;
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	vec4 texcolor = Texel(texture, texture_coords);
-	if(texcolor.r == 0 && texcolor.g == 0 && texcolor.b == 0) {
-		return vec4(0,0,0,0);
+	if(texcolor.a == 0) {
+		return vec4(0.0,0.0,0.0,0.0);
 	}
-	return texcolor * color;
+	int index = int(color.r*16.0);
+	// lookup the colour in the palette by index
+	return Texel(palette,vec2(float(index)/16.0,0));
 }]])
+	__text_shader:send('palette',__draw_palette)
 
-	--__sprite_shader:send('palette',__shader_palette)
+	__display_shader = love.graphics.newShader([[
+extern Image palette;
 
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+	int index = int(Texel(texture, texture_coords).r*16.0);
+	// lookup the colour in the palette by index
+	return Texel(palette,vec2(float(index)/16.0,0));
+}]])
+	__display_shader:send('palette',__display_palette)
+
+	pal()
 
 	-- load the cart
 	clip()
 	camera()
 	pal()
 	color(0)
-	load(argv[2])
+	--load(argv[2])
+	load(argv[2] or 'picopout.p8')
 	run()
 end
 
@@ -296,7 +342,7 @@ function load_p8(filename)
 		for i=1,#line do
 			local v = line:sub(i,i)
 			v = tonumber(v,16)
-			__pico_spritesheet_data:setPixel(col,row,unpack(__pico_palette[v]))
+			__pico_spritesheet_data:setPixel(col,row,v*16,0,0,255)
 
 			if row >= 64 and i%2 == 0 then
 				local v = line:sub(i,i+1)
@@ -415,7 +461,17 @@ function load_p8(filename)
 end
 
 function love.update(dt)
+	host_time = host_time + dt
 	if cart._update then cart._update() end
+end
+
+function love.resize(w,h)
+	-- adjust stuff to fit the screen
+	if w > h then
+		scale = h/(128+ypadding*2)
+	else
+		scale = w/(128+xpadding*2)
+	end
 end
 
 function love.run()
@@ -482,45 +538,33 @@ function love.draw()
 	love.graphics.setScissor(0,0,128,128)
 	love.graphics.origin()
 	love.graphics.translate(__pico_camera_x,__pico_camera_y)
+	--love.graphics.setShader(__draw_shader)
+	--__draw_shader:send('palette',__draw_palette)
 	if cart._draw then cart._draw() end
+	love.graphics.setShader(__display_shader)
+	__display_shader:send('palette',__display_palette)
 	love.graphics.setCanvas()
 	love.graphics.origin()
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
-	love.graphics.draw(__screen,xpadding,ypadding,0,scale,scale)
+	local screen_w,screen_h = love.graphics.getDimensions()
+	love.graphics.clear()
+
+	if screen_w > screen_h then
+		love.graphics.draw(__screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
+	else
+		love.graphics.draw(__screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
+	end
+	love.graphics.setShader()
+	--love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
 end
 
 function love.keypressed(key)
 	if key == 'r' and love.keyboard.isDown('lctrl') then
-		if _init then _init() end
+		reload()
 	end
-end
-
-function rgb2i(r,g,b,a)
-	-- returns 0..15, throws an error if not a valid colour
-	if     r ==   0 and g ==   0 and b ==   0 then return 0
-	elseif r ==  29 and g ==  43 and b ==  83 then return 1
-	elseif r == 126 and g ==  37 and b ==  83 then return 2
-	elseif r ==   0 and g == 135 and b ==  81 then return 3
-	elseif r == 171 and g ==  82 and b ==  54 then return 4
-	elseif r ==  95 and g ==  87 and b ==  79 then return 5
-	elseif r == 194 and g == 195 and b == 199 then return 6
-	elseif r == 255 and g == 241 and b == 232 then return 7
-	elseif r == 255 and g ==   0 and b ==  77 then return 8
-	elseif r == 255 and g == 163 and b ==   0 then return 9
-	elseif r == 255 and g == 255 and b ==  39 then return 10
-	elseif r ==   0 and g == 231 and b ==  86 then return 11
-	elseif r ==  41 and g == 173 and b == 255 then return 12
-	elseif r == 131 and g == 118 and b == 156 then return 13
-	elseif r == 255 and g == 119 and b == 168 then return 14
-	elseif r == 255 and g == 204 and b == 170 then return 15
-	end
-end
-
-function i2rgb(i)
-	return __pico_palette[i]
 end
 
 function music()
@@ -541,7 +585,7 @@ end
 
 function pget(x,y)
 	if x >= 0 and x < 128 and y >= 0 and y < 128 then
-		return rgb2i(__screen:getImageData():getPixel(flr(x),flr(y)))
+		return flr(__screen:getImageData():getPixel(flr(x),flr(y))[1]/16)
 	else
 		return nil
 	end
@@ -550,16 +594,21 @@ end
 function pset(x,y,c)
 	if not c then return end
 	color(c)
-	love.graphics.point(x,y,unpack(__pico_palette[flr(c)%16]))
+	love.graphics.point(x,y,c*16,0,0,255)
 end
 
 function sget(x,y)
 	-- return the color from the spritesheet
-	return rgb2i(__pico_spritesheet_data:getPixel(x,y))
+	x = flr(x)
+	y = flr(y)
+	local r,g,b,a = __pico_spritesheet_data:getPixel(x,y)
+	return flr(r/16)
 end
 
 function sset(x,y,c)
-	error("sset not yet implemented")
+	x = flr(x)
+	y = flr(y)
+	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
 end
 
 function fget(n,f)
@@ -607,7 +656,9 @@ end
 log = print
 function print(str,x,y,col)
 	if col then color(col) end
+	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))
+	love.graphics.setShader(__text_shader)
 end
 
 function cursor(x,y)
@@ -618,7 +669,7 @@ function color(c)
 	c = flr(c)
 	assert(c >= 0 and c < 16,string.format("c is %s",c))
 	__pico_color = c
-	love.graphics.setColor(__pico_palette[c])
+	love.graphics.setColor(c*16,0,0,255)
 end
 
 function cls()
@@ -647,15 +698,21 @@ end
 function circfill(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
-	local r2 = r*r
-	for y=-r,r do
-		for x=-r,r do
-			if x*x+y*y <= r2 + r*0.8 then
-				love.graphics.point(ox+x,oy+y)
-			end
-		end
-	end
+	ox = flr(ox)
+	oy = flr(oy)
+	r = flr(r)
+	love.graphics.circle("fill",ox,oy,r,32)
+	--local r2 = r*r
+	--for y=-r,r do
+	--	for x=-r,r do
+	--		if x*x+y*y <= r2 + r*0.8 then
+	--			love.graphics.point(ox+x,oy+y)
+	--		end
+	--	end
+	--end
 end
+
+local lineMesh = love.graphics.newMesh(128,nil,"points")
 
 function line(x0,y0,x1,y1,col)
 	col = col or __pico_color
@@ -684,7 +741,8 @@ function line(x0,y0,x1,y1,col)
 		stepx = 1
 	end
 
-	love.graphics.point(x0,y0)
+	local points = {{x0,y0}}
+	--love.graphics.point(x0,y0)
 	if dx > dy then
 		local fraction = dy - bit.rshift(dx, 1)
 		while x0 ~= x1 do
@@ -694,7 +752,8 @@ function line(x0,y0,x1,y1,col)
 			end
 			x0 = x0 + stepx
 			fraction = fraction + dy
-			love.graphics.point(flr(x0),flr(y0))
+			--love.graphics.point(flr(x0),flr(y0))
+			table.insert(points,{flr(x0),flr(y0)})
 		end
 	else
 		local fraction = dx - bit.rshift(dy, 1)
@@ -705,13 +764,17 @@ function line(x0,y0,x1,y1,col)
 			end
 			y0 = y0 + stepy
 			fraction = fraction + dx
-			love.graphics.point(flr(x0),flr(y0))
+			--love.graphics.point(flr(x0),flr(y0))
+			table.insert(points,{flr(x0),flr(y0)})
 		end
 	end
+	lineMesh:setVertices(points)
+	lineMesh:setDrawRange(1,#points)
+	love.graphics.draw(lineMesh)
 end
 
-function load(cartname)
-	-- FIXME: should only load, not run the cart
+function load(_cartname)
+	cartname = _cartname
 	cart = load_p8(cartname)
 end
 
@@ -732,20 +795,40 @@ function run()
 end
 
 function reload()
-	-- doesn't do anything since carts can't be modified
+	load(cartname)
+	run()
 end
 
 function pal(c0,c1,p)
 	if c0 == nil then
-		-- reset palette
-		__pico_pal_display = {}
-		__pico_pal_draw = {}
+		for i=0,15 do
+			__draw_palette:renderTo(function()
+				love.graphics.setColor(i*16,0,0,255)
+				love.graphics.point(i,0)
+			end)
+			__display_palette:renderTo(function()
+				love.graphics.setColor(unpack(__pico_palette[i]))
+				love.graphics.point(i,0)
+			end)
+			__draw_shader:send('palette',__draw_palette)
+			__sprite_shader:send('palette',__draw_palette)
+			__display_shader:send('palette',__display_palette)
+		end
 		return
 	end
 	if p == 1 then
-		__pico_pal_display[c0] = c1
+		__display_palette:renderTo(function()
+			love.graphics.setColor(unpack(__pico_palette[c1]))
+			love.graphics.point(c0,0)
+		end)
+		__display_shader:send('palette',__display_palette)
 	else
-		__pico_pal_draw[c0] = c1
+		__draw_palette:renderTo(function()
+			love.graphics.setColor(c1*16,0,0,255)
+			love.graphics.point(c0,0)
+		end)
+		__draw_shader:send('palette',__draw_palette)
+		__sprite_shader:send('palette',__draw_palette)
 	end
 end
 
@@ -765,17 +848,18 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.draw(__pico_spritesheet,__pico_quads[flr(n)],flr(x),flr(y),0)
-	love.graphics.setShader()
+	love.graphics.setShader(__draw_shader)
 end
 
 function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dw = dw or sw
 	dh = dh or sh
+	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,128,128)
 	love.graphics.setShader(__sprite_shader)
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.draw(__pico_spritesheet,q,flr(dx),flr(dy),0,dw/sw,dh/sh)
-	love.graphics.setShader()
+	love.graphics.setShader(__draw_shader)
 end
 
 function add(a,v)
@@ -916,7 +1000,7 @@ function memcpy(dest_addr,source_addr,len)
 		for i=1,len do
 			local x = flr(source_addr-0x6000+i)%128
 			local y = flr((source_addr-0x6000+i)/64)
-			local c = rgb2i(img:getPixel(x,y))
+			local c = flr(img:getPixel(x,y)/16)
 
 			local dx = flr(dest_addr-0x6000+i)%128
 			local dy = flr((dest_addr-0x6000+i)/64)
@@ -979,3 +1063,7 @@ shl = bit.lshift
 shr = bit.rshift
 
 sub = string.sub
+
+love.graphics.point = function(x,y)
+	love.graphics.rectangle('fill',x,y,1,1)
+end

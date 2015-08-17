@@ -703,6 +703,9 @@ function cls()
 	__screen:clear(0,0,0,255)
 end
 
+__pico_camera_x = 0
+__pico_camera_y = 0
+
 function camera(x,y)
 	if x ~= nil then
 		__pico_camera_x = flr(x)
@@ -832,9 +835,13 @@ function reload()
 	run()
 end
 
+local __palette_modified = true
+
 function pal(c0,c1,p)
 	love.graphics.setShader()
+	love.graphics.origin()
 	if c0 == nil then
+		if __palette_modified == false then return end
 		for i=0,15 do
 			__draw_palette:renderTo(function()
 				love.graphics.setColor(i*16,0,0,255)
@@ -849,25 +856,29 @@ function pal(c0,c1,p)
 		__sprite_shader:send('palette',__draw_palette)
 		__text_shader:send('palette',__draw_palette)
 		__display_shader:send('palette',__display_palette)
+		__palette_modified = false
 	elseif p == 1 then
 		__display_palette:renderTo(function()
-			if __pico_palette[c1] then
-				love.graphics.setColor(__pico_palette[c1])
+			if __pico_palette[flr(c1)] then
+				love.graphics.setColor(__pico_palette[flr(c1)])
 			else
 				love.graphics.setColor(0,0,0,255)
 			end
-			love.graphics.point(c0,0)
+			love.graphics.point(flr(c0),0)
 		end)
 		__display_shader:send('palette',__display_palette)
+		__palette_modified = true
 	else
 		__draw_palette:renderTo(function()
-			love.graphics.setColor(c1*16,0,0,255)
-			love.graphics.point(c0,0)
+			love.graphics.setColor(flr(c1)*16,0,0,255)
+			love.graphics.point(flr(c0),0)
 		end)
 		__draw_shader:send('palette',__draw_palette)
 		__sprite_shader:send('palette',__draw_palette)
 		__text_shader:send('palette',__draw_palette)
+		__palette_modified = true
 	end
+	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 	love.graphics.setShader(__draw_shader)
 end
 

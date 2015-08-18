@@ -96,7 +96,6 @@ function love.load(argv)
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
 	__screen = love.graphics.newCanvas(128,128)
-	__screen:clear(0,0,0,255)
 	__screen:setFilter('linear','nearest')
 
 	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+ ")
@@ -112,7 +111,7 @@ function love.load(argv)
 
 	love.graphics.origin()
 	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,128,128)
+	restore_clip()
 
 	__draw_palette = {}
 	__display_palette = {}
@@ -177,7 +176,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	camera()
 	pal()
 	color(0)
-	--load(argv[2])
 	load(argv[2] or 'picopout.p8')
 	run()
 end
@@ -294,20 +292,6 @@ function load_p8(filename)
 		-- deprecated pico-8 function aliases
 		mapdraw=map
 	}
-
-	local ok,f,e = pcall(loadstring,lua)
-	if not ok or f==nil then
-		error("Error loading lua: "..tostring(e))
-	else
-		local result
-		setfenv(f,cart_G)
-		ok,result = pcall(f)
-		if not ok then
-			error("Error running lua: "..tostring(result))
-		else
-			log("Ran lua")
-		end
-	end
 
 	-- load the sprites into an imagedata
 	-- generate a quad for each sprite index
@@ -472,6 +456,24 @@ function load_p8(filename)
 
 	log("finished loading cart",filename)
 
+	local ok,f,e = pcall(loadstring,lua)
+	if not ok or f==nil then
+		error("Error loading lua: "..tostring(e))
+	else
+		local result
+		setfenv(f,cart_G)
+		love.graphics.setShader(__draw_shader)
+		love.graphics.setCanvas(__screen)
+		love.graphics.origin()
+		restore_clip()
+		ok,result = pcall(f)
+		if not ok then
+			error("Error running lua: "..tostring(result))
+		else
+			log("Ran lua")
+		end
+	end
+
 	return cart_G
 end
 
@@ -542,25 +544,14 @@ function love.run()
 		if render and love.window and love.graphics and love.window.isCreated() then
 			love.graphics.origin()
 			if love.draw then love.draw() end
-			love.graphics.present()
 		end
 
 		if love.timer then love.timer.sleep(0.001) end
 	end
 end
 
-function love.draw()
-	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,128,128)
-	love.graphics.origin()
-	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
-
-	love.graphics.setShader(__draw_shader)
-
-	-- run the cart's draw function
-	if cart._draw then cart._draw() end
-
-	-- draw the contents of pico screen to our screen
+function flip_screen()
+	--love.graphics.setShader(__display_shader)
 	love.graphics.setShader(__display_shader)
 	__display_shader:send('palette',unpack(__display_palette))
 	love.graphics.setCanvas()
@@ -578,12 +569,26 @@ function love.draw()
 		love.graphics.draw(__screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
 	end
 
+	love.graphics.present()
 	-- get ready for next time
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,128,128)
-	love.graphics.origin()
-	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
+	restore_clip()
+	restore_camera()
+end
+
+function love.draw()
+	love.graphics.setCanvas(__screen)
+	restore_clip()
+	restore_camera()
+
+	love.graphics.setShader(__draw_shader)
+
+	-- run the cart's draw function
+	if cart._draw then cart._draw() end
+
+	-- draw the contents of pico screen to our screen
+	flip_screen()
 end
 
 function love.keypressed(key)
@@ -603,6 +608,16 @@ end
 function clip(x,y,w,h)
 	if x then
 		love.graphics.setScissor(x,y,w,h)
+		__pico_clip = {x,y,w,h}
+	else
+		love.graphics.setScissor(0,0,128,128)
+		__pico_clip = nil
+	end
+end
+
+function restore_clip()
+	if __pico_clip then
+		love.graphics.setScissor(unpack(__pico_clip))
 	else
 		love.graphics.setScissor(0,0,128,128)
 	end
@@ -610,7 +625,8 @@ end
 
 function pget(x,y)
 	if x >= 0 and x < 128 and y >= 0 and y < 128 then
-		return flr(__screen:getImageData():getPixel(flr(x),flr(y))[1]/16)
+		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
+		return flr(r/17.0)
 	else
 		return nil
 	end
@@ -619,7 +635,7 @@ end
 function pset(x,y,c)
 	if not c then return end
 	color(c)
-	love.graphics.point(x,y,c*16,0,0,255)
+	love.graphics.point(flr(x),flr(y),c*16,0,0,255)
 end
 
 function sget(x,y)
@@ -654,37 +670,46 @@ assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
 assert(bit.band(0x05,bit.lshift(1,3)) == 0)
 
 function fset(n,f,v)
+	-- fset n [f] v
+	-- f is the flag index 0..7
+	-- v is boolean
 	if v == nil then
 		v,f = f,nil
 	end
 	if f then
-		__pico_spriteflags[n] = bor(__pico_spriteflags[n],shl(1,v))
+		-- set specific bit to v (true or false)
+		if f then
+			__pico_spriteflags[n] = bor(__pico_spriteflags[n],shl(1,f))
+		else
+			__pico_spriteflags[n] = band(bnot(__pico_spriteflags[n],shl(1,f)))
+		end
 	else
+		-- set bitfield to v (number)
 		__pico_spriteflags[n] = v
 	end
 end
 
 function flip()
-	love.graphics.setCanvas()
-	love.graphics.origin()
-	love.graphics.setColor(255,255,255,255)
-	love.graphics.setScissor()
-	love.graphics.draw(__screen,xpadding,ypadding,0,scale,scale)
-	love.graphics.present()
-
-	love.graphics.setCanvas(__screen)
-	love.graphics.setScissor(0,0,128,128)
-
+	flip_screen()
 	love.timer.sleep(1/30)
 end
 
 log = print
 function print(str,x,y,col)
 	if col then color(col) end
+	if y==nil then
+		y = __pico_cursor[2]
+		__pico_cursor[2] = __pico_cursor[2] + 7
+	end
+	if x==nil then
+		x = __pico_cursor[1]
+	end
 	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))
 	love.graphics.setShader(__text_shader)
 end
+
+__pico_cursor = {0,0}
 
 function cursor(x,y)
 	__pico_cursor = {x,y}
@@ -708,18 +733,24 @@ function camera(x,y)
 	if x ~= nil then
 		__pico_camera_x = flr(x)
 		__pico_camera_y = flr(y)
-		love.graphics.origin()
-		love.graphics.translate(-flr(x),-flr(y))
 	else
 		__pico_camera_x = 0
 		__pico_camera_y = 0
-		love.graphics.origin()
 	end
+	restore_camera()
+end
+
+function restore_camera()
+	love.graphics.origin()
+	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
 function circ(x,y,r,col)
 	col = col or __pico_color
 	color(col)
+	x = flr(x)
+	y = flr(y)
+	r = flr(r)
 	love.graphics.circle("line",x,y,r,32)
 end
 
@@ -802,6 +833,10 @@ function line(x0,y0,x1,y1,col)
 end
 
 function load(_cartname)
+	love.graphics.setShader(__draw_shader)
+	love.graphics.setCanvas(__screen)
+	love.graphics.origin()
+	restore_clip()
 	cartname = _cartname
 	cart = load_p8(cartname)
 end
@@ -809,26 +844,29 @@ end
 function rect(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	love.graphics.rectangle("line",flr(x0),flr(y0),flr(x1-x0)+1,flr(y1-y0)+1)
+	love.graphics.rectangle("line",flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function rectfill(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	love.graphics.rectangle("fill",flr(x0),flr(y0),flr(x1-x0)+1,flr(y1-y0)+1)
+	local w = math.abs(x1-x0)+1
+	local h = math.abs(y1-y0)+1
+	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
 end
 
 function run()
 	love.graphics.setCanvas(__screen)
 	love.graphics.setShader(__draw_shader)
-	love.graphics.setScissor(0,0,128,128)
+	restore_clip()
+	love.graphics.origin()
+	pal()
+	palt()
+	camera()
 	if cart._init then cart._init() end
 end
 
 function reload()
-	love.graphics.setCanvas(__screen)
-	love.graphics.setShader(__draw_shader)
-	love.graphics.setScissor(0,0,128,128)
 	load(cartname)
 	run()
 end
@@ -862,8 +900,6 @@ function pal(c0,c1,p)
 		__text_shader:send('palette',unpack(__draw_palette))
 		__palette_modified = true
 	end
-	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
-	love.graphics.setShader(__draw_shader)
 end
 
 function palt(c,t)
@@ -874,7 +910,7 @@ function palt(c,t)
 	else
 		if t == false then
 			__pico_pal_transparent[c+1] = 1
-		else
+		elseif t == true then
 			__pico_pal_transparent[c+1] = 0
 		end
 	end
@@ -883,16 +919,25 @@ end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
-	love.graphics.draw(__pico_spritesheet,__pico_quads[flr(n)],flr(x),flr(y),0)
+	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	love.graphics.draw(__pico_spritesheet,__pico_quads[flr(n)],flr(x)+(flip_x and 8 or 0),flr(y),0,flip_x and -1 or 1,flip_y and -1 or 1)
 	love.graphics.setShader(__draw_shader)
 end
 
 function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
+-- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
+-- and draw in rectangle (dx, dy, dw, dh)
+-- Colour 0 drawn as transparent by default (see palt())
+-- dw, dh defaults to sw, sh
+-- flip_x=true to flip horizontally
+-- flip_y=true to flip vertically
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad
-	local q = love.graphics.newQuad(sx,sy,sw,sh,128,128)
+	-- FIXME handle flipping
+	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
 	love.graphics.setShader(__sprite_shader)
+	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 	love.graphics.draw(__pico_spritesheet,q,flr(dx),flr(dy),0,dw/sw,dh/sh)
 	love.graphics.setShader(__draw_shader)
 end
@@ -998,13 +1043,13 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	sy = flr(sy)
 	cel_w = flr(cel_w)
 	cel_h = flr(cel_h)
-	for y=cel_y,cel_y+cel_h-1 do
-		if y < 64 and y >= 0 then
-			for x=cel_x,cel_x+cel_w-1 do
-				if x < 128 and x >= 0 then
-					local v = __pico_map[y][x]
+	for y=0,cel_h-1 do
+		--if y < 64 and y >= 0 then
+			for x=0,cel_w-1 do
+				--if x < 128 and x >= 0 then
+					local v = __pico_map[flr(cel_y+y)][flr(cel_x+x)]
 					if v > 0 then
-						if bitmask == nil then
+						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
 						else
 							if band(__pico_spriteflags[v],bitmask) ~= 0 then
@@ -1013,9 +1058,9 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 							end
 						end
 					end
-				end
+				--end
 			end
-		end
+		--end
 	end
 	love.graphics.setShader(__draw_shader)
 end

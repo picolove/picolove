@@ -11,6 +11,7 @@ Why:
  * Allow standalone publishing of pico-8 games on other platforms
   * should work on mobile devices
  * Configurable controls
+ * Extendable
  * No arbitrary cpu or memory limitations
  * No arbitrary code size limitations
  * Betting debugging tools available
@@ -25,15 +26,12 @@ What it isn't:
 
 Not Yet Implemented:
 
- * Palette mapping
  * Memory modification/reading
  * Sound/music
  * if (foo) bar=1 shorthand
- * Resizing window
+ * stat() probably unnecessary
 
 Not working:
-
- * Camera stuff is broken with tilemap
 
 Differences:
 
@@ -289,6 +287,7 @@ function load_p8(filename)
 		shl=shl,
 		shr=shr,
 		sub=sub,
+		stat=stat,
 		-- deprecated pico-8 function aliases
 		mapdraw=map
 	}
@@ -717,7 +716,7 @@ end
 
 function color(c)
 	c = flr(c)
-	assert(c >= 0 and c < 16,string.format("c is %s",c))
+	assert(c >= 0 and c <= 16,string.format("c is %s",c))
 	__pico_color = c
 	love.graphics.setColor(c*16,0,0,255)
 end
@@ -1111,8 +1110,8 @@ function __pico_angle(a)
 end
 
 flr = math.floor
-cos = function(x) return math.cos(x*(math.pi*2)) end
-sin = function(x) return math.sin(-x*(math.pi*2)) end
+cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
+sin = function(x) return math.sin(-(x or 0)*(math.pi*2)) end
 atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end
 
 sqrt = math.sqrt
@@ -1143,6 +1142,10 @@ shl = bit.lshift
 shr = bit.rshift
 
 sub = string.sub
+
+function stat(x)
+	return 0
+end
 
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)

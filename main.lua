@@ -54,18 +54,11 @@ local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
 
-local __pico_pal_draw = {
-}
-
-local __pico_pal_display = {
-}
-
 local __pico_pal_transparent = {
-	[0] = false
 }
 
 local __pico_palette = {
-	[0] = {0,0,0,255},
+	{0,0,0,255},
 	{29,43,83,255},
 	{126,37,83,255},
 	{0,135,81,255},
@@ -100,6 +93,7 @@ function love.load(argv)
 	else
 		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
 	end
+	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
 	__screen = love.graphics.newCanvas(128,128)
 	__screen:clear(0,0,0,255)
@@ -120,37 +114,39 @@ function love.load(argv)
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
 
-	__draw_palette = love.graphics.newCanvas(16,1)
-	__display_palette = love.graphics.newCanvas(16,1)
+	__draw_palette = {}
+	__display_palette = {}
+	__pico_pal_transparent = {}
+	for i=1,16 do
+		__draw_palette[i] = i
+		__pico_pal_transparent[i] = i == 1 and 0 or 1
+		__display_palette[i] = __pico_palette[i]
+	end
 
-	__draw_palette:setFilter('nearest','nearest')
-	__display_palette:setFilter('nearest','nearest')
 
 	__draw_shader = love.graphics.newShader([[
-extern Image palette;
+extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(color.r*16.0);
-	// lookup the colour in the palette by index
-	return Texel(palette,vec2(float(index)/16.0,0));
+	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__draw_shader:send('palette',__draw_palette)
+	__draw_shader:send('palette',unpack(__draw_palette))
 
 	__sprite_shader = love.graphics.newShader([[
-extern Image palette;
+extern float palette[16];
+extern float transparent[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*16.0);
-	if(index == 0) {
-		return vec4(0.0,0.0,0.0,0.0);
-	}
-	// lookup the colour in the palette by index
-	return Texel(palette,vec2(float(index)/16.0,0));
+	int index = int(floor(Texel(texture, texture_coords).r*16.0));
+	float alpha = transparent[index];
+	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
-	__sprite_shader:send('palette',__draw_palette)
+	__sprite_shader:send('palette',unpack(__draw_palette))
+	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 
 	__text_shader = love.graphics.newShader([[
-extern Image palette;
+extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	vec4 texcolor = Texel(texture, texture_coords);
@@ -159,19 +155,20 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	}
 	int index = int(color.r*16.0);
 	// lookup the colour in the palette by index
-	return Texel(palette,vec2(float(index)/16.0,0));
+	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__text_shader:send('palette',__draw_palette)
+	__text_shader:send('palette',unpack(__draw_palette))
 
 	__display_shader = love.graphics.newShader([[
-extern Image palette;
+
+extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*16.0);
+	int index = int(Texel(texture, texture_coords).r*15.0);
 	// lookup the colour in the palette by index
-	return Texel(palette,vec2(float(index)/16.0,0));
+	return palette[index]/256.0;
 }]])
-	__display_shader:send('palette',__display_palette)
+	__display_shader:send('palette',unpack(__display_palette))
 
 	pal()
 
@@ -556,24 +553,23 @@ function love.draw()
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
 	love.graphics.origin()
-	love.graphics.translate(__pico_camera_x,__pico_camera_y)
+	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 
 	love.graphics.setShader(__draw_shader)
-	__draw_shader:send('palette',__draw_palette)
-	__text_shader:send('palette',__draw_palette)
-	__sprite_shader:send('palette',__draw_palette)
 
 	-- run the cart's draw function
 	if cart._draw then cart._draw() end
 
 	-- draw the contents of pico screen to our screen
 	love.graphics.setShader(__display_shader)
-	__display_shader:send('palette',__display_palette)
+	__display_shader:send('palette',unpack(__display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
+
+	love.graphics.clear()
 
 	local screen_w,screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
@@ -586,6 +582,8 @@ function love.draw()
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.setScissor(0,0,128,128)
+	love.graphics.origin()
+	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
 function love.keypressed(key)
@@ -838,44 +836,30 @@ end
 local __palette_modified = true
 
 function pal(c0,c1,p)
-	love.graphics.setShader()
-	love.graphics.origin()
 	if c0 == nil then
 		if __palette_modified == false then return end
-		for i=0,15 do
-			__draw_palette:renderTo(function()
-				love.graphics.setColor(i*16,0,0,255)
-				love.graphics.point(i,0)
-			end)
-			__display_palette:renderTo(function()
-				love.graphics.setColor(__pico_palette[i] or 0)
-				love.graphics.point(i,0)
-			end)
+		for i=1,16 do
+			__draw_palette[i] = i
+			__display_palette[i] = __pico_palette[i]
 		end
-		__draw_shader:send('palette',__draw_palette)
-		__sprite_shader:send('palette',__draw_palette)
-		__text_shader:send('palette',__draw_palette)
-		__display_shader:send('palette',__display_palette)
+		__draw_shader:send('palette',unpack(__draw_palette))
+		__sprite_shader:send('palette',unpack(__draw_palette))
+		__text_shader:send('palette',unpack(__draw_palette))
+		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = false
 	elseif p == 1 and c1 ~= nil then
-		__display_palette:renderTo(function()
-			if __pico_palette[flr(c1)] then
-				love.graphics.setColor(__pico_palette[flr(c1)])
-			else
-				love.graphics.setColor(0,0,0,255)
-			end
-			love.graphics.point(flr(c0),0)
-		end)
-		__display_shader:send('palette',__display_palette)
+		c1 = c1+1
+		c0 = c0+1
+		__display_palette[c0] = __pico_palette[c1]
+		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
-		__draw_palette:renderTo(function()
-			love.graphics.setColor(flr(c1)*16,0,0,255)
-			love.graphics.point(flr(c0),0)
-		end)
-		__draw_shader:send('palette',__draw_palette)
-		__sprite_shader:send('palette',__draw_palette)
-		__text_shader:send('palette',__draw_palette)
+		c1 = c1+1
+		c0 = c0+1
+		__draw_palette[c0] = c1
+		__draw_shader:send('palette',unpack(__draw_palette))
+		__sprite_shader:send('palette',unpack(__draw_palette))
+		__text_shader:send('palette',unpack(__draw_palette))
 		__palette_modified = true
 	end
 	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
@@ -884,19 +868,21 @@ end
 
 function palt(c,t)
 	if c == nil then
-		__pico_pal_transparent = { [0] = false }
+		for i=1,16 do
+			__pico_pal_transparent[i] = i == 1 and 0 or 1
+		end
 	else
 		if t == false then
-			__pico_pal_transparent[c] = false
+			__pico_pal_transparent[c+1] = 1
 		else
-			__pico_pal_transparent[c] = nil
+			__pico_pal_transparent[c+1] = 0
 		end
 	end
+	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
-	love.graphics.setColor(255,255,255,255)
 	love.graphics.draw(__pico_spritesheet,__pico_quads[flr(n)],flr(x),flr(y),0)
 	love.graphics.setShader(__draw_shader)
 end
@@ -907,7 +893,6 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,128,128)
 	love.graphics.setShader(__sprite_shader)
-	love.graphics.setColor(255,255,255,255)
 	love.graphics.draw(__pico_spritesheet,q,flr(dx),flr(dy),0,dw/sw,dh/sh)
 	love.graphics.setShader(__draw_shader)
 end
@@ -1032,7 +1017,7 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 			end
 		end
 	end
-	love.graphics.setShader()
+	love.graphics.setShader(__draw_shader)
 end
 
 -- memory functions excluded

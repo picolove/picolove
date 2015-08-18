@@ -1,6 +1,8 @@
 --[[
 Implementation of PICO8 API for LOVE
 
+Please don't redistribute yet!
+
 What it is:
 
  * An implementation of pico-8's api in love
@@ -28,8 +30,6 @@ Not Yet Implemented:
 
  * Memory modification/reading
  * Sound/music
- * if (foo) bar=1 shorthand
- * stat() probably unnecessary
 
 Not working:
 
@@ -208,7 +208,7 @@ function load_p8(filename)
 	local lua = data:sub(lua_start,lua_end)
 
 	-- patch the lua
-	lua = lua:gsub("%-%-[^\n]*\n","\n")
+	--lua = lua:gsub("%-%-[^\n]*\n","\n")
 	lua = lua:gsub("!=","~=")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
@@ -615,7 +615,7 @@ function love.keypressed(key)
 		for p=0,1 do
 			for i=0,#__keymap[p] do
 				if key == __keymap[p][i] then
-					__pico_keypressed[p][i] = -1
+					__pico_keypressed[p][i] = -1 -- becomes 0 on the next frame
 					break
 				end
 			end
@@ -958,7 +958,13 @@ end
 function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
-	love.graphics.draw(__pico_spritesheet,__pico_quads[flr(n)],flr(x)+(flip_x and 8 or 0),flr(y),0,flip_x and -1 or 1,flip_y and -1 or 1)
+	w = w or 1
+	h = h or 1
+	local q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
+	love.graphics.draw(__pico_spritesheet,q,
+		flr(x)+(w*8*(flip_x and 1 or 0)),
+		flr(y)+(h*8*(flip_y and 1 or 0)),
+		0,flip_x and -1 or 1,flip_y and -1 or 1)
 	love.graphics.setShader(__draw_shader)
 end
 

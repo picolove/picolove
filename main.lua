@@ -208,19 +208,22 @@ function load_p8(filename)
 	local lua = data:sub(lua_start,lua_end)
 
 	-- patch the lua
+	lua = lua:gsub("%-%-[^\n]*\n","\n")
 	lua = lua:gsub("!=","~=")
+	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
+		local nl = a:find('\n')
+		local th = b:find('%f[%w]then%f[%W]')
+		local an = b:find('%f[%w]and%f[%W]')
+		local o = b:find('%f[%w]or%f[W]')
+		if nl or th or an or o then
+			return string.format('if %s %s\n',a,b)
+		else
+			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
+		end
+	end)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/])=","%1 = %1 %2 ")
-	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	--lua = lua:gsub("if%s*%(([^\n]+)%)%s+([^\n]+)\n",function(a,b)
-	--	local c = b:sub(1,5)
-	--	log("'"..c.."'")
-	--	if c == "then " or c == "then" or c == "then\t" then
-	--		return "if "..a.." "..b.."\n"
-	--	else
-	--		return "if "..a.." then "..b.." end\n"
-	--	end
-	--end)
 
 	local cart_G = {
 		-- extra functions provided by picolove
@@ -478,6 +481,15 @@ end
 
 function love.update(dt)
 	host_time = host_time + dt
+	for p=0,1 do
+		for i=0,#__keymap[p] do
+			local v = __pico_keypressed[p][i]
+			if v then
+				v = v + 1
+				__pico_keypressed[p][i] = v
+			end
+		end
+	end
 	if cart._update then cart._update() end
 end
 
@@ -593,6 +605,32 @@ end
 function love.keypressed(key)
 	if key == 'r' and love.keyboard.isDown('lctrl') then
 		reload()
+	elseif key == 'f6' then
+		-- screenshot
+		local screenshot = love.graphics.newScreenshot(false)
+		local filename = cartname..'-'..os.time()..'.png'
+		screenshot:encode(filename)
+		log('saved screenshort to',filename)
+	else
+		for p=0,1 do
+			for i=0,#__keymap[p] do
+				if key == __keymap[p][i] then
+					__pico_keypressed[p][i] = -1
+					break
+				end
+			end
+		end
+	end
+end
+
+function love.keyreleased(key)
+	for p=0,1 do
+		for i=0,#__keymap[p] do
+			if key == __keymap[p][i] then
+				__pico_keypressed[p][i] = nil
+				break
+			end
+		end
 	end
 end
 
@@ -649,6 +687,7 @@ function sset(x,y,c)
 	x = flr(x)
 	y = flr(y)
 	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
+	__pico_spritesheet:refresh()
 end
 
 function fget(n,f)
@@ -972,12 +1011,12 @@ function all(a)
 	end
 end
 
-local __pico_keypressed = {
+__pico_keypressed = {
 	[0] = {},
 	[1] = {}
 }
 
-local __keymap = {
+__keymap = {
 	[0] = {
 		[0] = 'left',
 		[1] = 'right',
@@ -994,8 +1033,9 @@ local __keymap = {
 function btn(i,p)
 	p = p or 0
 	if __keymap[p][i] then
-		return love.keyboard.isDown(__keymap[p][i])
+		return __pico_keypressed[p][i] ~= nil
 	end
+	return false
 end
 
 
@@ -1003,16 +1043,12 @@ end
 function btnp(i,p)
 	p = p or 0
 	if __keymap[p][i] then
-		local id = love.keyboard.isDown(__keymap[p][i])
-		if __pico_keypressed[p][i] and __pico_keypressed[p][i] > 0 then
-			__pico_keypressed[p][i] = __pico_keypressed[p][i] - 1
-			return false
-		end
-		if id then
-			__pico_keypressed[p][i] = 12
+		local v = __pico_keypressed[p][i]
+		if v and (v == 0 or v == 12 or (v > 12 and v % 4 == 0)) then
 			return true
 		end
 	end
+	return false
 end
 
 function sfx(n,channel,offset)
@@ -1022,8 +1058,8 @@ function music(n,fade_len,channel_mask)
 end
 
 function mget(x,y)
-	if x == nil or y == nil then return nil end
-	if y > 63 or x > 127 or x < 0 or y < 0 then return nil end
+	if x == nil or y == nil then return 0 end
+	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
 	return __pico_map[flr(y)][flr(x)]
 end
 
@@ -1116,8 +1152,10 @@ atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end
 
 sqrt = math.sqrt
 abs = math.abs
-rnd = function(x) return love.math.random()*x end
-srand = love.math.randomseed
+rnd = function(x) return love.math.random()*(x or 1) end
+srand = function(seed)
+	return love.math.setRandomSeed(flr(seed*32768))
+end
 sgn = function(x)
 	if x < 0 then
 		return -1

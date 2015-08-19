@@ -1087,9 +1087,9 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_w = flr(cel_w)
 	cel_h = flr(cel_h)
 	for y=0,cel_h-1 do
-		--if y < 64 and y >= 0 then
+		if y < 64 and y >= 0 then
 			for x=0,cel_w-1 do
-				--if x < 128 and x >= 0 then
+				if x < 128 and x >= 0 then
 					local v = __pico_map[flr(cel_y+y)][flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
@@ -1101,9 +1101,9 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 							end
 						end
 					end
-				--end
+				end
 			end
-		--end
+		end
 	end
 	love.graphics.setShader(__draw_shader)
 end

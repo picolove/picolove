@@ -605,6 +605,8 @@ end
 function love.keypressed(key)
 	if key == 'r' and love.keyboard.isDown('lctrl') then
 		reload()
+	elseif key == 'q' and love.keyboard.isDown('lctrl') then
+		love.event.quit()
 	elseif key == 'f6' then
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)

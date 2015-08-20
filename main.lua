@@ -47,6 +47,25 @@ Extra features:
 
 ]]
 
+require "strict"
+
+local cart = nil
+local cartname = nil
+local love_args = nil
+local __screen
+local __pico_clip
+local __pico_color
+local __pico_map
+local __pico_quads
+local __pico_spritesheet_data
+local __pico_spritesheet
+local __pico_spriteflags
+local __draw_palette
+local __draw_shader
+local __sprite_shader
+local __text_shader
+local __display_palette
+local __display_shader
 local scale = 4
 local xpadding = 8.5
 local ypadding = 3.5
@@ -73,6 +92,8 @@ local __pico_palette = {
 	{255,119,168,255},
 	{255,204,170,255}
 }
+
+local video_frames = nil
 
 
 
@@ -101,7 +122,7 @@ function love.load(argv)
 	font:setFilter('nearest','nearest')
 
 	love.mouse.setVisible(false)
-	love.window.setTitle("pico-8-emu")
+	love.window.setTitle("picolove")
 	love.graphics.setLineStyle('rough')
 	love.graphics.setPointStyle('rough')
 	love.graphics.setPointSize(1)
@@ -230,6 +251,8 @@ function load_p8(filename)
 		assert=assert,
 		error=error,
 		log=log,
+		pairs=pairs,
+		ipairs=ipairs,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -367,7 +390,21 @@ function load_p8(filename)
 	assert(sprite == 256,sprite)
 
 	__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
-	__pico_spritesheet_data:encode('spritesheet.png')
+
+	local tmp = love.graphics.newCanvas(128,128)
+	local spritesheetout = love.graphics.newCanvas(128,128)
+
+	love.graphics.setCanvas(tmp)
+	love.graphics.setShader(__sprite_shader)
+	love.graphics.draw(__pico_spritesheet,0,0,0)
+
+	love.graphics.setShader(__display_shader)
+	love.graphics.setCanvas(spritesheetout)
+	love.graphics.draw(tmp,0,0,0)
+	spritesheetout:getImageData():encode('spritesheet.png')
+
+	love.graphics.setCanvas()
+	love.graphics.setShader()
 
 	-- load the sprite flags
 	__pico_spriteflags = {}
@@ -441,7 +478,7 @@ function load_p8(filename)
 
 	-- check all the data is there
 	love.graphics.setScissor()
-	mapimage = love.graphics.newCanvas(1024,512)
+	local mapimage = love.graphics.newCanvas(1024,512)
 	mapimage:clear(0,0,0,255)
 	love.graphics.setCanvas(mapimage)
 	love.graphics.setShader(__display_shader)
@@ -472,7 +509,7 @@ function load_p8(filename)
 		if not ok then
 			error("Error running lua: "..tostring(result))
 		else
-			log("Ran lua")
+			log("lua completed")
 		end
 	end
 
@@ -581,6 +618,13 @@ function flip_screen()
 	end
 
 	love.graphics.present()
+
+	if video_frames then
+		local tmp = love.graphics.newCanvas(128,128)
+		love.graphics.setCanvas(tmp)
+		love.graphics.draw(__screen,0,0)
+		table.insert(video_frames,tmp:getImageData())
+	end
 	-- get ready for next time
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
@@ -613,6 +657,17 @@ function love.keypressed(key)
 		local filename = cartname..'-'..os.time()..'.png'
 		screenshot:encode(filename)
 		log('saved screenshort to',filename)
+	elseif key == 'f8' then
+		-- start recording
+		video_frames = {}
+	elseif key == 'f9' then
+		-- stop recording and save
+		local basename = cartname..'-'..os.time()..'-'
+		for i,v in ipairs(video_frames) do
+			v:encode(string.format("%s%04d.png",basename,i))
+		end
+		video_frames = nil
+		log('saved video to',basename)
 	else
 		for p=0,1 do
 			for i=0,#__keymap[p] do
@@ -1087,9 +1142,9 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_w = flr(cel_w)
 	cel_h = flr(cel_h)
 	for y=0,cel_h-1 do
-		if y < 64 and y >= 0 then
+		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do
-				if x < 128 and x >= 0 then
+				if cel_x+x < 128 and cel_x+x >= 0 then
 					local v = __pico_map[flr(cel_y+y)][flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then

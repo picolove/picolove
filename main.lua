@@ -40,7 +40,7 @@ Differences:
  * Uses luajit not lua 5.2
 
 Extra features:
-
+ * ipairs(), pairs()
  * log(...) function prints to console for debugging
  * assert(expr,message) if expr is not true then errors with message
  * error(message) bluescreens with an error message
@@ -1017,7 +1017,18 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 	w = w or 1
 	h = h or 1
-	local q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
+	local q
+	if w == 1 and h == 1 then
+		q = __pico_quads[n]
+	else
+		local id = string.format("%d-%d-%d",n,w,h)
+		if __pico_quads[id] then
+			q =  __pico_quads[id]
+		else
+			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
+			__pico_quads[id] = q
+		end
+	end
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(x)+(w*8*(flip_x and 1 or 0)),
 		flr(y)+(h*8*(flip_y and 1 or 0)),

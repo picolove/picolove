@@ -95,14 +95,33 @@ local __pico_palette = {
 
 local video_frames = nil
 
-
-
 local __pico_camera_x = 0
 local __pico_camera_y = 0
+local osc
 
 local host_time = 0
 
 local retro_mode = false
+
+local denver = require "denver.denver"
+
+local __pico_audio_channels = {
+	[0]=nil,
+	[1]=nil,
+	[2]=nil,
+	[3]=nil
+}
+
+local __pico_sfx = {}
+
+local __pico_music = {}
+
+local __pico_current_music = nil
+
+function get_bits(v,s,e)
+	local mask = shl(shl(1,s)-1,e)
+	return shr(band(mask,v))
+end
 
 function love.load(argv)
 	love_args = argv
@@ -112,6 +131,21 @@ function love.load(argv)
 	else
 		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
 	end
+
+	osc = {}
+	osc[0] = denver.get{waveform='triangle',frequency=66}
+	osc[1] = denver.get{waveform='sawtooth',frequency=66} -- should be filtered
+	osc[2] = denver.get{waveform='sawtooth',frequency=66}
+	osc[3] = denver.get{waveform='square',frequency=66}
+	osc[4] = denver.get{waveform='square',frequency=66,pwm=0.25} -- impulse
+	osc[5] = denver.get{waveform='square',frequency=66} -- should be ?
+	osc[6] = denver.get{waveform='brownnoise',frequency=66} -- noise
+	osc[7] = denver.get{waveform='triangle',frequency=66} -- triangle with harmonics
+
+	for i=0,7 do
+		osc[i]:setLooping(true)
+	end
+
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
 	__screen = love.graphics.newCanvas(128,128)
@@ -245,78 +279,6 @@ function load_p8(filename)
 	end)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/])=","%1 = %1 %2 ")
-
-	local cart_G = {
-		-- extra functions provided by picolove
-		assert=assert,
-		error=error,
-		log=log,
-		pairs=pairs,
-		ipairs=ipairs,
-		-- pico8 api functions go here
-		clip=clip,
-		pget=pget,
-		pset=pset,
-		sget=sget,
-		sset=sset,
-		fget=fget,
-		fset=fset,
-		flip=flip,
-		print=print,
-		cursor=cursor,
-		color=color,
-		cls=cls,
-		camera=camera,
-		circ=circ,
-		circfill=circfill,
-		line=line,
-		load=load,
-		rect=rect,
-		rectfill=rectfill,
-		run=run,
-		reload=reload,
-		pal=pal,
-		palt=palt,
-		spr=spr,
-		sspr=sspr,
-		add=add,
-		del=del,
-		foreach=foreach,
-		count=count,
-		all=all,
-		btn=btn,
-		btnp=btnp,
-		sfx=sfx,
-		music=music,
-		mget=mget,
-		mset=mset,
-		map=map,
-		memcpy=memcpy,
-		peek=peek,
-		poke=poke,
-		max=max,
-		min=min,
-		mid=mid,
-		flr=flr,
-		cos=cos,
-		sin=sin,
-		atan2=atan2,
-		sqrt=sqrt,
-		abs=abs,
-		rnd=rnd,
-		srand=srand,
-		sgn=sgn,
-		band=band,
-		bor=bor,
-		bxor=bxor,
-		bnot=bnot,
-		shl=shl,
-		shr=shr,
-		sub=sub,
-		stat=stat,
-		-- deprecated pico-8 function aliases
-		mapdraw=map
-	}
 
 	-- load the sprites into an imagedata
 	-- generate a quad for each sprite index
@@ -493,7 +455,128 @@ function load_p8(filename)
 	love.graphics.setCanvas()
 	mapimage:getImageData():encode('map.png')
 
-	log("finished loading cart",filename)
+	-- load sfx
+	local sfx_start = data:find("__sfx__") + 8
+	local sfx_end = data:find("__music__") - 1
+	local sfxdata = data:sub(sfx_start,sfx_end)
+
+	__pico_sfx = {}
+	for i=0,63 do
+		__pico_sfx[i] = {
+			speed=16,
+			loop_start=0,
+			loop_end=0
+		}
+		for j=0,31 do
+			__pico_sfx[i][j] = {0,0,0,0}
+		end
+	end
+
+	local _sfx = 0
+	local step = 0
+
+	local next_line = 1
+	while next_line do
+		local end_of_line = sfxdata:find("\n",next_line)
+		if end_of_line == nil then break end
+		end_of_line = end_of_line - 1
+		local line = sfxdata:sub(next_line,end_of_line)
+		local editor_mode = tonumber(line:sub(1,2),16)
+		__pico_sfx[_sfx].speed = tonumber(line:sub(3,4),16)
+		__pico_sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
+		__pico_sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
+		for i=9,#line,5 do
+			local v = line:sub(i,i+4)
+			assert(#v == 5)
+			local note  = tonumber(line:sub(i,i+1),16)
+			local instr = tonumber(line:sub(i+2,i+2),16)
+			local vol   = tonumber(line:sub(i+3,i+3),16)
+			local fx    = tonumber(line:sub(i+4,i+4),16)
+			__pico_sfx[_sfx][step] = {note,instr,vol,fx}
+			step = step + 1
+		end
+		_sfx = _sfx + 1
+		step = 0
+		next_line = sfxdata:find("\n",end_of_line)+1
+	end
+
+	assert(_sfx == 64)
+
+	-- load music
+
+	local cart_G = {
+		-- extra functions provided by picolove
+		assert=assert,
+		error=error,
+		log=log,
+		pairs=pairs,
+		ipairs=ipairs,
+		-- pico8 api functions go here
+		clip=clip,
+		pget=pget,
+		pset=pset,
+		sget=sget,
+		sset=sset,
+		fget=fget,
+		fset=fset,
+		flip=flip,
+		print=print,
+		cursor=cursor,
+		color=color,
+		cls=cls,
+		camera=camera,
+		circ=circ,
+		circfill=circfill,
+		line=line,
+		load=load,
+		rect=rect,
+		rectfill=rectfill,
+		run=run,
+		reload=reload,
+		pal=pal,
+		palt=palt,
+		spr=spr,
+		sspr=sspr,
+		add=add,
+		del=del,
+		foreach=foreach,
+		count=count,
+		all=all,
+		btn=btn,
+		btnp=btnp,
+		sfx=sfx,
+		music=music,
+		mget=mget,
+		mset=mset,
+		map=map,
+		memcpy=memcpy,
+		peek=peek,
+		poke=poke,
+		max=max,
+		min=min,
+		mid=mid,
+		flr=flr,
+		cos=cos,
+		sin=sin,
+		atan2=atan2,
+		sqrt=sqrt,
+		abs=abs,
+		rnd=rnd,
+		srand=srand,
+		sgn=sgn,
+		band=band,
+		bor=bor,
+		bxor=bxor,
+		bnot=bnot,
+		shl=shl,
+		shr=shr,
+		sub=sub,
+		stat=stat,
+		-- deprecated pico-8 function aliases
+		mapdraw=map
+	}
+
+
 
 	local ok,f,e = pcall(loadstring,lua)
 	if not ok or f==nil then
@@ -579,6 +662,52 @@ function love.run()
 		if love.timer then
 			love.timer.step()
 			dt = dt + love.timer.getDelta()
+		end
+
+		for i=0,3 do
+			if __pico_audio_channels[i] ~= nil then
+				local ch = __pico_audio_channels[i]
+				local s = __pico_sfx[__pico_audio_channels[i].sfx]
+				if s.speed <= 0 then s.speed = 1/30 end
+				ch.offset = ch.offset + (dt*4) / s.speed
+				if s.loop_end ~= 0 then
+					if ch.offset >= s.loop_end then
+						if ch.loop then
+							ch.offset = s.loop_start + (ch.offset-s.loop_end)
+							ch.last_step = s.loop_start-1
+						else
+							love.audio.stop(ch.current)
+							ch.current = nil
+							__pico_audio_channels[i] = nil
+						end
+					end
+				elseif ch.offset >= 32 then
+					if ch.current then
+						love.audio.stop(ch.current)
+						ch.current = nil
+					end
+					__pico_audio_channels[i] = nil
+				end
+				if __pico_audio_channels[i] then
+					-- if we pass a step
+					if flr(ch.offset) > ch.last_step then
+						if ch.current then
+							love.audio.stop(ch.current)
+							ch.current = nil
+						end
+						local note,instr,vol,fx = unpack(s[flr(ch.offset)])
+						if vol > 0 then
+							local o = osc[instr]
+							o:setPitch((note/12)+1)
+							ch.current = o
+							o:setLooping(true)
+							o:setVolume((1/7)*vol)
+							love.audio.play(o)
+						end
+						ch.last_step = flr(ch.offset)
+					end
+				end
+			end
 		end
 
 		-- Call update and draw
@@ -691,12 +820,36 @@ function love.keyreleased(key)
 	end
 end
 
-function music()
-	-- STUB
+function music(n,fade_len,channel_mask)
+	__pico_current_music = {n,offset=0,channel_mask=channel_mask}
 end
 
-function sfx()
-	-- STUB
+function sfx(n,channel,offset)
+	-- n = -1 stop sound on channel
+	-- n = -2 to stop looping on channel
+	channel = channel or -1
+	if n == -1 and channel >= 0 then
+		love.audio.stop(__pico_audio_channels[channel].current)
+		__pico_audio_channels[channel]=nil
+		return
+	elseif n == -2 and channel >= 0 then
+		__pico_audio_channels[channel].loop = false
+	end
+	log('sfx',n,channel,offset)
+	offset = offset or 0
+	if channel == -1 then
+		-- find a free channel
+		for i=0,3 do
+			if __pico_audio_channels[i] == nil then
+				channel = i
+			end
+		end
+	end
+	if channel == -1 then return end
+	if __pico_audio_channels[channel] and __pico_audio_channels[channel].current then
+		love.audio.stop(__pico_audio_channels[channel].current)
+	end
+	__pico_audio_channels[channel]={sfx=n,offset=offset,last_step=offset-1,current=nil,loop=true}
 end
 
 function clip(x,y,w,h)
@@ -794,7 +947,7 @@ function print(str,x,y,col)
 	if col then color(col) end
 	if y==nil then
 		y = __pico_cursor[2]
-		__pico_cursor[2] = __pico_cursor[2] + 7
+		__pico_cursor[2] = __pico_cursor[2] + 6
 	end
 	if x==nil then
 		x = __pico_cursor[1]
@@ -840,13 +993,42 @@ function restore_camera()
 	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
-function circ(x,y,r,col)
+
+local circleMesh = love.graphics.newMesh(128,nil,"points")
+
+function circ(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
-	x = flr(x)
-	y = flr(y)
+	ox = flr(ox)
+	oy = flr(oy)
 	r = flr(r)
-	love.graphics.circle("line",x,y,r,32)
+	local points = {}
+
+	local x = r
+	local y = 0
+	local decisionover2 = 1 - x
+	while x >= y do
+		table.insert(points,{x+ox,y+oy})
+		table.insert(points,{y+ox,x+oy})
+		table.insert(points,{-x+ox,y+oy})
+		table.insert(points,{-y+ox,x+oy})
+
+		table.insert(points,{-x+ox,-y+oy})
+		table.insert(points,{-y+ox,-x+oy})
+		table.insert(points,{x+ox,-y+oy})
+		table.insert(points,{y+ox,-x+oy})
+		y = y + 1
+		if decisionover2 <= 0 then
+			decisionover2 = decisionover2 + 2 * y + 1
+		else
+			x = x - 1
+			decisionover2 = decisionover2 + 2 * (y - x) + 1
+		end
+	end
+
+	circleMesh:setVertices(points)
+	circleMesh:setDrawRange(1,#points)
+	love.graphics.draw(circleMesh)
 end
 
 function circfill(ox,oy,r,col)
@@ -855,15 +1037,28 @@ function circfill(ox,oy,r,col)
 	ox = flr(ox)
 	oy = flr(oy)
 	r = flr(r)
-	love.graphics.circle("fill",ox,oy,r,32)
-	--local r2 = r*r
-	--for y=-r,r do
-	--	for x=-r,r do
-	--		if x*x+y*y <= r2 + r*0.8 then
-	--			love.graphics.point(ox+x,oy+y)
-	--		end
-	--	end
-	--end
+
+	local err = -r
+	local x = r
+	local y = 0
+	while x >= y do
+		local lasty = y
+		err = err + y
+		y = y + 1
+		err = err + y
+		line(ox+x,oy+lasty,ox-x,oy+lasty)
+		line(ox+x,oy-lasty,ox-x,oy-lasty)
+
+		if err >= 0 then
+			if x ~= lasty then
+				line(ox+lasty,oy+x,ox-lasty,oy+x)
+				line(ox+lasty,oy-x,ox-lasty,oy-x)
+			end
+			err = err - x
+			x = x - 1
+			err = err - x
+		end
+	end
 end
 
 local lineMesh = love.graphics.newMesh(128,nil,"points")
@@ -931,6 +1126,7 @@ function load(_cartname)
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.origin()
+	camera()
 	restore_clip()
 	cartname = _cartname
 	cart = load_p8(cartname)
@@ -945,6 +1141,10 @@ end
 function rectfill(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
+	x0 = flr(x0)
+	x1 = flr(x1)
+	y0 = flr(y0)
+	y1 = flr(y1)
 	local w = math.abs(x1-x0)+1
 	local h = math.abs(y1-y0)+1
 	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
@@ -953,11 +1153,6 @@ end
 function run()
 	love.graphics.setCanvas(__screen)
 	love.graphics.setShader(__draw_shader)
-	restore_clip()
-	love.graphics.origin()
-	pal()
-	palt()
-	camera()
 	if cart._init then cart._init() end
 end
 
@@ -1015,11 +1210,16 @@ end
 function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	n = flr(n)
 	w = w or 1
 	h = h or 1
 	local q
 	if w == 1 and h == 1 then
 		q = __pico_quads[n]
+		if not q then
+			log('warning: sprite '..n..' is missing')
+			return
+		end
 	else
 		local id = string.format("%d-%d-%d",n,w,h)
 		if __pico_quads[id] then
@@ -1123,12 +1323,6 @@ function btnp(i,p)
 		end
 	end
 	return false
-end
-
-function sfx(n,channel,offset)
-end
-
-function music(n,fade_len,channel_mask)
 end
 
 function mget(x,y)

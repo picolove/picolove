@@ -169,6 +169,10 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	pal()
 
+	if argv[2] and argv[2]:sub(#argv[2]-3,#argv[2]) == '.png' then
+		return load_p8png(argv[2])
+	end
+
 	-- load the cart
 	clip()
 	camera()
@@ -176,6 +180,118 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	color(0)
 	load(argv[2] or 'picopout.p8')
 	run()
+end
+
+function load_p8png(filename)
+	local img = love.graphics.newImage(filename)
+	if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
+		error("Image is the wrong size")
+	end
+	local data = img:getData()
+
+	local outData = love.image.newImageData(128,128)
+	local mapData = love.graphics.newCanvas(128*8,64*8)
+	__pico_spritesheet_data = love.image.newImageData(128,128)
+	__pico_quads = {}
+	local outX = 0
+	local outY = 0
+	local inbyte = 0
+	local spriteflags = {}
+	__pico_map = {}
+	local mapY = 32
+	local mapX = 0
+	for y=0,64 do
+		__pico_map[y] = {}
+	end
+	for y=0,204 do
+		for x=0,159 do
+			local r,g,b,a = data:getPixel(x,y)
+			-- extract lowest bits
+			r = bit.band(r,0x0003)
+			g = bit.band(g,0x0003)
+			b = bit.band(b,0x0003)
+			a = bit.band(a,0x0003)
+			data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
+			local byte = b + bit.lshift(g,2) + bit.lshift(r,4) + bit.lshift(a,6)
+			local lo = bit.band(byte,0x0f)
+			local hi = bit.rshift(byte,4)
+			if inbyte < 8192 then
+				if outY >= 64 then
+					__pico_map[mapY][mapX] = byte
+					mapX = mapX + 1
+					if mapX == 128 then
+						mapX = 0
+						mapY = mapY + 1
+					end
+				end
+				__pico_spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
+				outX = outX + 1
+				__pico_spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
+				outX = outX + 1
+				if outX == 128 then
+					outY = outY + 1
+					outX = 0
+					if outY == 128 then
+						log('end of spritesheet')
+						-- end of spritesheet, generate quads
+						__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+						local sprite = 0
+						for yy=0,15 do
+							for xx=0,15 do
+								__pico_quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
+								sprite = sprite + 1
+							end
+						end
+						mapY = 0
+						mapX = 0
+					end
+				end
+			elseif inbyte < 8192+4096 then
+				__pico_map[mapY][mapX] = byte
+				mapX = mapX + 1
+				if mapX == 128 then
+					mapX = 0
+					mapY = mapY + 1
+				end
+			elseif inbyte < 8192+4096+256 then
+				spriteflags[#spriteflags+1] = byte
+			end
+			inbyte = inbyte + 1
+		end
+	end
+	love.graphics.setScissor()
+	mapData:clear(0,0,0,255)
+	love.graphics.setCanvas(mapData)
+	love.graphics.setShader(__sprite_shader)
+	for y=0,63 do
+		for x=0,127 do
+			local n = __pico_map[y][x]
+			love.graphics.draw(__pico_spritesheet,__pico_quads[__pico_map[y][x]],x*8,y*8)
+		end
+	end
+	local tmp = love.graphics.newCanvas(128*8,64*8)
+	love.graphics.setCanvas(tmp)
+	love.graphics.setShader(__display_shader)
+	love.graphics.draw(mapData,0,0)
+	tmp:getImageData():encode(string.format("%s.map.png",filename))
+	local tmp = love.graphics.newCanvas(128,128)
+	love.graphics.setCanvas(tmp)
+	tmp:clear(0,0,0,255)
+	love.graphics.setShader(__sprite_shader)
+	local n = 0
+	for y=0,15 do
+		for x=0,15 do
+			love.graphics.draw(__pico_spritesheet,__pico_quads[n],x*8,y*8)
+			n = n + 1
+		end
+	end
+	local tmp2 = love.graphics.newCanvas(128,128)
+	love.graphics.setCanvas(tmp2)
+	love.graphics.setShader(__display_shader)
+	love.graphics.draw(tmp,0,0)
+	tmp2:getImageData():encode(string.format("%s.spritesheet.png",filename))
+	data:encode(string.format("%s.data.png",filename))
+	love.event.quit()
 end
 
 function load_p8(filename)

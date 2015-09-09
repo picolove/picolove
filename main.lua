@@ -113,6 +113,10 @@ local __pico_audio_channels = {
 }
 
 local __pico_sfx = {}
+local __audio_channels
+local rate = 22050
+local channel = 1
+local bits = 8
 
 local __pico_music = {}
 
@@ -122,6 +126,8 @@ function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
 end
+
+local QueueableSource = require "QueueableSource"
 
 function love.load(argv)
 	love_args = argv
@@ -133,17 +139,49 @@ function love.load(argv)
 	end
 
 	osc = {}
-	osc[0] = denver.get{waveform='triangle',frequency=66}
-	osc[1] = denver.get{waveform='sawtooth',frequency=66} -- should be filtered
-	osc[2] = denver.get{waveform='sawtooth',frequency=66}
-	osc[3] = denver.get{waveform='square',frequency=66}
-	osc[4] = denver.get{waveform='square',frequency=66,pwm=0.25} -- impulse
-	osc[5] = denver.get{waveform='square',frequency=66} -- should be ?
-	osc[6] = denver.get{waveform='brownnoise',frequency=66} -- noise
-	osc[7] = denver.get{waveform='triangle',frequency=66} -- triangle with harmonics
+	osc[0] = function(x)
+		-- tri
+		return (abs((x%2)-1)-0.5) * 0.5
+	end
+	osc[1] = function(x)
+		-- uneven tri
+		local t = x%1
+		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
+	end
+	osc[2] = function(x)
+		-- saw
+		return (x%1-0.5) * 0.333
+	end
+	osc[3] = function(x)
+		-- sqr
+		return (x%2 < 0.5 and 1 or -1) * 0.25
+	end
+	osc[4] = function(x)
+		-- pulse
+		return (x%2 < 0.25 and 1 or -1) * 0.25
+	end
+	osc[5] = function(x)
+		-- tri/2
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
+	end
+	osc[6] = function(x)
+		-- noise
+		return (love.math.random()*2-1) * 0.666
+	end
+	osc[7] = function(x)
+		-- detuned tri
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
+	end
 
-	for i=0,7 do
-		osc[i]:setLooping(true)
+	__audio_channels = {
+		[0]=QueueableSource:new(16),
+		QueueableSource:new(16),
+		QueueableSource:new(16),
+		QueueableSource:new(16)
+	}
+
+	for i=0,3 do
+		__audio_channels[i]:play()
 	end
 
 	love.graphics.clear()
@@ -664,55 +702,59 @@ function love.run()
 			dt = dt + love.timer.getDelta()
 		end
 
-		for i=0,3 do
-			if __pico_audio_channels[i] ~= nil then
-				local ch = __pico_audio_channels[i]
-				local s = __pico_sfx[__pico_audio_channels[i].sfx]
-				if s.speed <= 0 then s.speed = 1/30 end
-				ch.offset = ch.offset + (dt*4) / s.speed
-				if s.loop_end ~= 0 then
-					if ch.offset >= s.loop_end then
-						if ch.loop then
-							ch.offset = s.loop_start + (ch.offset-s.loop_end)
-							ch.last_step = s.loop_start-1
-						else
-							love.audio.stop(ch.current)
-							ch.current = nil
-							__pico_audio_channels[i] = nil
-						end
-					end
-				elseif ch.offset >= 32 then
-					if ch.current then
-						love.audio.stop(ch.current)
-						ch.current = nil
-					end
-					__pico_audio_channels[i] = nil
-				end
-				if __pico_audio_channels[i] then
-					-- if we pass a step
-					if flr(ch.offset) > ch.last_step then
-						if ch.current then
-							love.audio.stop(ch.current)
-							ch.current = nil
-						end
-						local note,instr,vol,fx = unpack(s[flr(ch.offset)])
-						if vol > 0 then
-							local o = osc[instr]
-							o:setPitch((note/12)+1)
-							ch.current = o
-							o:setLooping(true)
-							o:setVolume((1/7)*vol)
-							love.audio.play(o)
-						end
-						ch.last_step = flr(ch.offset)
-					end
-				end
-			end
-		end
-
 		-- Call update and draw
 		local render = false
 		while dt > 1/30 do
+			for i=0,3 do
+				local snd = love.sound.newSoundData(flr(rate*dt),rate,bits,channel)
+				for tick=0,31 do
+					if __pico_audio_channels[i] ~= nil then
+						local ch = __pico_audio_channels[i]
+						local s = __pico_sfx[__pico_audio_channels[i].sfx]
+						if s.speed <= 0 then s.speed = 1/30 end
+						ch.offset = ch.offset + (dt/32) / s.speed
+						if s.loop_end ~= 0 then
+							if ch.offset >= s.loop_end then
+								if ch.loop then
+									ch.offset = s.loop_start + (ch.offset-s.loop_end)
+									ch.last_step = s.loop_start-1
+								else
+									ch.current = nil
+									__pico_audio_channels[i] = nil
+								end
+							end
+						elseif ch.offset >= 32 then
+							if ch.current then
+								ch.current = nil
+							end
+							__pico_audio_channels[i] = nil
+						end
+						if __pico_audio_channels[i] then
+							-- get a sounddata of the right length
+							local ch = __pico_audio_channels[i]
+							local note,instr,vol,fx = unpack(s[flr(ch.offset)])
+							local freq = (65.41*math.pow(2,flr(note/12)))
+							local samples = flr(rate*dt)/32
+							for smp=0,samples-1 do
+								snd:setSample(smp,(osc[instr]((ch.offset*rate)+smp*(freq/rate))) * vol)
+							end
+							if not __audio_channels[i]:isPlaying() then
+								__audio_channels[i]:play()
+							end
+							-- if we pass a step
+							if flr(ch.offset) > ch.last_step then
+								if ch.current then
+									ch.current = nil
+								end
+								--local note,instr,vol,fx = unpack(s[flr(ch.offset)])
+								ch.last_step = flr(ch.offset)
+							end
+						end
+					end
+					__audio_channels[i]:queue(snd)
+				end
+			end
+
 			if love.update then love.update(1/30) end -- will pass 0 if love.timer is disabled
 			dt = dt - 1/30
 			render = true
@@ -1103,6 +1145,9 @@ function line(x0,y0,x1,y1,col)
 			fraction = fraction + dy
 			--love.graphics.point(flr(x0),flr(y0))
 			table.insert(points,{flr(x0),flr(y0)})
+			if #points > 181 then
+				break
+			end
 		end
 	else
 		local fraction = dx - bit.rshift(dy, 1)
@@ -1115,6 +1160,9 @@ function line(x0,y0,x1,y1,col)
 			fraction = fraction + dx
 			--love.graphics.point(flr(x0),flr(y0))
 			table.insert(points,{flr(x0),flr(y0)})
+			if #points > 181 then
+				break
+			end
 		end
 	end
 	lineMesh:setVertices(points)

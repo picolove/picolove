@@ -1,11 +1,17 @@
 --[[
 Implementation of PICO8 API for LOVE
 
-Please don't redistribute yet!
+On github at: https://github.com/ftsf/picolove
+
+Requires love 0.9.x
 
 What it is:
 
  * An implementation of pico-8's api in love
+
+What is Pico-8:
+
+ * See http://www.lexaloffle.com/pico-8.php
 
 Why:
 
@@ -25,6 +31,7 @@ What it isn't:
  * A perfect replica
  * No dev tools, no image editor, map editor, sfx editor, music editor
  * No modifying or saving carts
+ * Not memory compatible with pico-8
 
 Not Yet Implemented:
 
@@ -32,6 +39,7 @@ Not Yet Implemented:
  * Sound/music
 
 Not working:
+ * ?
 
 Differences:
 
@@ -40,7 +48,7 @@ Differences:
  * Uses luajit not lua 5.2
 
 Extra features:
- * ipairs(), pairs()
+ * ipairs(), pairs() standard lua functions
  * log(...) function prints to console for debugging
  * assert(expr,message) if expr is not true then errors with message
  * error(message) bluescreens with an error message
@@ -107,7 +115,6 @@ local retro_mode = false
 function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == "Android" then
-		--love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
 		love.resize(love.window.getDimensions())
 	else
 		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
@@ -195,7 +202,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	camera()
 	pal()
 	color(0)
-	load(argv[2] or 'picopout.p8')
+	load(argv[2] or 'nocart.p8')
 	run()
 end
 
@@ -1013,6 +1020,7 @@ function palt(c,t)
 end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
+	n = flr(n)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 	w = w or 1
@@ -1028,6 +1036,9 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
 			__pico_quads[id] = q
 		end
+	end
+	if not q then
+		log('missing quad',n)
 	end
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(x)+(w*8*(flip_x and 1 or 0)),

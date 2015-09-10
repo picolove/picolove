@@ -25,6 +25,8 @@ local __accum = 0
 local __pico_pal_transparent = {
 }
 
+local lineMesh = love.graphics.newMesh(128,nil,"points")
+
 local __pico_palette = {
 	{0,0,0,255},
 	{29,43,83,255},
@@ -790,33 +792,86 @@ function restore_camera()
 	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
-function circ(x,y,r,col)
-	col = col or __pico_color
-	color(col)
-	x = flr(x)
-	y = flr(y)
-	r = flr(r)
-	love.graphics.circle("line",x,y,r,32)
-end
-
-function circfill(ox,oy,r,col)
+function circ(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
 	ox = flr(ox)
 	oy = flr(oy)
 	r = flr(r)
-	love.graphics.circle("fill",ox,oy,r,32)
-	--local r2 = r*r
-	--for y=-r,r do
-	--	for x=-r,r do
-	--		if x*x+y*y <= r2 + r*0.8 then
-	--			love.graphics.point(ox+x,oy+y)
-	--		end
-	--	end
-	--end
+	local points = {}
+	local x = r
+	local y = 0
+	local decisionOver2 = 1 - x
+
+	while y <= x do
+		table.insert(points,{ox+x,oy+y})
+		table.insert(points,{ox+y,oy+x})
+		table.insert(points,{ox-x,oy+y})
+		table.insert(points,{ox-y,oy+x})
+
+		table.insert(points,{ox-x,oy-y})
+		table.insert(points,{ox-y,oy-x})
+		table.insert(points,{ox+x,oy-y})
+		table.insert(points,{ox+y,oy-x})
+		y = y + 1
+		if decisionOver2 <= 0 then
+			decisionOver2 = decisionOver2 + 2 * y + 1
+		else
+			x = x - 1
+			decisionOver2 = decisionOver2 + 2 * (y-x) + 1
+		end
+	end
+	lineMesh:setVertices(points)
+	lineMesh:setDrawRange(1,#points)
+	love.graphics.draw(lineMesh)
 end
 
-local lineMesh = love.graphics.newMesh(128,nil,"points")
+function _plot4points(points,cx,cy,x,y)
+	_horizontal_line(points, cx - x, cy + y, cx + x)
+	if x ~= 0 and y ~= 0 then
+		_horizontal_line(points, cx - x, cy - y, cx + x)
+	end
+end
+
+function _horizontal_line(points,x0,y,x1)
+	for x=x0,x1 do
+		table.insert(points,{x,y})
+	end
+end
+
+function circfill(cx,cy,r,col)
+	col = col or __pico_color
+	color(col)
+	cx = flr(cx)
+	cy = flr(cy)
+	r = flr(r)
+	local x = r
+	local y = 0
+	local err = -r
+
+	local points = {}
+
+	while x >= y do
+		local lasty = y
+		err = err + y
+		y = y + 1
+		err = err + y
+		_plot4points(points,cx,cy,x,lasty)
+		if err >= 0 then
+			if x ~= lasty then
+				_plot4points(points,cx,cy,lasty,x)
+			end
+			err = err - x
+			x = x - 1
+			err = err - x
+		end
+	end
+
+	lineMesh:setVertices(points)
+	lineMesh:setDrawRange(1,#points)
+	love.graphics.draw(lineMesh)
+
+end
 
 function line(x0,y0,x1,y1,col)
 	col = col or __pico_color

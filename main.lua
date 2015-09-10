@@ -67,7 +67,7 @@ function love.load(argv)
 	__screen = love.graphics.newCanvas(128,128)
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+ ")
+	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ ")
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -744,7 +744,7 @@ function print(str,x,y,col)
 	if col then color(col) end
 	if y==nil then
 		y = __pico_cursor[2]
-		__pico_cursor[2] = __pico_cursor[2] + 7
+		__pico_cursor[2] = __pico_cursor[2] + 6
 	end
 	if x==nil then
 		x = __pico_cursor[1]
@@ -907,7 +907,6 @@ function run()
 	love.graphics.origin()
 	pal()
 	palt()
-	camera()
 	if cart._init then cart._init() end
 end
 

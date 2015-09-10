@@ -878,54 +878,70 @@ function line(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
 
+	if x0 ~= x0 then
+		error("x0 is nan")
+		log(x0,y0,x1,y1)
+	end
+
 	x0 = flr(x0)
 	y0 = flr(y0)
 	x1 = flr(x1)
 	y1 = flr(y1)
 
+
 	local dx = x1 - x0
 	local dy = y1 - y0
 	local stepx, stepy
 
-	if dy < 0 then
-		dy = -dy
-		stepy = -1
-	else
-		stepy = 1
-	end
-
-	if dx < 0 then
-		dx = -dx
-		stepx = -1
-	else
-		stepx = 1
-	end
-
 	local points = {{x0,y0}}
-	--love.graphics.point(x0,y0)
-	if dx > dy then
-		local fraction = dy - bit.rshift(dx, 1)
-		while x0 ~= x1 do
-			if fraction >= 0 then
-				y0 = y0 + stepy
-				fraction = fraction - dx
-			end
-			x0 = x0 + stepx
-			fraction = fraction + dy
-			--love.graphics.point(flr(x0),flr(y0))
-			table.insert(points,{flr(x0),flr(y0)})
+
+	if dx == 0 then
+		-- simple case draw a vertical line
+		for y=y0,y1 do
+			table.insert(points,{x0,y})
+		end
+	elseif dy == 0 then
+		-- simple case draw a horizontal line
+		for x=x0,x1 do
+			table.insert(points,{x,y0})
 		end
 	else
-		local fraction = dx - bit.rshift(dy, 1)
-		while y0 ~= y1 do
-			if fraction >= 0 then
+		if dy < 0 then
+			dy = -dy
+			stepy = -1
+		else
+			stepy = 1
+		end
+
+		if dx < 0 then
+			dx = -dx
+			stepx = -1
+		else
+			stepx = 1
+		end
+
+		if dx > dy then
+			local fraction = dy - bit.rshift(dx, 1)
+			while x0 ~= x1 do
+				if fraction >= 0 then
+					y0 = y0 + stepy
+					fraction = fraction - dx
+				end
 				x0 = x0 + stepx
-				fraction = fraction - dy
+				fraction = fraction + dy
+				table.insert(points,{flr(x0),flr(y0)})
 			end
-			y0 = y0 + stepy
-			fraction = fraction + dx
-			--love.graphics.point(flr(x0),flr(y0))
-			table.insert(points,{flr(x0),flr(y0)})
+		else
+			local fraction = dx - bit.rshift(dy, 1)
+			while y0 ~= y1 do
+				if fraction >= 0 then
+					x0 = x0 + stepx
+					fraction = fraction - dy
+				end
+				y0 = y0 + stepy
+				fraction = fraction + dx
+				table.insert(points,{flr(x0),flr(y0)})
+			end
 		end
 	end
 	lineMesh:setVertices(points)

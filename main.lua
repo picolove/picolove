@@ -1006,12 +1006,16 @@ function pal(c0,c1,p)
 		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = false
 	elseif p == 1 and c1 ~= nil then
+		c0 = flr(c0)%16
+		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		__display_palette[c0] = __pico_palette[c1]
 		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
+		c0 = flr(c0)%16
+		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		__draw_palette[c0] = c1
@@ -1028,6 +1032,7 @@ function palt(c,t)
 			__pico_pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
+		c = flr(c)%16
 		if t == false then
 			__pico_pal_transparent[c+1] = 1
 		elseif t == true then

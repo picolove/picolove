@@ -897,11 +897,15 @@ function line(x0,y0,x1,y1,col)
 
 	if dx == 0 then
 		-- simple case draw a vertical line
+		points = {}
+		if y0 > y1 then y0,y1 = y1,y0 end
 		for y=y0,y1 do
 			table.insert(points,{x0,y})
 		end
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
+		points = {}
+		if x0 > x1 then x0,x1 = x1,x0 end
 		for x=x0,x1 do
 			table.insert(points,{x,y0})
 		end

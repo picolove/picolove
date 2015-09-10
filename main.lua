@@ -675,7 +675,7 @@ function pget(x,y)
 		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
-		return nil
+		return 0
 	end
 end
 

@@ -164,7 +164,6 @@ function load_p8(filename)
 		error("invalid cart")
 	end
 
-	--local start = data:find("pico-8 cartridge // http://www.pico-8.com\nversion ")
 	local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
 	local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
 	if start == nil then
@@ -314,21 +313,24 @@ function load_p8(filename)
 		next_line = gfxdata:find("\n",end_of_line)+1
 	end
 
-	local tx,ty = 0,32
-	for sy=64,127 do
-		for sx=0,127,2 do
-			-- get the two pixel values and merge them
-			local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
-			local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
-			local v = bor(shl(hi,4),lo)
-			__pico_map[ty][tx] = v
-			shared = shared + 1
-			tx = tx + 1
-			if tx == 128 then
-				tx = 0
-				ty = ty + 1
+	if version > 2 then
+		local tx,ty = 0,32
+		for sy=64,127 do
+			for sx=0,127,2 do
+				-- get the two pixel values and merge them
+				local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
+				local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+				local v = bor(shl(hi,4),lo)
+				__pico_map[ty][tx] = v
+				shared = shared + 1
+				tx = tx + 1
+				if tx == 128 then
+					tx = 0
+					ty = ty + 1
+				end
 			end
 		end
+		assert(shared == 128 * 32,shared)
 	end
 
 	for y=0,15 do
@@ -338,7 +340,6 @@ function load_p8(filename)
 		end
 	end
 
-	assert(shared == 128 * 32,shared)
 	assert(sprite == 256,sprite)
 
 	__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)

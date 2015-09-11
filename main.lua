@@ -195,7 +195,7 @@ function load_p8(filename)
 		end
 	end)
 	-- rewrite assignment operators
-	lua = lua:gsub("(%S+)%s*([%+-%*/])=","%1 = %1 %2 ")
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 
 	local cart_G = {
 		-- extra functions provided by picolove

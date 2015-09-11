@@ -204,6 +204,7 @@ function load_p8(filename)
 		log=log,
 		pairs=pairs,
 		ipairs=ipairs,
+		warning=warning,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -878,9 +879,9 @@ function line(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
 
-	if x0 ~= x0 then
-		error("x0 is nan")
-		log(x0,y0,x1,y1)
+	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
+		warning("line has NaN value")
+		return
 	end
 
 	x0 = flr(x0)
@@ -1100,7 +1101,15 @@ function del(a,dv)
 	end
 end
 
+function warning(msg)
+	log(debug.traceback("WARNING: "..msg,3))
+end
+
 function foreach(a,f)
+	if not a then
+		warning("foreach got a nil value")
+		return
+	end
 	for i,v in ipairs(a) do
 		f(v)
 	end

@@ -215,6 +215,7 @@ function load_p8(filename)
 		setfps=setfps,
 		_keydown=nil,
 		_keyup=nil,
+		_textinput=nil,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -611,9 +612,8 @@ function love.draw()
 end
 
 function love.keypressed(key)
-	if cart and cart.keydown then
-		cart.keydown(key)
-		return
+	if cart and cart._keydown then
+		return cart._keydown(key)
 	end
 	if key == 'r' and love.keyboard.isDown('lctrl') then
 		reload()
@@ -649,9 +649,8 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-	if cart and cart.keyup then
-		cart.keyup(key)
-		return
+	if cart and cart._keyup then
+		return cart._keyup(key)
 	end
 	for p=0,1 do
 		for i=0,#__keymap[p] do
@@ -664,7 +663,7 @@ function love.keyreleased(key)
 end
 
 function love.textinput(text)
-	if cart and cart.textinput then cart.textinput(text) end
+	if cart and cart._textinput then return cart._textinput(text) end
 end
 
 function music()

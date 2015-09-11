@@ -666,24 +666,6 @@ function load_p8(filename)
 	end
 	log("finished loading cart",filename)
 
-	-- save images
-
-	local tmp = love.graphics.newCanvas(128,128)
-	local spritesheetout = love.graphics.newCanvas(128,128)
-
-	love.graphics.setCanvas(tmp)
-	love.graphics.setShader(__sprite_shader)
-	love.graphics.draw(__pico_spritesheet,0,0,0)
-
-	love.graphics.setShader(__display_shader)
-	love.graphics.setCanvas(spritesheetout)
-	love.graphics.draw(tmp,0,0,0)
-	spritesheetout:getImageData():encode('spritesheet.png')
-
-	love.graphics.setCanvas()
-	love.graphics.setShader()
-
-
 	return cart_G
 end
 

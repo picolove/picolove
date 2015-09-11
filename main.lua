@@ -396,7 +396,7 @@ function load_p8(filename)
 		local lua_start = data:find("__lua__") + 8
 		local lua_end = data:find("__gfx__") - 1
 
-		local lua = data:sub(lua_start,lua_end)
+		lua = data:sub(lua_start,lua_end)
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
@@ -495,7 +495,7 @@ function load_p8(filename)
 			next_line = gfxdata:find("\n",end_of_line)+1
 		end
 
-		assert(#__pico_spriteflags == 256,"wrong number of spriteflags:"..#__pico_spriteflags)
+		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
 
 		-- convert the tile data to a table
 
@@ -510,7 +510,6 @@ function load_p8(filename)
 		while next_line do
 			local end_of_line = mapdata:find("\n",next_line)
 			if end_of_line == nil then
-				log("reached end of map data")
 				break
 			end
 			end_of_line = end_of_line - 1
@@ -531,26 +530,7 @@ function load_p8(filename)
 			next_line = mapdata:find("\n",end_of_line)+1
 		end
 		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
-
-
 	end
-
-	-- check all the data is there
-	love.graphics.setScissor()
-	local mapimage = love.graphics.newCanvas(1024,512)
-	mapimage:clear(0,0,0,255)
-	love.graphics.setCanvas(mapimage)
-	love.graphics.setShader(__display_shader)
-	for y=0,63 do
-		for x=0,127 do
-			assert(__pico_map[y][x],string.format("missing map data: %d,%d",x,y))
-			local n = mget(x,y)
-			love.graphics.draw(__pico_spritesheet,__pico_quads[n],x*8,y*8)
-		end
-	end
-	love.graphics.setShader()
-	love.graphics.setCanvas()
-	mapimage:getImageData():encode('map.png')
 
 	-- patch the lua
 	--lua = lua:gsub("%-%-[^\n]*\n","\n")

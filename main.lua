@@ -933,6 +933,10 @@ function fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
+		if not __pico_spriteflags[flr(n)] then
+			warning(string.format('fget(%d,%d)',n,f))
+			return 0
+		end
 		return band(__pico_spriteflags[flr(n)],shl(1,flr(f))) ~= 0
 	end
 	return __pico_spriteflags[flr(n)]
@@ -1486,8 +1490,24 @@ end
 function poke(...)
 end
 
-max = math.max
-min = math.min
+function min(a,b)
+	if a == nil or b == nil then
+		warning('min a or b are nil returning 0')
+		return 0
+	end
+	if a < b then return a end
+	return b
+end
+
+function max(a,b)
+	if a == nil or b == nil then
+		warning('max a or b are nil returning 0')
+		return 0
+	end
+	if a > b then return a end
+	return b
+end
+
 function mid(x,y,z)
 	return x > y and x or y > z and z or y
 end

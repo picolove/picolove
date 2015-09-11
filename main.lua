@@ -1,5 +1,9 @@
 require "strict"
 
+local __pico_fps=30
+
+local frametime = 1/__pico_fps
+
 local cart = nil
 local cartname = nil
 local love_args = nil
@@ -24,6 +28,8 @@ local __accum = 0
 
 local __pico_pal_transparent = {
 }
+
+__pico_resolution = {128,128}
 
 local lineMesh = love.graphics.newMesh(128,nil,"points")
 
@@ -62,11 +68,11 @@ function love.load(argv)
 	if love.system.getOS() == "Android" then
 		love.resize(love.window.getDimensions())
 	else
-		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
+		love.window.setMode(__pico_resolution[1]*scale+xpadding*scale*2,__pico_resolution[2]*scale+ypadding*scale*2)
 	end
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
-	__screen = love.graphics.newCanvas(128,128)
+	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
 	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ ")
@@ -146,6 +152,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	clip()
 	camera()
 	pal()
+	palt()
 	color(0)
 	_load(argv[2] or 'nocart.p8')
 	run()
@@ -205,6 +212,9 @@ function load_p8(filename)
 		pairs=pairs,
 		ipairs=ipairs,
 		warning=warning,
+		setfps=setfps,
+		_keydown=nil,
+		_keyup=nil,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -488,9 +498,9 @@ function love.resize(w,h)
 	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
-		scale = h/(128+ypadding*2)
+		scale = h/(__pico_resolution[2]+ypadding*2)
 	else
-		scale = w/(128+xpadding*2)
+		scale = w/(__pico_resolution[1]+xpadding*2)
 	end
 end
 
@@ -537,9 +547,9 @@ function love.run()
 
 		-- Call update and draw
 		local render = false
-		while dt > 1/30 do
-			if love.update then love.update(1/30) end -- will pass 0 if love.timer is disabled
-			dt = dt - 1/30
+		while dt > frametime do
+			if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
+			dt = dt - frametime
 			render = true
 		end
 
@@ -574,7 +584,7 @@ function flip_screen()
 	love.graphics.present()
 
 	if video_frames then
-		local tmp = love.graphics.newCanvas(128,128)
+		local tmp = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 		love.graphics.setCanvas(tmp)
 		love.graphics.draw(__screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
@@ -601,6 +611,10 @@ function love.draw()
 end
 
 function love.keypressed(key)
+	if cart and cart.keydown then
+		cart.keydown(key)
+		return
+	end
 	if key == 'r' and love.keyboard.isDown('lctrl') then
 		reload()
 	elseif key == 'q' and love.keyboard.isDown('lctrl') then
@@ -635,6 +649,10 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
+	if cart and cart.keyup then
+		cart.keyup(key)
+		return
+	end
 	for p=0,1 do
 		for i=0,#__keymap[p] do
 			if key == __keymap[p][i] then
@@ -643,6 +661,10 @@ function love.keyreleased(key)
 			end
 		end
 	end
+end
+
+function love.textinput(text)
+	if cart and cart.textinput then cart.textinput(text) end
 end
 
 function music()
@@ -658,7 +680,7 @@ function clip(x,y,w,h)
 		love.graphics.setScissor(x,y,w,h)
 		__pico_clip = {x,y,w,h}
 	else
-		love.graphics.setScissor(0,0,128,128)
+		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 		__pico_clip = nil
 	end
 end
@@ -667,15 +689,16 @@ function restore_clip()
 	if __pico_clip then
 		love.graphics.setScissor(unpack(__pico_clip))
 	else
-		love.graphics.setScissor(0,0,128,128)
+		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 	end
 end
 
 function pget(x,y)
-	if x >= 0 and x < 128 and y >= 0 and y < 128 then
+	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
 		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
+		warning(string.format("pget out of screen %d,%d",x,y))
 		return 0
 	end
 end
@@ -740,7 +763,7 @@ end
 
 function flip()
 	flip_screen()
-	love.timer.sleep(1/30)
+	love.timer.sleep(frametime)
 end
 
 log = print
@@ -853,13 +876,13 @@ function circfill(cx,cy,r,col)
 
 	local points = {}
 
-	while x >= y do
+	while y <= x do
 		local lasty = y
 		err = err + y
 		y = y + 1
 		err = err + y
 		_plot4points(points,cx,cy,x,lasty)
-		if err >= 0 then
+		if err > 0 then
 			if x ~= lasty then
 				_plot4points(points,cx,cy,lasty,x)
 			end
@@ -972,8 +995,16 @@ end
 function rectfill(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	local w = math.abs(x1-x0)+1
-	local h = math.abs(y1-y0)+1
+	local w = (x1-x0)+1
+	local h = (y1-y0)+1
+	if w < 0 then
+		w = -w
+		x0 = x0-w
+	end
+	if h < 0 then
+		h = -h
+		y0 = y0-h
+	end
 	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
 end
 
@@ -982,8 +1013,6 @@ function run()
 	love.graphics.setShader(__draw_shader)
 	restore_clip()
 	love.graphics.origin()
-	pal()
-	palt()
 	if cart._init then cart._init() end
 end
 
@@ -1309,4 +1338,12 @@ end
 
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
+end
+
+setfps = function(fps)
+	__pico_fps = flr(fps)
+	if __pico_fps <= 0 then
+		__pico_fps = 30
+	end
+	frametime = 1/__pico_fps
 end

@@ -4,6 +4,69 @@ local __pico_fps=30
 
 local frametime = 1/__pico_fps
 
+local __compression_map = {
+	'INVALID',
+	' ',
+	'0',
+	'1',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'a',
+	'b',
+	'c',
+	'd',
+	'e',
+	'f',
+	'g',
+	'h',
+	'i',
+	'j',
+	'k',
+	'l',
+	'm',
+	'n',
+	'o',
+	'p',
+	'q',
+	'r',
+	's',
+	't',
+	'u',
+	'v',
+	'w',
+	'x',
+	'y',
+	'z',
+	'!',
+	'#',
+	'%',
+	'(',
+	')',
+	'{',
+	'}',
+	'[',
+	']',
+	'<',
+	'>',
+	'+',
+	'=',
+	'/',
+	'*',
+	':',
+	';',
+	'.',
+	',',
+	'~',
+	'_',
+	'"',
+}
+
 local cart = nil
 local cartname = nil
 local love_args = nil
@@ -148,159 +211,346 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	pal()
 
-	if argv[2] and argv[2]:sub(#argv[2]-3,#argv[2]) == '.png' then
-		return load_p8png(argv[2])
-	end
-
 	-- load the cart
 	clip()
 	camera()
 	pal()
 	palt()
 	color(0)
+
 	_load(argv[2] or 'nocart.p8')
 	run()
 end
 
-function load_p8png(filename)
-	local img = love.graphics.newImage(filename)
-	if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
-		error("Image is the wrong size")
-	end
-	local data = img:getData()
+function load_p8(filename)
+	log("Loading",filename)
 
-	local outData = love.image.newImageData(128,128)
-	local mapData = love.graphics.newCanvas(128*8,64*8)
-	__pico_spritesheet_data = love.image.newImageData(128,128)
-	__pico_quads = {}
-	local outX = 0
-	local outY = 0
-	local inbyte = 0
-	local spriteflags = {}
+	local lua = ""
 	__pico_map = {}
-	local mapY = 32
-	local mapX = 0
-	for y=0,64 do
+	__pico_quads = {}
+	for y=0,63 do
 		__pico_map[y] = {}
+		for x=0,127 do
+			__pico_map[y][x] = 0
+		end
 	end
-	for y=0,204 do
-		for x=0,159 do
-			local r,g,b,a = data:getPixel(x,y)
-			-- extract lowest bits
-			r = bit.band(r,0x0003)
-			g = bit.band(g,0x0003)
-			b = bit.band(b,0x0003)
-			a = bit.band(a,0x0003)
-			data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
-			local byte = b + bit.lshift(g,2) + bit.lshift(r,4) + bit.lshift(a,6)
-			local lo = bit.band(byte,0x0f)
-			local hi = bit.rshift(byte,4)
-			if inbyte < 8192 then
-				if outY >= 64 then
+	__pico_spritesheet_data = love.image.newImageData(128,128)
+	__pico_spriteflags = {}
+
+	if filename:sub(#filename-3,#filename) == '.png' then
+		local img = love.graphics.newImage(filename)
+		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
+			error("Image is the wrong size")
+		end
+		local data = img:getData()
+
+		local outX = 0
+		local outY = 0
+		local inbyte = 0
+		local lastbyte = nil
+		local mapY = 32
+		local mapX = 0
+		local version = nil
+		local codelen = nil
+		local code = ""
+		local sprite = 0
+		for y=0,204 do
+			for x=0,159 do
+				local r,g,b,a = data:getPixel(x,y)
+				-- extract lowest bits
+				r = bit.band(r,0x0003)
+				g = bit.band(g,0x0003)
+				b = bit.band(b,0x0003)
+				a = bit.band(a,0x0003)
+				data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
+				local byte = b + bit.lshift(g,2) + bit.lshift(r,4) + bit.lshift(a,6)
+				local lo = bit.band(byte,0x0f)
+				local hi = bit.rshift(byte,4)
+				if inbyte < 0x2000 then
+					if outY >= 64 then
+						__pico_map[mapY][mapX] = byte
+						mapX = mapX + 1
+						if mapX == 128 then
+							mapX = 0
+							mapY = mapY + 1
+						end
+					end
+					__pico_spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
+					outX = outX + 1
+					__pico_spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
+					outX = outX + 1
+					if outX == 128 then
+						outY = outY + 1
+						outX = 0
+						if outY == 128 then
+							-- end of spritesheet, generate quads
+							__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+							local sprite = 0
+							for yy=0,15 do
+								for xx=0,15 do
+									__pico_quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
+									sprite = sprite + 1
+								end
+							end
+							mapY = 0
+							mapX = 0
+						end
+					end
+				elseif inbyte < 0x3000 then
 					__pico_map[mapY][mapX] = byte
 					mapX = mapX + 1
 					if mapX == 128 then
 						mapX = 0
 						mapY = mapY + 1
 					end
+				elseif inbyte < 0x3100 then
+					__pico_spriteflags[sprite] = byte
+					sprite = sprite + 1
+				elseif inbyte < 0x3200 then
+					-- load song
+				elseif inbyte < 0x4300 then
+					-- sfx
+				elseif inbyte == 0x8000 then
+					version = byte
+				else
+					-- code, possibly compressed
+					if inbyte == 0x4305 then
+						codelen = bit.lshift(lastbyte,8) + byte
+					elseif inbyte >= 0x4308 then
+						code = code .. string.char(byte)
+					end
+					lastbyte = byte
 				end
-				__pico_spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
-				outX = outX + 1
-				__pico_spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
-				outX = outX + 1
-				if outX == 128 then
-					outY = outY + 1
-					outX = 0
-					if outY == 128 then
-						log('end of spritesheet')
-						-- end of spritesheet, generate quads
-						__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
-						local sprite = 0
-						for yy=0,15 do
-							for xx=0,15 do
-								__pico_quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
-								sprite = sprite + 1
-							end
-						end
-						mapY = 0
-						mapX = 0
+				inbyte = inbyte + 1
+			end
+		end
+
+		-- decompress code
+		log('version',version)
+		log('codelen',codelen)
+		if version == 0 then
+			lua = code
+		elseif version == 1 then
+			-- decompress code
+			local mode = 0
+			local copy = nil
+			local i = 0
+			while #lua < codelen do
+				i = i + 1
+				local byte = string.byte(code,i,i)
+				if byte == nil then
+					error('reached end of code')
+				else
+					if mode == 1 then
+						lua = lua .. code:sub(i,i)
+						mode = 0
+					elseif mode == 2 then
+						-- copy from buffer
+						local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
+						local length = bit.rshift(byte,4) + 2
+
+						local offset = #lua - offset
+						local buffer = lua:sub(offset+1,offset+1+length-1)
+						lua = lua .. buffer
+						mode = 0
+					elseif byte == 0x00 then
+						-- output next byte
+						mode = 1
+					elseif byte == 0x01 then
+						-- output newline
+						lua = lua .. "\n"
+					elseif byte >= 0x02 and byte <= 0x3b then
+						-- output this byte from map
+						lua = lua .. __compression_map[byte]
+					elseif byte >= 0x3c then
+						-- copy previous bytes
+						mode = 2
+						copy = byte
 					end
 				end
-			elseif inbyte < 8192+4096 then
-				__pico_map[mapY][mapX] = byte
-				mapX = mapX + 1
-				if mapX == 128 then
-					mapX = 0
-					mapY = mapY + 1
-				end
-			elseif inbyte < 8192+4096+256 then
-				spriteflags[#spriteflags+1] = byte
 			end
-			inbyte = inbyte + 1
+		else
+			error(string.format('unknown file version %d',version))
 		end
+
+	else
+		local f = love.filesystem.newFile(filename,'r')
+		if not f then
+			error("Unable to open",filename)
+		end
+		local data,size = f:read()
+		f:close()
+		if not data then
+			error("invalid cart")
+		end
+		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
+		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
+		if start == nil then
+			error("invalid cart")
+		end
+		local next_line = data:find("\n",start+#header)
+		local version_str = data:sub(start+#header,next_line-1)
+		local version = tonumber(version_str)
+		log("version",version)
+		-- extract the lua
+		local lua_start = data:find("__lua__") + 8
+		local lua_end = data:find("__gfx__") - 1
+
+		local lua = data:sub(lua_start,lua_end)
+
+		-- load the sprites into an imagedata
+		-- generate a quad for each sprite index
+		local gfx_start = data:find("__gfx__") + 8
+		local gfx_end = data:find("__gff__") - 1
+		local gfxdata = data:sub(gfx_start,gfx_end)
+
+		local row = 0
+		local tile_row = 32
+		local tile_col = 0
+		local col = 0
+		local sprite = 0
+		local tiles = 0
+		local shared = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = gfxdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = gfxdata:sub(next_line,end_of_line)
+			for i=1,#line do
+				local v = line:sub(i,i)
+				v = tonumber(v,16)
+				__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
+
+				col = col + 1
+				if col == 128 then
+					col = 0
+					row = row + 1
+				end
+			end
+			next_line = gfxdata:find("\n",end_of_line)+1
+		end
+
+		if version > 2 then
+			local tx,ty = 0,32
+			for sy=64,127 do
+				for sx=0,127,2 do
+					-- get the two pixel values and merge them
+					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
+					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+					local v = bor(shl(hi,4),lo)
+					__pico_map[ty][tx] = v
+					shared = shared + 1
+					tx = tx + 1
+					if tx == 128 then
+						tx = 0
+						ty = ty + 1
+					end
+				end
+			end
+			assert(shared == 128 * 32,shared)
+		end
+
+		for y=0,15 do
+			for x=0,15 do
+				__pico_quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
+				sprite = sprite + 1
+			end
+		end
+
+		assert(sprite == 256,sprite)
+
+		__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+
+		-- load the sprite flags
+
+		local gff_start = data:find("__gff__") + 8
+		local gff_end = data:find("__map__") - 1
+		local gffdata = data:sub(gff_start,gff_end)
+
+		local sprite = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = gffdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = gffdata:sub(next_line,end_of_line)
+			if version <= 2 then
+				for i=1,#line do
+					local v = line:sub(i)
+					v = tonumber(v,16)
+					__pico_spriteflags[sprite] = v
+					sprite = sprite + 1
+				end
+			else
+				for i=1,#line,2 do
+					local v = line:sub(i,i+1)
+					v = tonumber(v,16)
+					__pico_spriteflags[sprite] = v
+					sprite = sprite + 1
+				end
+			end
+			next_line = gfxdata:find("\n",end_of_line)+1
+		end
+
+		assert(#__pico_spriteflags == 256,"wrong number of spriteflags:"..#__pico_spriteflags)
+
+		-- convert the tile data to a table
+
+		local map_start = data:find("__map__") + 8
+		local map_end = data:find("__sfx__") - 1
+		local mapdata = data:sub(map_start,map_end)
+
+		local row = 0
+		local col = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = mapdata:find("\n",next_line)
+			if end_of_line == nil then
+				log("reached end of map data")
+				break
+			end
+			end_of_line = end_of_line - 1
+			local line = mapdata:sub(next_line,end_of_line)
+			for i=1,#line,2 do
+				local v = line:sub(i,i+1)
+				v = tonumber(v,16)
+				if col == 0 then
+				end
+				__pico_map[row][col] = v
+				col = col + 1
+				tiles = tiles + 1
+				if col == 128 then
+					col = 0
+					row = row + 1
+				end
+			end
+			next_line = mapdata:find("\n",end_of_line)+1
+		end
+		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
+
+
 	end
+
+	-- check all the data is there
 	love.graphics.setScissor()
-	mapData:clear(0,0,0,255)
-	love.graphics.setCanvas(mapData)
-	love.graphics.setShader(__sprite_shader)
+	local mapimage = love.graphics.newCanvas(1024,512)
+	mapimage:clear(0,0,0,255)
+	love.graphics.setCanvas(mapimage)
+	love.graphics.setShader(__display_shader)
 	for y=0,63 do
 		for x=0,127 do
-			local n = __pico_map[y][x]
-			love.graphics.draw(__pico_spritesheet,__pico_quads[__pico_map[y][x]],x*8,y*8)
-		end
-	end
-	local tmp = love.graphics.newCanvas(128*8,64*8)
-	love.graphics.setCanvas(tmp)
-	love.graphics.setShader(__display_shader)
-	love.graphics.draw(mapData,0,0)
-	tmp:getImageData():encode(string.format("%s.map.png",filename))
-	local tmp = love.graphics.newCanvas(128,128)
-	love.graphics.setCanvas(tmp)
-	tmp:clear(0,0,0,255)
-	love.graphics.setShader(__sprite_shader)
-	local n = 0
-	for y=0,15 do
-		for x=0,15 do
+			assert(__pico_map[y][x],string.format("missing map data: %d,%d",x,y))
+			local n = mget(x,y)
 			love.graphics.draw(__pico_spritesheet,__pico_quads[n],x*8,y*8)
-			n = n + 1
 		end
 	end
-	local tmp2 = love.graphics.newCanvas(128,128)
-	love.graphics.setCanvas(tmp2)
-	love.graphics.setShader(__display_shader)
-	love.graphics.draw(tmp,0,0)
-	tmp2:getImageData():encode(string.format("%s.spritesheet.png",filename))
-	data:encode(string.format("%s.data.png",filename))
-	love.event.quit()
-end
-
-function load_p8(filename)
-	log("Opening",filename)
-	local f = love.filesystem.newFile(filename,'r')
-	if not f then
-		error("Unable to open",filename)
-	end
-	local data,size = f:read()
-	f:close()
-
-	if not data then
-		error("invalid cart")
-	end
-
-	local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-	local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
-	if start == nil then
-		error("invalid cart")
-	end
-	local next_line = data:find("\n",start+#header)
-	local version_str = data:sub(start+#header,next_line-1)
-	local version = tonumber(version_str)
-	log("version",version)
-	-- extract the lua
-	local lua_start = data:find("__lua__") + 8
-	local lua_end = data:find("__gfx__") - 1
-
-	local lua = data:sub(lua_start,lua_end)
+	love.graphics.setShader()
+	love.graphics.setCanvas()
+	mapimage:getImageData():encode('map.png')
 
 	-- patch the lua
 	--lua = lua:gsub("%-%-[^\n]*\n","\n")
@@ -397,184 +647,6 @@ function load_p8(filename)
 		mapdraw=map
 	}
 
-	-- load the sprites into an imagedata
-	-- generate a quad for each sprite index
-	local gfx_start = data:find("__gfx__") + 8
-	local gfx_end = data:find("__gff__") - 1
-	local gfxdata = data:sub(gfx_start,gfx_end)
-
-	local row = 0
-	local tile_row = 32
-	local tile_col = 0
-	local col = 0
-	local sprite = 0
-	local tiles = 0
-	local shared = 0
-
-	__pico_map = {}
-	__pico_quads = {}
-	for y=0,63 do
-		__pico_map[y] = {}
-		for x=0,127 do
-			__pico_map[y][x] = 0
-		end
-	end
-	__pico_spritesheet_data = love.image.newImageData(128,128)
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = gfxdata:find("\n",next_line)
-		if end_of_line == nil then break end
-		end_of_line = end_of_line - 1
-		local line = gfxdata:sub(next_line,end_of_line)
-		for i=1,#line do
-			local v = line:sub(i,i)
-			v = tonumber(v,16)
-			__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
-
-			col = col + 1
-			if col == 128 then
-				col = 0
-				row = row + 1
-			end
-		end
-		next_line = gfxdata:find("\n",end_of_line)+1
-	end
-
-	if version > 2 then
-		local tx,ty = 0,32
-		for sy=64,127 do
-			for sx=0,127,2 do
-				-- get the two pixel values and merge them
-				local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
-				local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
-				local v = bor(shl(hi,4),lo)
-				__pico_map[ty][tx] = v
-				shared = shared + 1
-				tx = tx + 1
-				if tx == 128 then
-					tx = 0
-					ty = ty + 1
-				end
-			end
-		end
-		assert(shared == 128 * 32,shared)
-	end
-
-	for y=0,15 do
-		for x=0,15 do
-			__pico_quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
-			sprite = sprite + 1
-		end
-	end
-
-	assert(sprite == 256,sprite)
-
-	__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
-
-	local tmp = love.graphics.newCanvas(128,128)
-	local spritesheetout = love.graphics.newCanvas(128,128)
-
-	love.graphics.setCanvas(tmp)
-	love.graphics.setShader(__sprite_shader)
-	love.graphics.draw(__pico_spritesheet,0,0,0)
-
-	love.graphics.setShader(__display_shader)
-	love.graphics.setCanvas(spritesheetout)
-	love.graphics.draw(tmp,0,0,0)
-	spritesheetout:getImageData():encode('spritesheet.png')
-
-	love.graphics.setCanvas()
-	love.graphics.setShader()
-
-	-- load the sprite flags
-	__pico_spriteflags = {}
-
-	local gff_start = data:find("__gff__") + 8
-	local gff_end = data:find("__map__") - 1
-	local gffdata = data:sub(gff_start,gff_end)
-
-	local sprite = 0
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = gffdata:find("\n",next_line)
-		if end_of_line == nil then break end
-		end_of_line = end_of_line - 1
-		local line = gffdata:sub(next_line,end_of_line)
-		if version <= 2 then
-			for i=1,#line do
-				local v = line:sub(i)
-				v = tonumber(v,16)
-				__pico_spriteflags[sprite] = v
-				sprite = sprite + 1
-			end
-		else
-			for i=1,#line,2 do
-				local v = line:sub(i,i+1)
-				v = tonumber(v,16)
-				__pico_spriteflags[sprite] = v
-				sprite = sprite + 1
-			end
-		end
-		next_line = gfxdata:find("\n",end_of_line)+1
-	end
-
-	assert(sprite == 256,"wrong number of spriteflags:"..sprite)
-
-	-- convert the tile data to a table
-
-	local map_start = data:find("__map__") + 8
-	local map_end = data:find("__sfx__") - 1
-	local mapdata = data:sub(map_start,map_end)
-
-	local row = 0
-	local col = 0
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = mapdata:find("\n",next_line)
-		if end_of_line == nil then
-			log("reached end of map data")
-			break
-		end
-		end_of_line = end_of_line - 1
-		local line = mapdata:sub(next_line,end_of_line)
-		for i=1,#line,2 do
-			local v = line:sub(i,i+1)
-			v = tonumber(v,16)
-			if col == 0 then
-			end
-			__pico_map[row][col] = v
-			col = col + 1
-			tiles = tiles + 1
-			if col == 128 then
-				col = 0
-				row = row + 1
-			end
-		end
-		next_line = mapdata:find("\n",end_of_line)+1
-	end
-	assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
-
-	-- check all the data is there
-	love.graphics.setScissor()
-	local mapimage = love.graphics.newCanvas(1024,512)
-	mapimage:clear(0,0,0,255)
-	love.graphics.setCanvas(mapimage)
-	love.graphics.setShader(__display_shader)
-	for y=0,63 do
-		for x=0,127 do
-			assert(__pico_map[y][x],string.format("missing map data: %d,%d",x,y))
-			local n = mget(x,y)
-			love.graphics.draw(__pico_spritesheet,__pico_quads[n],x*8,y*8)
-		end
-	end
-	love.graphics.setShader()
-	love.graphics.setCanvas()
-	mapimage:getImageData():encode('map.png')
-
-
 	local ok,f,e = pcall(load,lua,cartname)
 	if not ok or f==nil then
 		error("Error loading lua: "..tostring(e))
@@ -593,6 +665,24 @@ function load_p8(filename)
 		end
 	end
 	log("finished loading cart",filename)
+
+	-- save images
+
+	local tmp = love.graphics.newCanvas(128,128)
+	local spritesheetout = love.graphics.newCanvas(128,128)
+
+	love.graphics.setCanvas(tmp)
+	love.graphics.setShader(__sprite_shader)
+	love.graphics.draw(__pico_spritesheet,0,0,0)
+
+	love.graphics.setShader(__display_shader)
+	love.graphics.setCanvas(spritesheetout)
+	love.graphics.draw(tmp,0,0,0)
+	spritesheetout:getImageData():encode('spritesheet.png')
+
+	love.graphics.setCanvas()
+	love.graphics.setShader()
+
 
 	return cart_G
 end

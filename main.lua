@@ -1,53 +1,71 @@
---[[
-Implementation of PICO8 API for LOVE
-
-Please don't redistribute yet!
-
-What it is:
-
- * An implementation of pico-8's api in love
-
-Why:
-
- * For a fun challenge!
- * Allow standalone publishing of pico-8 games on other platforms
-  * should work on mobile devices
- * Configurable controls
- * Extendable
- * No arbitrary cpu or memory limitations
- * No arbitrary code size limitations
- * Betting debugging tools available
- * Open source
-
-What it isn't:
-
- * A replacement for Pico-8
- * A perfect replica
- * No dev tools, no image editor, map editor, sfx editor, music editor
- * No modifying or saving carts
-
-Not Yet Implemented:
-
- * Memory modification/reading
- * Sound/music
-
-Not working:
-
-Differences:
-
- * Uses floating point numbers not fixed point
- * sqrt doesn't freeze
- * Uses luajit not lua 5.2
-
-Extra features:
- * ipairs(), pairs()
- * log(...) function prints to console for debugging
- * assert(expr,message) if expr is not true then errors with message
- * error(message) bluescreens with an error message
-
-]]
-
 require "strict"
+
+local __pico_fps=30
+
+local frametime = 1/__pico_fps
+
+local __compression_map = {
+	'INVALID',
+	' ',
+	'0',
+	'1',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'a',
+	'b',
+	'c',
+	'd',
+	'e',
+	'f',
+	'g',
+	'h',
+	'i',
+	'j',
+	'k',
+	'l',
+	'm',
+	'n',
+	'o',
+	'p',
+	'q',
+	'r',
+	's',
+	't',
+	'u',
+	'v',
+	'w',
+	'x',
+	'y',
+	'z',
+	'!',
+	'#',
+	'%',
+	'(',
+	')',
+	'{',
+	'}',
+	'[',
+	']',
+	'<',
+	'>',
+	'+',
+	'=',
+	'/',
+	'*',
+	':',
+	';',
+	'.',
+	',',
+	'~',
+	'_',
+	'"',
+}
 
 local cart = nil
 local cartname = nil
@@ -73,6 +91,10 @@ local __accum = 0
 
 local __pico_pal_transparent = {
 }
+
+__pico_resolution = {128,128}
+
+local lineMesh = love.graphics.newMesh(128,nil,"points")
 
 local __pico_palette = {
 	{0,0,0,255},
@@ -132,10 +154,9 @@ local QueueableSource = require "QueueableSource"
 function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == "Android" then
-		--love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
 		love.resize(love.window.getDimensions())
 	else
-		love.window.setMode(128*scale+xpadding*scale*2,128*scale+ypadding*scale*2)
+		love.window.setMode(__pico_resolution[1]*scale+xpadding*scale*2,__pico_resolution[2]*scale+ypadding*scale*2)
 	end
 
 	osc = {}
@@ -186,10 +207,10 @@ function love.load(argv)
 
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
-	__screen = love.graphics.newCanvas(128,128)
+	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+ ")
+	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ ")
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -266,72 +287,17 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	clip()
 	camera()
 	pal()
+	palt()
 	color(0)
-	load(argv[2] or 'picopout.p8')
+
+	_load(argv[2] or 'nocart.p8')
 	run()
 end
 
 function load_p8(filename)
-	log("Opening",filename)
-	local f = love.filesystem.newFile(filename,'r')
-	if not f then
-		error("Unable to open",filename)
-	end
-	local data,size = f:read()
-	f:close()
+	log("Loading",filename)
 
-	if not data then
-		error("invalid cart")
-	end
-
-	--local start = data:find("pico-8 cartridge // http://www.pico-8.com\nversion ")
-	local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-	local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
-	if start == nil then
-		error("invalid cart")
-	end
-	local next_line = data:find("\n",start+#header)
-	local version_str = data:sub(start+#header,next_line-1)
-	local version = tonumber(version_str)
-	log("version",version)
-	-- extract the lua
-	local lua_start = data:find("__lua__") + 8
-	local lua_end = data:find("__gfx__") - 1
-
-	local lua = data:sub(lua_start,lua_end)
-
-	-- patch the lua
-	--lua = lua:gsub("%-%-[^\n]*\n","\n")
-	lua = lua:gsub("!=","~=")
-	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
-		local nl = a:find('\n')
-		local th = b:find('%f[%w]then%f[%W]')
-		local an = b:find('%f[%w]and%f[%W]')
-		local o = b:find('%f[%w]or%f[W]')
-		if nl or th or an or o then
-			return string.format('if %s %s\n',a,b)
-		else
-			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
-		end
-	end)
-	-- rewrite assignment operators
-	lua = lua:gsub("(%S+)%s*([%+-%*/])=","%1 = %1 %2 ")
-
-	-- load the sprites into an imagedata
-	-- generate a quad for each sprite index
-	local gfx_start = data:find("__gfx__") + 8
-	local gfx_end = data:find("__gff__") - 1
-	local gfxdata = data:sub(gfx_start,gfx_end)
-
-	local row = 0
-	local tile_row = 32
-	local tile_col = 0
-	local col = 0
-	local sprite = 0
-	local tiles = 0
-	local shared = 0
-
+	local lua = ""
 	__pico_map = {}
 	__pico_quads = {}
 	for y=0,63 do
@@ -341,140 +307,305 @@ function load_p8(filename)
 		end
 	end
 	__pico_spritesheet_data = love.image.newImageData(128,128)
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = gfxdata:find("\n",next_line)
-		if end_of_line == nil then break end
-		end_of_line = end_of_line - 1
-		local line = gfxdata:sub(next_line,end_of_line)
-		for i=1,#line do
-			local v = line:sub(i,i)
-			v = tonumber(v,16)
-			__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
-
-			col = col + 1
-			if col == 128 then
-				col = 0
-				row = row + 1
-			end
-		end
-		next_line = gfxdata:find("\n",end_of_line)+1
-	end
-
-	local tx,ty = 0,32
-	for sy=64,127 do
-		for sx=0,127,2 do
-			-- get the two pixel values and merge them
-			local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
-			local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
-			local v = bor(shl(hi,4),lo)
-			__pico_map[ty][tx] = v
-			shared = shared + 1
-			tx = tx + 1
-			if tx == 128 then
-				tx = 0
-				ty = ty + 1
-			end
-		end
-	end
-
-	for y=0,15 do
-		for x=0,15 do
-			__pico_quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
-			sprite = sprite + 1
-		end
-	end
-
-	assert(shared == 128 * 32,shared)
-	assert(sprite == 256,sprite)
-
-	__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
-
-	local tmp = love.graphics.newCanvas(128,128)
-	local spritesheetout = love.graphics.newCanvas(128,128)
-
-	love.graphics.setCanvas(tmp)
-	love.graphics.setShader(__sprite_shader)
-	love.graphics.draw(__pico_spritesheet,0,0,0)
-
-	love.graphics.setShader(__display_shader)
-	love.graphics.setCanvas(spritesheetout)
-	love.graphics.draw(tmp,0,0,0)
-	spritesheetout:getImageData():encode('spritesheet.png')
-
-	love.graphics.setCanvas()
-	love.graphics.setShader()
-
-	-- load the sprite flags
 	__pico_spriteflags = {}
 
-	local gff_start = data:find("__gff__") + 8
-	local gff_end = data:find("__map__") - 1
-	local gffdata = data:sub(gff_start,gff_end)
+	if filename:sub(#filename-3,#filename) == '.png' then
+		local img = love.graphics.newImage(filename)
+		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
+			error("Image is the wrong size")
+		end
+		local data = img:getData()
 
-	local sprite = 0
+		local outX = 0
+		local outY = 0
+		local inbyte = 0
+		local lastbyte = nil
+		local mapY = 32
+		local mapX = 0
+		local version = nil
+		local codelen = nil
+		local code = ""
+		local sprite = 0
+		for y=0,204 do
+			for x=0,159 do
+				local r,g,b,a = data:getPixel(x,y)
+				-- extract lowest bits
+				r = bit.band(r,0x0003)
+				g = bit.band(g,0x0003)
+				b = bit.band(b,0x0003)
+				a = bit.band(a,0x0003)
+				data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
+				local byte = b + bit.lshift(g,2) + bit.lshift(r,4) + bit.lshift(a,6)
+				local lo = bit.band(byte,0x0f)
+				local hi = bit.rshift(byte,4)
+				if inbyte < 0x2000 then
+					if outY >= 64 then
+						__pico_map[mapY][mapX] = byte
+						mapX = mapX + 1
+						if mapX == 128 then
+							mapX = 0
+							mapY = mapY + 1
+						end
+					end
+					__pico_spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
+					outX = outX + 1
+					__pico_spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
+					outX = outX + 1
+					if outX == 128 then
+						outY = outY + 1
+						outX = 0
+						if outY == 128 then
+							-- end of spritesheet, generate quads
+							__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+							local sprite = 0
+							for yy=0,15 do
+								for xx=0,15 do
+									__pico_quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
+									sprite = sprite + 1
+								end
+							end
+							mapY = 0
+							mapX = 0
+						end
+					end
+				elseif inbyte < 0x3000 then
+					__pico_map[mapY][mapX] = byte
+					mapX = mapX + 1
+					if mapX == 128 then
+						mapX = 0
+						mapY = mapY + 1
+					end
+				elseif inbyte < 0x3100 then
+					__pico_spriteflags[sprite] = byte
+					sprite = sprite + 1
+				elseif inbyte < 0x3200 then
+					-- load song
+				elseif inbyte < 0x4300 then
+					-- sfx
+				elseif inbyte == 0x8000 then
+					version = byte
+				else
+					-- code, possibly compressed
+					if inbyte == 0x4305 then
+						codelen = bit.lshift(lastbyte,8) + byte
+					elseif inbyte >= 0x4308 then
+						code = code .. string.char(byte)
+					end
+					lastbyte = byte
+				end
+				inbyte = inbyte + 1
+			end
+		end
 
-	local next_line = 1
-	while next_line do
-		local end_of_line = gffdata:find("\n",next_line)
-		if end_of_line == nil then break end
-		end_of_line = end_of_line - 1
-		local line = gffdata:sub(next_line,end_of_line)
-		if version <= 2 then
-			for i=1,#line do
-				local v = line:sub(i)
-				v = tonumber(v,16)
-				__pico_spriteflags[sprite] = v
-				sprite = sprite + 1
+		-- decompress code
+		log('version',version)
+		log('codelen',codelen)
+		if version == 0 then
+			lua = code
+		elseif version == 1 then
+			-- decompress code
+			local mode = 0
+			local copy = nil
+			local i = 0
+			while #lua < codelen do
+				i = i + 1
+				local byte = string.byte(code,i,i)
+				if byte == nil then
+					error('reached end of code')
+				else
+					if mode == 1 then
+						lua = lua .. code:sub(i,i)
+						mode = 0
+					elseif mode == 2 then
+						-- copy from buffer
+						local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
+						local length = bit.rshift(byte,4) + 2
+
+						local offset = #lua - offset
+						local buffer = lua:sub(offset+1,offset+1+length-1)
+						lua = lua .. buffer
+						mode = 0
+					elseif byte == 0x00 then
+						-- output next byte
+						mode = 1
+					elseif byte == 0x01 then
+						-- output newline
+						lua = lua .. "\n"
+					elseif byte >= 0x02 and byte <= 0x3b then
+						-- output this byte from map
+						lua = lua .. __compression_map[byte]
+					elseif byte >= 0x3c then
+						-- copy previous bytes
+						mode = 2
+						copy = byte
+					end
+				end
 			end
 		else
+			error(string.format('unknown file version %d',version))
+		end
+
+	else
+		local f = love.filesystem.newFile(filename,'r')
+		if not f then
+			error("Unable to open",filename)
+		end
+		local data,size = f:read()
+		f:close()
+		if not data then
+			error("invalid cart")
+		end
+		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
+		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
+		if start == nil then
+			error("invalid cart")
+		end
+		local next_line = data:find("\n",start+#header)
+		local version_str = data:sub(start+#header,next_line-1)
+		local version = tonumber(version_str)
+		log("version",version)
+		-- extract the lua
+		local lua_start = data:find("__lua__") + 8
+		local lua_end = data:find("__gfx__") - 1
+
+		local lua = data:sub(lua_start,lua_end)
+
+		-- load the sprites into an imagedata
+		-- generate a quad for each sprite index
+		local gfx_start = data:find("__gfx__") + 8
+		local gfx_end = data:find("__gff__") - 1
+		local gfxdata = data:sub(gfx_start,gfx_end)
+
+		local row = 0
+		local tile_row = 32
+		local tile_col = 0
+		local col = 0
+		local sprite = 0
+		local tiles = 0
+		local shared = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = gfxdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = gfxdata:sub(next_line,end_of_line)
+			for i=1,#line do
+				local v = line:sub(i,i)
+				v = tonumber(v,16)
+				__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
+
+				col = col + 1
+				if col == 128 then
+					col = 0
+					row = row + 1
+				end
+			end
+			next_line = gfxdata:find("\n",end_of_line)+1
+		end
+
+		if version > 2 then
+			local tx,ty = 0,32
+			for sy=64,127 do
+				for sx=0,127,2 do
+					-- get the two pixel values and merge them
+					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
+					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+					local v = bor(shl(hi,4),lo)
+					__pico_map[ty][tx] = v
+					shared = shared + 1
+					tx = tx + 1
+					if tx == 128 then
+						tx = 0
+						ty = ty + 1
+					end
+				end
+			end
+			assert(shared == 128 * 32,shared)
+		end
+
+		for y=0,15 do
+			for x=0,15 do
+				__pico_quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
+				sprite = sprite + 1
+			end
+		end
+
+		assert(sprite == 256,sprite)
+
+		__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+
+		-- load the sprite flags
+
+		local gff_start = data:find("__gff__") + 8
+		local gff_end = data:find("__map__") - 1
+		local gffdata = data:sub(gff_start,gff_end)
+
+		local sprite = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = gffdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = gffdata:sub(next_line,end_of_line)
+			if version <= 2 then
+				for i=1,#line do
+					local v = line:sub(i)
+					v = tonumber(v,16)
+					__pico_spriteflags[sprite] = v
+					sprite = sprite + 1
+				end
+			else
+				for i=1,#line,2 do
+					local v = line:sub(i,i+1)
+					v = tonumber(v,16)
+					__pico_spriteflags[sprite] = v
+					sprite = sprite + 1
+				end
+			end
+			next_line = gfxdata:find("\n",end_of_line)+1
+		end
+
+		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
+
+		-- convert the tile data to a table
+
+		local map_start = data:find("__map__") + 8
+		local map_end = data:find("__sfx__") - 1
+		local mapdata = data:sub(map_start,map_end)
+
+		local row = 0
+		local col = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = mapdata:find("\n",next_line)
+			if end_of_line == nil then
+				log("reached end of map data")
+				break
+			end
+			end_of_line = end_of_line - 1
+			local line = mapdata:sub(next_line,end_of_line)
 			for i=1,#line,2 do
 				local v = line:sub(i,i+1)
 				v = tonumber(v,16)
-				__pico_spriteflags[sprite] = v
-				sprite = sprite + 1
+				if col == 0 then
+				end
+				__pico_map[row][col] = v
+				col = col + 1
+				tiles = tiles + 1
+				if col == 128 then
+					col = 0
+					row = row + 1
+				end
 			end
+			next_line = mapdata:find("\n",end_of_line)+1
 		end
-		next_line = gfxdata:find("\n",end_of_line)+1
+		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
+
+
 	end
-
-	assert(sprite == 256,"wrong number of spriteflags:"..sprite)
-
-	-- convert the tile data to a table
-
-	local map_start = data:find("__map__") + 8
-	local map_end = data:find("__sfx__") - 1
-	local mapdata = data:sub(map_start,map_end)
-
-	local row = 0
-	local col = 0
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = mapdata:find("\n",next_line)
-		if end_of_line == nil then
-			log("reached end of map data")
-			break
-		end
-		end_of_line = end_of_line - 1
-		local line = mapdata:sub(next_line,end_of_line)
-		for i=1,#line,2 do
-			local v = line:sub(i,i+1)
-			v = tonumber(v,16)
-			if col == 0 then
-			end
-			__pico_map[row][col] = v
-			col = col + 1
-			tiles = tiles + 1
-			if col == 128 then
-				col = 0
-				row = row + 1
-			end
-		end
-		next_line = mapdata:find("\n",end_of_line)+1
-	end
-	assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 	-- check all the data is there
 	love.graphics.setScissor()
@@ -493,54 +624,23 @@ function load_p8(filename)
 	love.graphics.setCanvas()
 	mapimage:getImageData():encode('map.png')
 
-	-- load sfx
-	local sfx_start = data:find("__sfx__") + 8
-	local sfx_end = data:find("__music__") - 1
-	local sfxdata = data:sub(sfx_start,sfx_end)
-
-	__pico_sfx = {}
-	for i=0,63 do
-		__pico_sfx[i] = {
-			speed=16,
-			loop_start=0,
-			loop_end=0
-		}
-		for j=0,31 do
-			__pico_sfx[i][j] = {0,0,0,0}
+	-- patch the lua
+	--lua = lua:gsub("%-%-[^\n]*\n","\n")
+	lua = lua:gsub("!=","~=")
+	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
+		local nl = a:find('\n')
+		local th = b:find('%f[%w]then%f[%W]')
+		local an = b:find('%f[%w]and%f[%W]')
+		local o = b:find('%f[%w]or%f[W]')
+		if nl or th or an or o then
+			return string.format('if %s %s\n',a,b)
+		else
+			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
 		end
-	end
-
-	local _sfx = 0
-	local step = 0
-
-	local next_line = 1
-	while next_line do
-		local end_of_line = sfxdata:find("\n",next_line)
-		if end_of_line == nil then break end
-		end_of_line = end_of_line - 1
-		local line = sfxdata:sub(next_line,end_of_line)
-		local editor_mode = tonumber(line:sub(1,2),16)
-		__pico_sfx[_sfx].speed = tonumber(line:sub(3,4),16)
-		__pico_sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
-		__pico_sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
-		for i=9,#line,5 do
-			local v = line:sub(i,i+4)
-			assert(#v == 5)
-			local note  = tonumber(line:sub(i,i+1),16)
-			local instr = tonumber(line:sub(i+2,i+2),16)
-			local vol   = tonumber(line:sub(i+3,i+3),16)
-			local fx    = tonumber(line:sub(i+4,i+4),16)
-			__pico_sfx[_sfx][step] = {note,instr,vol,fx}
-			step = step + 1
-		end
-		_sfx = _sfx + 1
-		step = 0
-		next_line = sfxdata:find("\n",end_of_line)+1
-	end
-
-	assert(_sfx == 64)
-
-	-- load music
+	end)
+	-- rewrite assignment operators
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 
 	local cart_G = {
 		-- extra functions provided by picolove
@@ -549,6 +649,11 @@ function load_p8(filename)
 		log=log,
 		pairs=pairs,
 		ipairs=ipairs,
+		warning=warning,
+		setfps=setfps,
+		_keydown=nil,
+		_keyup=nil,
+		_textinput=nil,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -566,7 +671,7 @@ function load_p8(filename)
 		circ=circ,
 		circfill=circfill,
 		line=line,
-		load=load,
+		load=_load,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -614,9 +719,7 @@ function load_p8(filename)
 		mapdraw=map
 	}
 
-
-
-	local ok,f,e = pcall(loadstring,lua)
+	local ok,f,e = pcall(load,lua,cartname)
 	if not ok or f==nil then
 		error("Error loading lua: "..tostring(e))
 	else
@@ -633,6 +736,7 @@ function load_p8(filename)
 			log("lua completed")
 		end
 	end
+	log("finished loading cart",filename)
 
 	return cart_G
 end
@@ -655,9 +759,9 @@ function love.resize(w,h)
 	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
-		scale = h/(128+ypadding*2)
+		scale = h/(__pico_resolution[2]+ypadding*2)
 	else
-		scale = w/(128+xpadding*2)
+		scale = w/(__pico_resolution[1]+xpadding*2)
 	end
 end
 
@@ -704,59 +808,9 @@ function love.run()
 
 		-- Call update and draw
 		local render = false
-		while dt > 1/30 do
-			for i=0,3 do
-				local snd = love.sound.newSoundData(flr(rate*dt),rate,bits,channel)
-				for tick=0,31 do
-					if __pico_audio_channels[i] ~= nil then
-						local ch = __pico_audio_channels[i]
-						local s = __pico_sfx[__pico_audio_channels[i].sfx]
-						if s.speed <= 0 then s.speed = 1/30 end
-						ch.offset = ch.offset + (dt/32) / s.speed
-						if s.loop_end ~= 0 then
-							if ch.offset >= s.loop_end then
-								if ch.loop then
-									ch.offset = s.loop_start + (ch.offset-s.loop_end)
-									ch.last_step = s.loop_start-1
-								else
-									ch.current = nil
-									__pico_audio_channels[i] = nil
-								end
-							end
-						elseif ch.offset >= 32 then
-							if ch.current then
-								ch.current = nil
-							end
-							__pico_audio_channels[i] = nil
-						end
-						if __pico_audio_channels[i] then
-							-- get a sounddata of the right length
-							local ch = __pico_audio_channels[i]
-							local note,instr,vol,fx = unpack(s[flr(ch.offset)])
-							local freq = (65.41*math.pow(2,flr(note/12)))
-							local samples = flr(rate*dt)/32
-							for smp=0,samples-1 do
-								snd:setSample(smp,(osc[instr]((ch.offset*rate)+smp*(freq/rate))) * vol)
-							end
-							if not __audio_channels[i]:isPlaying() then
-								__audio_channels[i]:play()
-							end
-							-- if we pass a step
-							if flr(ch.offset) > ch.last_step then
-								if ch.current then
-									ch.current = nil
-								end
-								--local note,instr,vol,fx = unpack(s[flr(ch.offset)])
-								ch.last_step = flr(ch.offset)
-							end
-						end
-					end
-					__audio_channels[i]:queue(snd)
-				end
-			end
-
-			if love.update then love.update(1/30) end -- will pass 0 if love.timer is disabled
-			dt = dt - 1/30
+		while dt > frametime do
+			if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
+			dt = dt - frametime
 			render = true
 		end
 
@@ -791,7 +845,7 @@ function flip_screen()
 	love.graphics.present()
 
 	if video_frames then
-		local tmp = love.graphics.newCanvas(128,128)
+		local tmp = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 		love.graphics.setCanvas(tmp)
 		love.graphics.draw(__screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
@@ -818,6 +872,9 @@ function love.draw()
 end
 
 function love.keypressed(key)
+	if cart and cart._keydown then
+		return cart._keydown(key)
+	end
 	if key == 'r' and love.keyboard.isDown('lctrl') then
 		reload()
 	elseif key == 'q' and love.keyboard.isDown('lctrl') then
@@ -852,6 +909,9 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
+	if cart and cart._keyup then
+		return cart._keyup(key)
+	end
 	for p=0,1 do
 		for i=0,#__keymap[p] do
 			if key == __keymap[p][i] then
@@ -864,6 +924,10 @@ end
 
 function music(n,fade_len,channel_mask)
 	__pico_current_music = {n,offset=0,channel_mask=channel_mask}
+end
+
+function love.textinput(text)
+	if cart and cart._textinput then return cart._textinput(text) end
 end
 
 function sfx(n,channel,offset)
@@ -899,7 +963,7 @@ function clip(x,y,w,h)
 		love.graphics.setScissor(x,y,w,h)
 		__pico_clip = {x,y,w,h}
 	else
-		love.graphics.setScissor(0,0,128,128)
+		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 		__pico_clip = nil
 	end
 end
@@ -908,16 +972,17 @@ function restore_clip()
 	if __pico_clip then
 		love.graphics.setScissor(unpack(__pico_clip))
 	else
-		love.graphics.setScissor(0,0,128,128)
+		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 	end
 end
 
 function pget(x,y)
-	if x >= 0 and x < 128 and y >= 0 and y < 128 then
+	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
 		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
-		return nil
+		warning(string.format("pget out of screen %d,%d",x,y))
+		return 0
 	end
 end
 
@@ -946,6 +1011,10 @@ function fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
+		if not __pico_spriteflags[flr(n)] then
+			warning(string.format('fget(%d,%d)',n,f))
+			return 0
+		end
 		return band(__pico_spriteflags[flr(n)],shl(1,flr(f))) ~= 0
 	end
 	return __pico_spriteflags[flr(n)]
@@ -981,7 +1050,7 @@ end
 
 function flip()
 	flip_screen()
-	love.timer.sleep(1/30)
+	love.timer.sleep(frametime)
 end
 
 log = print
@@ -1035,9 +1104,6 @@ function restore_camera()
 	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
-
-local circleMesh = love.graphics.newMesh(128,nil,"points")
-
 function circ(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
@@ -1045,123 +1111,151 @@ function circ(ox,oy,r,col)
 	oy = flr(oy)
 	r = flr(r)
 	local points = {}
-
 	local x = r
 	local y = 0
-	local decisionover2 = 1 - x
-	while x >= y do
-		table.insert(points,{x+ox,y+oy})
-		table.insert(points,{y+ox,x+oy})
-		table.insert(points,{-x+ox,y+oy})
-		table.insert(points,{-y+ox,x+oy})
+	local decisionOver2 = 1 - x
 
-		table.insert(points,{-x+ox,-y+oy})
-		table.insert(points,{-y+ox,-x+oy})
-		table.insert(points,{x+ox,-y+oy})
-		table.insert(points,{y+ox,-x+oy})
+	while y <= x do
+		table.insert(points,{ox+x,oy+y})
+		table.insert(points,{ox+y,oy+x})
+		table.insert(points,{ox-x,oy+y})
+		table.insert(points,{ox-y,oy+x})
+
+		table.insert(points,{ox-x,oy-y})
+		table.insert(points,{ox-y,oy-x})
+		table.insert(points,{ox+x,oy-y})
+		table.insert(points,{ox+y,oy-x})
 		y = y + 1
-		if decisionover2 <= 0 then
-			decisionover2 = decisionover2 + 2 * y + 1
+		if decisionOver2 <= 0 then
+			decisionOver2 = decisionOver2 + 2 * y + 1
 		else
 			x = x - 1
-			decisionover2 = decisionover2 + 2 * (y - x) + 1
+			decisionOver2 = decisionOver2 + 2 * (y-x) + 1
 		end
 	end
-
-	circleMesh:setVertices(points)
-	circleMesh:setDrawRange(1,#points)
-	love.graphics.draw(circleMesh)
+	lineMesh:setVertices(points)
+	lineMesh:setDrawRange(1,#points)
+	love.graphics.draw(lineMesh)
 end
 
-function circfill(ox,oy,r,col)
+function _plot4points(points,cx,cy,x,y)
+	_horizontal_line(points, cx - x, cy + y, cx + x)
+	if x ~= 0 and y ~= 0 then
+		_horizontal_line(points, cx - x, cy - y, cx + x)
+	end
+end
+
+function _horizontal_line(points,x0,y,x1)
+	for x=x0,x1 do
+		table.insert(points,{x,y})
+	end
+end
+
+function circfill(cx,cy,r,col)
 	col = col or __pico_color
 	color(col)
-	ox = flr(ox)
-	oy = flr(oy)
+	cx = flr(cx)
+	cy = flr(cy)
 	r = flr(r)
-
-	local err = -r
 	local x = r
 	local y = 0
-	while x >= y do
+	local err = -r
+
+	local points = {}
+
+	while y <= x do
 		local lasty = y
 		err = err + y
 		y = y + 1
 		err = err + y
-		line(ox+x,oy+lasty,ox-x,oy+lasty)
-		line(ox+x,oy-lasty,ox-x,oy-lasty)
-
-		if err >= 0 then
+		_plot4points(points,cx,cy,x,lasty)
+		if err > 0 then
 			if x ~= lasty then
-				line(ox+lasty,oy+x,ox-lasty,oy+x)
-				line(ox+lasty,oy-x,ox-lasty,oy-x)
+				_plot4points(points,cx,cy,lasty,x)
 			end
 			err = err - x
 			x = x - 1
 			err = err - x
 		end
 	end
-end
 
-local lineMesh = love.graphics.newMesh(128,nil,"points")
+	lineMesh:setVertices(points)
+	lineMesh:setDrawRange(1,#points)
+	love.graphics.draw(lineMesh)
+
+end
 
 function line(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
+
+	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
+		warning("line has NaN value")
+		return
+	end
 
 	x0 = flr(x0)
 	y0 = flr(y0)
 	x1 = flr(x1)
 	y1 = flr(y1)
 
+
 	local dx = x1 - x0
 	local dy = y1 - y0
 	local stepx, stepy
 
-	if dy < 0 then
-		dy = -dy
-		stepy = -1
-	else
-		stepy = 1
-	end
-
-	if dx < 0 then
-		dx = -dx
-		stepx = -1
-	else
-		stepx = 1
-	end
-
 	local points = {{x0,y0}}
-	--love.graphics.point(x0,y0)
-	if dx > dy then
-		local fraction = dy - bit.rshift(dx, 1)
-		while x0 ~= x1 do
-			if fraction >= 0 then
-				y0 = y0 + stepy
-				fraction = fraction - dx
-			end
-			x0 = x0 + stepx
-			fraction = fraction + dy
-			--love.graphics.point(flr(x0),flr(y0))
-			table.insert(points,{flr(x0),flr(y0)})
-			if #points > 181 then
-				break
-			end
+
+	if dx == 0 then
+		-- simple case draw a vertical line
+		points = {}
+		if y0 > y1 then y0,y1 = y1,y0 end
+		for y=y0,y1 do
+			table.insert(points,{x0,y})
+		end
+	elseif dy == 0 then
+		-- simple case draw a horizontal line
+		points = {}
+		if x0 > x1 then x0,x1 = x1,x0 end
+		for x=x0,x1 do
+			table.insert(points,{x,y0})
 		end
 	else
-		local fraction = dx - bit.rshift(dy, 1)
-		while y0 ~= y1 do
-			if fraction >= 0 then
+		if dy < 0 then
+			dy = -dy
+			stepy = -1
+		else
+			stepy = 1
+		end
+
+		if dx < 0 then
+			dx = -dx
+			stepx = -1
+		else
+			stepx = 1
+		end
+
+		if dx > dy then
+			local fraction = dy - bit.rshift(dx, 1)
+			while x0 ~= x1 do
+				if fraction >= 0 then
+					y0 = y0 + stepy
+					fraction = fraction - dx
+				end
 				x0 = x0 + stepx
-				fraction = fraction - dy
+				fraction = fraction + dy
+				table.insert(points,{flr(x0),flr(y0)})
 			end
-			y0 = y0 + stepy
-			fraction = fraction + dx
-			--love.graphics.point(flr(x0),flr(y0))
-			table.insert(points,{flr(x0),flr(y0)})
-			if #points > 181 then
-				break
+		else
+			local fraction = dx - bit.rshift(dy, 1)
+			while y0 ~= y1 do
+				if fraction >= 0 then
+					x0 = x0 + stepx
+					fraction = fraction - dy
+				end
+				y0 = y0 + stepy
+				fraction = fraction + dx
+				table.insert(points,{flr(x0),flr(y0)})
 			end
 		end
 	end
@@ -1170,7 +1264,7 @@ function line(x0,y0,x1,y1,col)
 	love.graphics.draw(lineMesh)
 end
 
-function load(_cartname)
+function _load(_cartname)
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.origin()
@@ -1189,23 +1283,29 @@ end
 function rectfill(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	x0 = flr(x0)
-	x1 = flr(x1)
-	y0 = flr(y0)
-	y1 = flr(y1)
-	local w = math.abs(x1-x0)+1
-	local h = math.abs(y1-y0)+1
+	local w = (x1-x0)+1
+	local h = (y1-y0)+1
+	if w < 0 then
+		w = -w
+		x0 = x0-w
+	end
+	if h < 0 then
+		h = -h
+		y0 = y0-h
+	end
 	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
 end
 
 function run()
 	love.graphics.setCanvas(__screen)
 	love.graphics.setShader(__draw_shader)
+	restore_clip()
+	love.graphics.origin()
 	if cart._init then cart._init() end
 end
 
 function reload()
-	load(cartname)
+	_load(cartname)
 	run()
 end
 
@@ -1224,12 +1324,16 @@ function pal(c0,c1,p)
 		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = false
 	elseif p == 1 and c1 ~= nil then
+		c0 = flr(c0)%16
+		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		__display_palette[c0] = __pico_palette[c1]
 		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
+		c0 = flr(c0)%16
+		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		__draw_palette[c0] = c1
@@ -1246,6 +1350,7 @@ function palt(c,t)
 			__pico_pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
+		c = flr(c)%16
 		if t == false then
 			__pico_pal_transparent[c+1] = 1
 		elseif t == true then
@@ -1256,6 +1361,7 @@ function palt(c,t)
 end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
+	n = flr(n)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
 	n = flr(n)
@@ -1276,6 +1382,9 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
 			__pico_quads[id] = q
 		end
+	end
+	if not q then
+		log('missing quad',n)
 	end
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(x)+(w*8*(flip_x and 1 or 0)),
@@ -1314,7 +1423,15 @@ function del(a,dv)
 	end
 end
 
+function warning(msg)
+	log(debug.traceback("WARNING: "..msg,3))
+end
+
 function foreach(a,f)
+	if not a then
+		warning("foreach got a nil value")
+		return
+	end
 	for i,v in ipairs(a) do
 		f(v)
 	end
@@ -1451,8 +1568,24 @@ end
 function poke(...)
 end
 
-max = math.max
-min = math.min
+function min(a,b)
+	if a == nil or b == nil then
+		warning('min a or b are nil returning 0')
+		return 0
+	end
+	if a < b then return a end
+	return b
+end
+
+function max(a,b)
+	if a == nil or b == nil then
+		warning('max a or b are nil returning 0')
+		return 0
+	end
+	if a > b then return a end
+	return b
+end
+
 function mid(x,y,z)
 	return x > y and x or y > z and z or y
 end
@@ -1508,4 +1641,12 @@ end
 
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
+end
+
+setfps = function(fps)
+	__pico_fps = flr(fps)
+	if __pico_fps <= 0 then
+		__pico_fps = 30
+	end
+	frametime = 1/__pico_fps
 end

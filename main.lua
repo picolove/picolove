@@ -147,7 +147,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	camera()
 	pal()
 	color(0)
-	load(argv[2] or 'nocart.p8')
+	_load(argv[2] or 'nocart.p8')
 	run()
 end
 
@@ -222,7 +222,7 @@ function load_p8(filename)
 		circ=circ,
 		circfill=circfill,
 		line=line,
-		load=load,
+		load=_load,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -447,9 +447,8 @@ function load_p8(filename)
 	love.graphics.setCanvas()
 	mapimage:getImageData():encode('map.png')
 
-	log("finished loading cart",filename)
 
-	local ok,f,e = pcall(loadstring,lua)
+	local ok,f,e = pcall(load,lua,cartname)
 	if not ok or f==nil then
 		error("Error loading lua: "..tostring(e))
 	else
@@ -466,6 +465,7 @@ function load_p8(filename)
 			log("lua completed")
 		end
 	end
+	log("finished loading cart",filename)
 
 	return cart_G
 end
@@ -954,7 +954,7 @@ function line(x0,y0,x1,y1,col)
 	love.graphics.draw(lineMesh)
 end
 
-function load(_cartname)
+function _load(_cartname)
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.origin()
@@ -988,7 +988,7 @@ function run()
 end
 
 function reload()
-	load(cartname)
+	_load(cartname)
 	run()
 end
 

@@ -89,6 +89,8 @@ local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
 
+local __audio_buffer_size = 512
+
 local __pico_pal_transparent = {
 }
 
@@ -136,8 +138,8 @@ local __pico_audio_channels = {
 
 local __pico_sfx = {}
 local __audio_channels
-local rate = 22050
-local channel = 1
+local __sample_rate = 11025
+local channels = 1
 local bits = 8
 
 local __pico_music = {}
@@ -147,6 +149,11 @@ local __pico_current_music = nil
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
+end
+
+local _noise_lookup_table = {}
+for i=0,1023 do
+	_noise_lookup_table[i] = love.math.random()*2-1
 end
 
 local QueueableSource = require "QueueableSource"
@@ -186,8 +193,8 @@ function love.load(argv)
 		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
 	end
 	osc[6] = function(x)
-		-- noise
-		return (love.math.random()*2-1) * 0.666
+		-- noise FIXME: (zep said this is brown noise)
+		return lerp(_noise_lookup_table[flr(x)%1024],_noise_lookup_table[flr(x+1)%1024],x%1) + ((love.math.random()*2-1) * 0.5) * 0.666
 	end
 	osc[7] = function(x)
 		-- detuned tri
@@ -195,10 +202,10 @@ function love.load(argv)
 	end
 
 	__audio_channels = {
-		[0]=QueueableSource:new(16),
-		QueueableSource:new(16),
-		QueueableSource:new(16),
-		QueueableSource:new(16)
+		[0]=QueueableSource:new(8),
+		QueueableSource:new(8),
+		QueueableSource:new(8),
+		QueueableSource:new(8)
 	}
 
 	for i=0,3 do
@@ -448,7 +455,7 @@ function load_p8(filename)
 	else
 		local f = love.filesystem.newFile(filename,'r')
 		if not f then
-			error("Unable to open",filename)
+			error(string.format("Unable to open: %s",filename))
 		end
 		local data,size = f:read()
 		f:close()
@@ -602,6 +609,79 @@ function load_p8(filename)
 			next_line = mapdata:find("\n",end_of_line)+1
 		end
 		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
+
+		-- load sfx
+		local sfx_start = data:find("__sfx__") + 8
+		local sfx_end = data:find("__music__") - 1
+		local sfxdata = data:sub(sfx_start,sfx_end)
+
+		__pico_sfx = {}
+		for i=0,63 do
+			__pico_sfx[i] = {
+				speed=16,
+				loop_start=0,
+				loop_end=0
+			}
+			for j=0,31 do
+				__pico_sfx[i][j] = {0,0,0,0}
+			end
+		end
+
+		local _sfx = 0
+		local step = 0
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = sfxdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = sfxdata:sub(next_line,end_of_line)
+			local editor_mode = tonumber(line:sub(1,2),16)
+			__pico_sfx[_sfx].speed = tonumber(line:sub(3,4),16)
+			__pico_sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
+			__pico_sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
+			for i=9,#line,5 do
+				local v = line:sub(i,i+4)
+				assert(#v == 5)
+				local note  = tonumber(line:sub(i,i+1),16)
+				local instr = tonumber(line:sub(i+2,i+2),16)
+				local vol   = tonumber(line:sub(i+3,i+3),16)
+				local fx    = tonumber(line:sub(i+4,i+4),16)
+				__pico_sfx[_sfx][step] = {note,instr,vol,fx}
+				step = step + 1
+			end
+			_sfx = _sfx + 1
+			step = 0
+			next_line = sfxdata:find("\n",end_of_line)+1
+		end
+
+		assert(_sfx == 64)
+
+		-- load music
+		local music_start = data:find("__music__") + 10
+		local music_end = #data-1
+		local musicdata = data:sub(music_start,music_end)
+
+		local _music = 0
+		__pico_music = {}
+
+		local next_line = 1
+		while next_line do
+			local end_of_line = musicdata:find("\n",next_line)
+			if end_of_line == nil then break end
+			end_of_line = end_of_line - 1
+			local line = musicdata:sub(next_line,end_of_line)
+
+			__pico_music[_music] = {
+				loop = tonumber(line:sub(1,2),16),
+				a = tonumber(line:sub(4,5),16),
+				b = tonumber(line:sub(6,7),16),
+				c = tonumber(line:sub(8,9),16),
+				d = tonumber(line:sub(10,11),16)
+			}
+			_music = _music + 1
+			next_line = musicdata:find("\n",end_of_line)+1
+		end
 	end
 
 	-- patch the lua
@@ -790,6 +870,7 @@ function love.run()
 		local render = false
 		while dt > frametime do
 			if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
+			update_audio(frametime)
 			dt = dt - frametime
 			render = true
 		end
@@ -800,6 +881,94 @@ function love.run()
 		end
 
 		if love.timer then love.timer.sleep(0.001) end
+	end
+end
+
+function note_to_hz(note)
+	return 65.41*math.pow(2,note/12)
+end
+
+function update_audio(time)
+	-- check what sfx should be playing
+	for channel=0,3 do
+		local ch = __pico_audio_channels[channel]
+		if ch and ch.sfx then
+			local tick = 0
+			local tickrate = 60*16
+			local samples = flr(time*__sample_rate)
+			local sfx = __pico_sfx[ch.sfx]
+			local note,instr,vol,fx
+			local freq
+			for i=0,samples-1 do
+				if ch.bufferpos == 0 or ch.bufferpos == nil then
+					ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
+					ch.bufferpos = 0
+				end
+				if sfx then
+					ch.offset = ch.offset + __sample_rate / (tickrate*__sample_rate * sfx.speed/8)
+					if sfx.loop_end ~= 0 and ch.offset > sfx.loop_end then
+						if ch.loop then
+							ch.offset = sfx.loop_start
+						else
+							__pico_audio_channels[channel] = nil
+						end
+					elseif ch.offset >= 32 then
+						__pico_audio_channels[channel] = nil
+					end
+				end
+				if __pico_audio_channels[channel] and sfx then
+					-- when we pass a new step
+					if flr(ch.offset) > ch.last_step then
+						ch.lastnote = ch.note
+						ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
+						if ch.vol > 0 then
+							ch.freq = note_to_hz(ch.note)
+						end
+						ch.last_step = flr(ch.offset)
+					end
+					if ch.vol and ch.vol > 0 then
+						local vol = ch.vol
+						if ch.fx == 1 then
+							-- slide from previous note over the length of a step
+							ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
+						elseif ch.fx == 2 then
+							-- vibrato one semitone?
+							ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+1),(ch.offset%0.5)*2)
+						elseif ch.fx == 3 then
+							-- drop/bomb slide from note to c-0
+							ch.freq = lerp(note_to_hz(ch.note),note_to_hz(0),ch.offset%1)
+						elseif ch.fx == 4 then
+							-- fade in
+							vol = lerp(0,ch.vol,ch.offset%1)
+						elseif ch.fx == 5 then
+							-- fade out
+							vol = lerp(ch.vol,0,ch.offset%1)
+						elseif ch.fx == 6 then
+							-- fast appreggio over 4 steps
+							ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/4)%4][1])
+						elseif ch.fx == 7 then
+							-- slow appreggio over 4 steps
+							ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/8)%4][1])
+						end
+						ch.sample = osc[ch.instr](i/__sample_rate*ch.freq) * vol/7
+						ch.buffer:setSample(ch.bufferpos,ch.sample)
+					else
+						ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
+						ch.sample = 0
+					end
+				else
+					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
+					ch.sample = 0
+				end
+				ch.bufferpos = ch.bufferpos + 1
+				if ch.bufferpos == __audio_buffer_size then
+					-- queue buffer and reset
+					__audio_channels[channel]:queue(ch.buffer)
+					__audio_channels[channel]:play()
+					ch.bufferpos = 0
+				end
+			end
+		end
 	end
 end
 
@@ -1251,7 +1420,7 @@ function _load(_cartname)
 	camera()
 	restore_clip()
 	cartname = _cartname
-	cart = load_p8(cartname)
+	cart = load_p8(_cartname)
 end
 
 function rect(x0,y0,x1,y1,col)
@@ -1629,4 +1798,8 @@ setfps = function(fps)
 		__pico_fps = 30
 	end
 	frametime = 1/__pico_fps
+end
+
+function lerp(a,b,t)
+	return (1-t)*a+t*b
 end

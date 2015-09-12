@@ -192,7 +192,7 @@ function love.load(argv)
 	end
 	osc[6] = function(x)
 		-- noise FIXME: (zep said this is brown noise)
-		return lerp(_noise_lookup_table[flr(x)%1024],_noise_lookup_table[flr(x+1)%1024],x%1) + ((love.math.random()*2-1) * 0.5) * 0.666
+		return lerp(_noise_lookup_table[flr(x)%1024],_noise_lookup_table[flr(x+1)%1024],x%1) * 0.666
 	end
 	osc[7] = function(x)
 		-- detuned tri
@@ -509,7 +509,7 @@ function load_p8(filename)
 			next_line = gfxdata:find("\n",end_of_line)+1
 		end
 
-		if version > 2 then
+		if version > 3 then
 			local tx,ty = 0,32
 			for sy=64,127 do
 				for sx=0,127,2 do
@@ -672,10 +672,10 @@ function load_p8(filename)
 
 			__pico_music[_music] = {
 				loop = tonumber(line:sub(1,2),16),
-				a = tonumber(line:sub(4,5),16),
-				b = tonumber(line:sub(6,7),16),
-				c = tonumber(line:sub(8,9),16),
-				d = tonumber(line:sub(10,11),16)
+				[0] = tonumber(line:sub(4,5),16),
+				[1] = tonumber(line:sub(6,7),16),
+				[2] = tonumber(line:sub(8,9),16),
+				[3] = tonumber(line:sub(10,11),16)
 			}
 			_music = _music + 1
 			next_line = musicdata:find("\n",end_of_line)+1
@@ -904,7 +904,8 @@ function note_to_string(note)
 end
 
 function note_to_hz(note)
-	return 440*math.pow(2,(note-33)/12)
+	--return 880*math.pow(2,(note-33)/12)
+	return 65.41*math.pow(2,note/12)
 end
 
 total_samples = 0
@@ -912,46 +913,71 @@ total_samples = 0
 function update_audio(time)
 	-- check what sfx should be playing
 	local samples = flr(time*__sample_rate)
-	for channel=0,3 do
-		local ch = __pico_audio_channels[channel]
-		local tick = 0
-		local tickrate = 60*16
-		local note,instr,vol,fx
-		local freq
-		for i=0,samples-1 do
+
+	for i=0,samples-1 do
+		if __pico_current_music then
+			__pico_current_music.offset = __pico_current_music.offset + 1/200*(1/__pico_current_music.speed)
+			if __pico_current_music.offset >= 32 then
+				local next_track = __pico_current_music.music
+				if __pico_music[next_track].loop == 2 then
+					-- go back until we find the loop start
+					while true do
+						if __pico_music[next_track].loop == 1 or next_track == 0 then
+							break
+						end
+						next_track = next_track - 1
+					end
+				elseif __pico_music[__pico_current_music.music].loop == 4 then
+					next_track = nil
+				elseif __pico_music[__pico_current_music.music].loop <= 1 then
+					next_track = next_track + 1
+				end
+				if next_track then
+					music(next_track)
+				end
+			end
+		end
+		local music = __pico_current_music and __pico_music[__pico_current_music.music] or nil
+
+		for channel=0,3 do
+			local ch = __pico_audio_channels[channel]
+			local tick = 0
+			local tickrate = 60*16
+			local note,instr,vol,fx
+			local freq
+
+			--if music and music[channel] < 64 then
+			--	ch.sfx = music[channel]
+			--	if not ch.offset then
+			--		ch.offset = __pico_current_music.offset
+			--		ch.last_step = -1
+			--	end
+			--end
+
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
 				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
 				ch.bufferpos = 0
 			end
-			if ch.sfx then
+			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
-				ch.offset = ch.offset + 1/256*(1/sfx.speed)
-				if sfx.loop_end ~= 0 and ch.offset > sfx.loop_end then
-					log('sfx reached loop end',channel,ch.sfx)
+				ch.offset = ch.offset + 1/200*(1/sfx.speed)
+				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
-						log('looping to ',sfx.loop_start)
 						ch.last_step = -1
 						ch.offset = sfx.loop_start
 					else
-						log('ending')
 						__pico_audio_channels[channel].sfx = nil
 					end
 				elseif ch.offset >= 32 then
-					log('sfx finished',channel,ch.sfx)
 					__pico_audio_channels[channel].sfx = nil
 				end
 			end
-			if ch.sfx then
+			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
 				-- when we pass a new step
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
 					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
-					if ch.vol == 0 then
-						log('-')
-					else
-						log(note_to_string(ch.note),ch.instr,ch.vol,ch.fx)
-					end
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
 					end
@@ -964,7 +990,8 @@ function update_audio(time)
 						ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
-						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+1),(ch.offset%0.5)*2)
+						local lfo = osc[0](total_samples+i)*(8/__sample_rate)
+						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),lfo)
 					elseif ch.fx == 3 then
 						-- drop/bomb slide from note to c-0
 						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(0),ch.offset%1)
@@ -976,10 +1003,10 @@ function update_audio(time)
 						vol = lerp(ch.vol,0,ch.offset%1)
 					elseif ch.fx == 6 then
 						-- fast appreggio over 4 steps
-						ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/4)%4][1])
+						--ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/4)%4][1])
 					elseif ch.fx == 7 then
 						-- slow appreggio over 4 steps
-						ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/8)%4][1])
+						--ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/8)%4][1])
 					end
 					ch.sample = osc[ch.instr]((total_samples+i)*(ch.freq/__sample_rate)) * vol/7
 					if ch.offset%1 < 0.1 then
@@ -1110,7 +1137,36 @@ function love.keyreleased(key)
 end
 
 function music(n,fade_len,channel_mask)
-	__pico_current_music = {n,offset=0,channel_mask=channel_mask}
+	if n == -1 then
+		for i=0,3 do
+			if __pico_music[__pico_current_music.music][i] < 64 then
+				__pico_audio_channels[i].sfx = nil
+				__pico_audio_channels[i].offset = 0
+				__pico_audio_channels[i].last_step = -1
+			end
+		end
+		__pico_current_music = nil
+		return
+	end
+	local m = __pico_music[n]
+	local slowest_speed = nil
+	for i=0,3 do
+		if m[i] < 64 then
+			local sfx = __pico_sfx[m[i]]
+			if slowest_speed == nil or slowest_speed > sfx.speed then
+				slowest_speed = sfx.speed
+			end
+		end
+	end
+	log('music',n,slowest_speed)
+	__pico_current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
+	for i=0,3 do
+		if __pico_music[n][i] < 64 then
+			__pico_audio_channels[i].sfx = __pico_music[n][i]
+			__pico_audio_channels[i].offset = 0
+			__pico_audio_channels[i].last_step = -1
+		end
+	end
 end
 
 function love.textinput(text)

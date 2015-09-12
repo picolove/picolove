@@ -127,8 +127,6 @@ local host_time = 0
 
 local retro_mode = false
 
-local denver = require "denver.denver"
-
 local __pico_audio_channels = {
 	[0]=nil,
 	[1]=nil,

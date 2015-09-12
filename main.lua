@@ -89,7 +89,7 @@ local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
 
-local __audio_buffer_size = 512
+local __audio_buffer_size = 1024
 
 local __pico_pal_transparent = {
 }
@@ -128,17 +128,17 @@ local host_time = 0
 local retro_mode = false
 
 local __pico_audio_channels = {
-	[0]=nil,
-	[1]=nil,
-	[2]=nil,
-	[3]=nil
+	[0]={},
+	[1]={},
+	[2]={},
+	[3]={}
 }
 
 local __pico_sfx = {}
 local __audio_channels
-local __sample_rate = 11025
+local __sample_rate = 22050
 local channels = 1
-local bits = 8
+local bits = 16
 
 local __pico_music = {}
 
@@ -882,92 +882,132 @@ function love.run()
 	end
 end
 
-function note_to_hz(note)
-	return 65.41*math.pow(2,note/12)
+note_map = {
+	[0] = 'C-',
+	      'C#',
+	      'D-',
+	      'D#',
+	      'E-',
+	      'F-',
+	      'F#',
+	      'G-',
+	      'G#',
+	      'A-',
+	      'A#',
+	      'B-',
+}
+
+function note_to_string(note)
+	local octave = flr(note/12)
+	local note = flr(note%12)
+	return string.format("%s%d",note_map[note],octave)
 end
+
+function note_to_hz(note)
+	return 440*math.pow(2,(note-33)/12)
+end
+
+total_samples = 0
 
 function update_audio(time)
 	-- check what sfx should be playing
+	local samples = flr(time*__sample_rate)
 	for channel=0,3 do
 		local ch = __pico_audio_channels[channel]
-		if ch and ch.sfx then
-			local tick = 0
-			local tickrate = 60*16
-			local samples = flr(time*__sample_rate)
-			local sfx = __pico_sfx[ch.sfx]
-			local note,instr,vol,fx
-			local freq
-			for i=0,samples-1 do
-				if ch.bufferpos == 0 or ch.bufferpos == nil then
-					ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
-					ch.bufferpos = 0
-				end
-				if sfx then
-					ch.offset = ch.offset + __sample_rate / (tickrate*__sample_rate * sfx.speed/8)
-					if sfx.loop_end ~= 0 and ch.offset > sfx.loop_end then
-						if ch.loop then
-							ch.offset = sfx.loop_start
-						else
-							__pico_audio_channels[channel] = nil
-						end
-					elseif ch.offset >= 32 then
-						__pico_audio_channels[channel] = nil
-					end
-				end
-				if __pico_audio_channels[channel] and sfx then
-					-- when we pass a new step
-					if flr(ch.offset) > ch.last_step then
-						ch.lastnote = ch.note
-						ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
-						if ch.vol > 0 then
-							ch.freq = note_to_hz(ch.note)
-						end
-						ch.last_step = flr(ch.offset)
-					end
-					if ch.vol and ch.vol > 0 then
-						local vol = ch.vol
-						if ch.fx == 1 then
-							-- slide from previous note over the length of a step
-							ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
-						elseif ch.fx == 2 then
-							-- vibrato one semitone?
-							ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+1),(ch.offset%0.5)*2)
-						elseif ch.fx == 3 then
-							-- drop/bomb slide from note to c-0
-							ch.freq = lerp(note_to_hz(ch.note),note_to_hz(0),ch.offset%1)
-						elseif ch.fx == 4 then
-							-- fade in
-							vol = lerp(0,ch.vol,ch.offset%1)
-						elseif ch.fx == 5 then
-							-- fade out
-							vol = lerp(ch.vol,0,ch.offset%1)
-						elseif ch.fx == 6 then
-							-- fast appreggio over 4 steps
-							ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/4)%4][1])
-						elseif ch.fx == 7 then
-							-- slow appreggio over 4 steps
-							ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/8)%4][1])
-						end
-						ch.sample = osc[ch.instr](i/__sample_rate*ch.freq) * vol/7
-						ch.buffer:setSample(ch.bufferpos,ch.sample)
+		local tick = 0
+		local tickrate = 60*16
+		local note,instr,vol,fx
+		local freq
+		for i=0,samples-1 do
+			if ch.bufferpos == 0 or ch.bufferpos == nil then
+				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
+				ch.bufferpos = 0
+			end
+			if ch.sfx then
+				local sfx = __pico_sfx[ch.sfx]
+				ch.offset = ch.offset + 1/256*(1/sfx.speed)
+				if sfx.loop_end ~= 0 and ch.offset > sfx.loop_end then
+					log('sfx reached loop end',channel,ch.sfx)
+					if ch.loop then
+						log('looping to ',sfx.loop_start)
+						ch.last_step = -1
+						ch.offset = sfx.loop_start
 					else
-						ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
-						ch.sample = 0
+						log('ending')
+						__pico_audio_channels[channel].sfx = nil
 					end
+				elseif ch.offset >= 32 then
+					log('sfx finished',channel,ch.sfx)
+					__pico_audio_channels[channel].sfx = nil
+				end
+			end
+			if ch.sfx then
+				local sfx = __pico_sfx[ch.sfx]
+				-- when we pass a new step
+				if flr(ch.offset) > ch.last_step then
+					ch.lastnote = ch.note
+					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
+					if ch.vol == 0 then
+						log('-')
+					else
+						log(note_to_string(ch.note),ch.instr,ch.vol,ch.fx)
+					end
+					if ch.vol > 0 then
+						ch.freq = note_to_hz(ch.note)
+					end
+					ch.last_step = flr(ch.offset)
+				end
+				if ch.vol and ch.vol > 0 then
+					local vol = ch.vol
+					if ch.fx == 1 then
+						-- slide from previous note over the length of a step
+						ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
+					elseif ch.fx == 2 then
+						-- vibrato one semitone?
+						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+1),(ch.offset%0.5)*2)
+					elseif ch.fx == 3 then
+						-- drop/bomb slide from note to c-0
+						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(0),ch.offset%1)
+					elseif ch.fx == 4 then
+						-- fade in
+						vol = lerp(0,ch.vol,ch.offset%1)
+					elseif ch.fx == 5 then
+						-- fade out
+						vol = lerp(ch.vol,0,ch.offset%1)
+					elseif ch.fx == 6 then
+						-- fast appreggio over 4 steps
+						ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/4)%4][1])
+					elseif ch.fx == 7 then
+						-- slow appreggio over 4 steps
+						ch.freq = note_to_hz(sfx[flr(ch.offset/4)+(ch.offset*tickrate/8)%4][1])
+					end
+					ch.sample = osc[ch.instr]((total_samples+i)*(ch.freq/__sample_rate)) * vol/7
+					if ch.offset%1 < 0.1 then
+						-- ramp up to avoid pops
+						ch.sample = lerp(0,ch.sample,ch.offset%0.1*10)
+					elseif ch.offset%1 > 0.9 then
+						-- ramp down to avoid pops
+						ch.sample = lerp(ch.sample,0,(ch.offset+0.8)%0.1*10)
+					end
+					ch.buffer:setSample(ch.bufferpos,ch.sample)
 				else
 					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
 					ch.sample = 0
 				end
-				ch.bufferpos = ch.bufferpos + 1
-				if ch.bufferpos == __audio_buffer_size then
-					-- queue buffer and reset
-					__audio_channels[channel]:queue(ch.buffer)
-					__audio_channels[channel]:play()
-					ch.bufferpos = 0
-				end
+			else
+				ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
+				ch.sample = 0
+			end
+			ch.bufferpos = ch.bufferpos + 1
+			if ch.bufferpos == __audio_buffer_size then
+				-- queue buffer and reset
+				__audio_channels[channel]:queue(ch.buffer)
+				__audio_channels[channel]:play()
+				ch.bufferpos = 0
 			end
 		end
 	end
+	total_samples = total_samples + samples
 end
 
 function flip_screen()
@@ -1082,8 +1122,8 @@ function sfx(n,channel,offset)
 	-- n = -2 to stop looping on channel
 	channel = channel or -1
 	if n == -1 and channel >= 0 then
-		love.audio.stop(__pico_audio_channels[channel].current)
-		__pico_audio_channels[channel]=nil
+		log('sfx end',channel)
+		__pico_audio_channels[channel].sfx = nil
 		return
 	elseif n == -2 and channel >= 0 then
 		__pico_audio_channels[channel].loop = false
@@ -1093,16 +1133,17 @@ function sfx(n,channel,offset)
 	if channel == -1 then
 		-- find a free channel
 		for i=0,3 do
-			if __pico_audio_channels[i] == nil then
+			if __pico_audio_channels[i].sfx == nil then
 				channel = i
 			end
 		end
 	end
 	if channel == -1 then return end
-	if __pico_audio_channels[channel] and __pico_audio_channels[channel].current then
-		love.audio.stop(__pico_audio_channels[channel].current)
-	end
-	__pico_audio_channels[channel]={sfx=n,offset=offset,last_step=offset-1,current=nil,loop=true}
+	local ch = __pico_audio_channels[channel]
+	ch.sfx=n
+	ch.offset=offset
+	ch.last_step=offset-1
+	ch.loop=true
 end
 
 function clip(x,y,w,h)

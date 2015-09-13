@@ -149,12 +149,17 @@ function get_bits(v,s,e)
 	return shr(band(mask,v))
 end
 
-local _noise_lookup_table = {}
-for i=0,1023 do
-	_noise_lookup_table[i] = love.math.random()*2-1
+local QueueableSource = require "QueueableSource"
+
+function lowpass(y0,y1, cutoff)
+	local RC = 1.0/(cutoff*2*3.14)
+	local dt = 1.0/__sample_rate
+	local alpha = dt/(RC+dt)
+	return y0 + (alpha*(y1 - y0))
 end
 
-local QueueableSource = require "QueueableSource"
+local paused = false
+local focus = true
 
 function love.load(argv)
 	love_args = argv
@@ -217,12 +222,14 @@ function love.load(argv)
 	osc[6] = function(x)
 		-- noise FIXME: (zep said this is brown noise)
 		local x = 0
-		local last_sample = 0
+		local last_samples = {0}
 		return function(freq)
-			x = x + freq/__sample_rate
-			local y = last_sample + (love.math.random()*2-1)/10
-			last_sample = y
-			return mid(-1,y,1) * 0.666
+			local y = last_samples[#last_samples] + (love.math.random()*2-1)/10
+			y = lowpass(last_samples[#last_samples],y,freq)
+			table.insert(last_samples,y)
+			table.remove(last_samples,1)
+			return mid(-1,y * 1.666,1)
+			--return y * 0.666
 		end
 	end
 	osc[7] = function(x)
@@ -846,7 +853,6 @@ function load_p8(filename)
 end
 
 function love.update(dt)
-	host_time = host_time + dt
 	for p=0,1 do
 		for i=0,#__keymap[p] do
 			local v = __pico_keypressed[p][i]
@@ -913,34 +919,48 @@ function love.run()
 		-- Call update and draw
 		local render = false
 		while dt > frametime do
-			if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
-			update_audio(frametime)
+			host_time = host_time + dt
+			if paused or not focus then
+			else
+				if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
+				update_audio(frametime)
+			end
 			dt = dt - frametime
 			render = true
 		end
 
 		if render and love.window and love.graphics and love.window.isCreated() then
 			love.graphics.origin()
-			if love.draw then love.draw() end
+			if paused or not focus then
+				rectfill(64-4*4,60,64+4*4-2,64+4+4,1)
+				print("paused",64 - 3*4,64,(host_time*20)%8<4 and 7 or 13)
+				flip_screen()
+			else
+				if love.draw then love.draw() end
+			end
 		end
 
 		if love.timer then love.timer.sleep(0.001) end
 	end
 end
 
+function love.focus(f)
+	focus = f
+end
+
 note_map = {
 	[0] = 'C-',
-	      'C#',
-	      'D-',
-	      'D#',
-	      'E-',
-	      'F-',
-	      'F#',
-	      'G-',
-	      'G#',
-	      'A-',
-	      'A#',
-	      'B-',
+		  'C#',
+		  'D-',
+		  'D#',
+		  'E-',
+		  'F-',
+		  'F#',
+		  'G-',
+		  'G#',
+		  'A-',
+		  'A#',
+		  'B-',
 }
 
 function note_to_string(note)
@@ -1143,6 +1163,8 @@ function love.keypressed(key)
 		reload()
 	elseif key == 'q' and love.keyboard.isDown('lctrl') then
 		love.event.quit()
+	elseif key == 'pause' then
+		paused = not paused
 	elseif key == 'f6' then
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)

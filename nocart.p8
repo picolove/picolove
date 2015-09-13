@@ -22,6 +22,7 @@ function _keydown(key)
 	elseif key == 'return' then
 		if linebuffer:sub(1,5) == 'load ' then
 			load(linebuffer:sub(6,#linebuffer))
+			run()
 			return
 		end
 		linebuffer = ''

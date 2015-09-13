@@ -234,7 +234,7 @@ function love.load(argv)
 		end
 	end
 	osc["saw_lfo"] = function()
-		-- saw
+		-- saw from 0 to 1, used for arppregiator
 		local x = 0
 		return function(freq)
 			x = x + freq/__sample_rate
@@ -950,8 +950,7 @@ function note_to_string(note)
 end
 
 function note_to_hz(note)
-	--return 880*math.pow(2,(note-33)/12)
-	return 65.41*math.pow(2,note/12)
+	return 440*math.pow(2,(note-33)/12)
 end
 
 function update_audio(time)
@@ -960,7 +959,7 @@ function update_audio(time)
 
 	for i=0,samples-1 do
 		if __pico_current_music then
-			__pico_current_music.offset = __pico_current_music.offset + 1/200*(1/__pico_current_music.speed)
+			__pico_current_music.offset = __pico_current_music.offset + 1/(48*16)*(1/__pico_current_music.speed*4)
 			if __pico_current_music.offset >= 32 then
 				local next_track = __pico_current_music.music
 				if __pico_music[next_track].loop == 2 then
@@ -996,7 +995,7 @@ function update_audio(time)
 			end
 			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
-				ch.offset = ch.offset + 1/200*(1/sfx.speed)
+				ch.offset = ch.offset + 1/(48*16)*(1/sfx.speed*4)
 				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
 						ch.last_step = -1
@@ -1212,7 +1211,6 @@ function music(n,fade_len,channel_mask)
 		end
 	end
 	__pico_audio_channels[slowest_channel].loop = false
-	log('music',n,slowest_speed)
 	__pico_current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
 	for i=0,3 do
 		if __pico_music[n][i] < 64 then
@@ -1232,13 +1230,11 @@ function sfx(n,channel,offset)
 	-- n = -2 to stop looping on channel
 	channel = channel or -1
 	if n == -1 and channel >= 0 then
-		log('sfx end',channel)
 		__pico_audio_channels[channel].sfx = nil
 		return
 	elseif n == -2 and channel >= 0 then
 		__pico_audio_channels[channel].loop = false
 	end
-	log('sfx',n,channel,offset)
 	offset = offset or 0
 	if channel == -1 then
 		-- find a free channel

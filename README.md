@@ -42,11 +42,6 @@ What it isn't:
 Not Yet Implemented:
 
  * Memory modification/reading
- * Sound/music
-
-Not working:
-
- * ?
 
 Differences:
 

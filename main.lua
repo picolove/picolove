@@ -1399,6 +1399,7 @@ end
 
 function cls()
 	__screen:clear(0,0,0,255)
+	__pico_cursor = {0,0}
 end
 
 __pico_camera_x = 0

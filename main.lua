@@ -1159,9 +1159,9 @@ function love.keypressed(key)
 	if cart and cart._keydown then
 		return cart._keydown(key)
 	end
-	if key == 'r' and love.keyboard.isDown('lctrl') then
+	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		reload()
-	elseif key == 'q' and love.keyboard.isDown('lctrl') then
+	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		love.event.quit()
 	elseif key == 'pause' then
 		paused = not paused
@@ -1170,7 +1170,7 @@ function love.keypressed(key)
 		local screenshot = love.graphics.newScreenshot(false)
 		local filename = cartname..'-'..os.time()..'.png'
 		screenshot:encode(filename)
-		log('saved screenshort to',filename)
+		log('saved screenshot to',filename)
 	elseif key == 'f8' then
 		-- start recording
 		video_frames = {}

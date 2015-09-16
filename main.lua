@@ -343,7 +343,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	camera()
 	pal()
 	palt()
-	color(0)
+  color(6)
 
 	_load(argv[2] or 'nocart.p8')
 	run()
@@ -1114,7 +1114,7 @@ function flip_screen()
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
-	love.graphics.setColor(255,255,255,255)
+  -- love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 
 	love.graphics.clear()

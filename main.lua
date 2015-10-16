@@ -855,10 +855,13 @@ end
 function love.update(dt)
 	for p=0,1 do
 		for i=0,#__keymap[p] do
-			local v = __pico_keypressed[p][i]
-			if v then
-				v = v + 1
-				__pico_keypressed[p][i] = v
+			for _,key in pairs(__keymap[p][i]) do
+				local v = __pico_keypressed[p][i]
+				if v then
+					v = v + 1
+					__pico_keypressed[p][i] = v
+					break
+				end
 			end
 		end
 	end
@@ -1185,9 +1188,11 @@ function love.keypressed(key)
 	else
 		for p=0,1 do
 			for i=0,#__keymap[p] do
-				if key == __keymap[p][i] then
-					__pico_keypressed[p][i] = -1 -- becomes 0 on the next frame
-					break
+				for _,testkey in pairs(__keymap[p][i]) do
+					if key == testkey then
+						__pico_keypressed[p][i] = -1 -- becomes 0 on the next frame
+						break
+					end
 				end
 			end
 		end
@@ -1200,9 +1205,11 @@ function love.keyreleased(key)
 	end
 	for p=0,1 do
 		for i=0,#__keymap[p] do
-			if key == __keymap[p][i] then
-				__pico_keypressed[p][i] = nil
-				break
+			for _,testkey in pairs(__keymap[p][i]) do
+				if key == testkey then
+					__pico_keypressed[p][i] = nil
+					break
+				end
 			end
 		end
 	end
@@ -1774,20 +1781,20 @@ __pico_keypressed = {
 
 __keymap = {
 	[0] = {
-		[0] = 'left',
-		[1] = 'right',
-		[2] = 'up',
-		[3] = 'down',
-		[4] = 'z',
-		[5] = 'x',
+		[0] = {'left'},
+		[1] = {'right'},
+		[2] = {'up'},
+		[3] = {'down'},
+		[4] = {'z','n'},
+		[5] = {'x','m'},
 	},
 	[1] = {
-		[0] = 's',
-		[1] = 'f',
-		[2] = 'e',
-		[3] = 'd',
-		[4] = 'q',
-		[5] = 'a',
+		[0] = {'s'},
+		[1] = {'f'},
+		[2] = {'e'},
+		[3] = {'d'},
+		[4] = {'tab','lshift'},
+		[5] = {'q','a'},
 	}
 }
 
@@ -1798,8 +1805,6 @@ function btn(i,p)
 	end
 	return false
 end
-
-
 
 function btnp(i,p)
 	p = p or 0

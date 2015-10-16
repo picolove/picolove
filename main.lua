@@ -89,7 +89,7 @@ local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
 
-local __audio_buffer_size = 1024
+local __audio_buffer_size = 512
 
 local __pico_pal_transparent = {
 }
@@ -160,6 +160,7 @@ end
 
 local paused = false
 local focus = true
+local muted = false
 
 function love.load(argv)
 	love_args = argv
@@ -170,90 +171,96 @@ function love.load(argv)
 	end
 
 	osc = {}
-	osc[0] = function()
+	osc[0] = function(x)
 		-- tri
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5) * 0.5
+			return (abs((x%2)-1)-0.5) * 0.5,x
 		end
 	end
-	osc[1] = function()
+	osc[1] = function(x)
 		-- uneven tri
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
 			local t = x%1
-			return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
+			return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5,x
 		end
 	end
-	osc[2] = function()
+	osc[2] = function(x)
 		-- saw
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (x%1-0.5) * 0.333
+			return (x%1-0.5) * 0.333,x
 		end
 	end
-	osc[3] = function()
+	osc[3] = function(x)
 		-- sqr
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (x%2 < 0.5 and 1 or -1) * 0.25
+			return (x%2 < 0.5 and 1 or -1) * 0.25,x
 		end
 	end
 	osc[4] = function(x)
 		-- pulse
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (x%2 < 0.25 and 1 or -1) * 0.25
+			return (x%2 < 0.25 and 1 or -1) * 0.25,x
 		end
 	end
 	osc[5] = function(x)
 		-- tri/2
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
+			return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333,x
 		end
 	end
 	osc[6] = function(x)
 		-- noise FIXME: (zep said this is brown noise)
-		local x = 0
+		x = x or 0
 		local last_samples = {0}
 		return function(freq)
-			local y = last_samples[#last_samples] + (love.math.random()*2-1)/10
+			local y = -1
+			local white = (love.math.random()*2-1) * 0.5
+			while y <= -1 or y >= 1 do
+				y = last_samples[#last_samples] + (love.math.random()*2-1)/7
+				--y = last_samples[#last_samples] + (love.math.random()*2-1)/10
+			end
+			y = y * 0.5
+			y = y + white
 			y = lowpass(last_samples[#last_samples],y,freq)
 			table.insert(last_samples,y)
 			table.remove(last_samples,1)
-			return mid(-1,y * 1.666,1)
-			--return y * 0.666
+			return y * 0.666,x
 		end
 	end
 	osc[7] = function(x)
 		-- detuned tri
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
+			return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333,x
 		end
 	end
-	osc["saw_lfo"] = function()
+	osc["saw_lfo"] = function(x)
 		-- saw from 0 to 1, used for arppregiator
-		local x = 0
+		x = x or 0
 		return function(freq)
 			x = x + freq/__sample_rate
-			return x%1
+			return x%1,x
 		end
 	end
 
 	__audio_channels = {
-		[0]=QueueableSource:new(8),
-		QueueableSource:new(8),
-		QueueableSource:new(8),
-		QueueableSource:new(8)
+		[0]=QueueableSource:new(4),
+		QueueableSource:new(4),
+		QueueableSource:new(4),
+		QueueableSource:new(4)
 	}
 
 	for i=0,3 do
@@ -923,7 +930,9 @@ function love.run()
 			if paused or not focus then
 			else
 				if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
-				update_audio(frametime)
+				if not muted then
+					update_audio(frametime)
+				end
 			end
 			dt = dt - frametime
 			render = true
@@ -975,7 +984,7 @@ end
 
 function update_audio(time)
 	-- check what sfx should be playing
-	local samples = flr(time*__sample_rate)
+	local samples = flr(time*__sample_rate)+5
 
 	for i=0,samples-1 do
 		if __pico_current_music then
@@ -1008,6 +1017,7 @@ function update_audio(time)
 			local tickrate = 60*16
 			local note,instr,vol,fx
 			local freq
+			local lastsample = ch.sample
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
 				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
@@ -1028,12 +1038,17 @@ function update_audio(time)
 				end
 			end
 			if ch.sfx and __pico_sfx[ch.sfx] then
+				local changed_instr = false
 				local sfx = __pico_sfx[ch.sfx]
 				-- when we pass a new step
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
+					local lastinstr = ch.instr
 					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
-					ch.osc = osc[ch.instr]()
+					changed_instr = lastinstr ~= ch.instr
+					if changed_instr then
+						ch.osc = osc[ch.instr](ch.phase or 0)
+					end
 					if ch.fx == 2 then
 						ch.lfo = osc[0]()
 					elseif ch.fx >= 6 then
@@ -1051,7 +1066,7 @@ function update_audio(time)
 						ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
-						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),ch.lfo(4))
+						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),ch.lfo(8))
 					elseif ch.fx == 3 then
 						-- drop/bomb slide from note to c-0
 						local off = ch.offset%1
@@ -1079,28 +1094,26 @@ function update_audio(time)
 						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
-					ch.sample = ch.osc(ch.freq) * vol/7
-					if ch.offset%1 < 0.1 then
-						-- ramp up to avoid pops
-						ch.sample = lerp(0,ch.sample,ch.offset%0.1*10)
-					elseif ch.offset%1 > 0.9 then
-						-- ramp down to avoid pops
-						ch.sample = lerp(ch.sample,0,(ch.offset+0.8)%0.1*10)
-					end
-					ch.buffer:setSample(ch.bufferpos,ch.sample)
+					ch.sample,ch.phase = ch.osc(ch.freq)
+					ch.sample = ch.sample * vol/7
+					--if changed_instr and lastsample and ch.offset%1 < 0.1 then
+					--	-- ramp up to avoid pops
+					--	ch.sample = lerp(lastsample,ch.sample,ch.offset%0.1*10)
+					--end
 				else
-					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
 					ch.sample = 0
 				end
 			else
-				ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
 				ch.sample = 0
 			end
+			ch.buffer:setSample(ch.bufferpos,ch.sample)
 			ch.bufferpos = ch.bufferpos + 1
 			if ch.bufferpos == __audio_buffer_size then
 				-- queue buffer and reset
 				__audio_channels[channel]:queue(ch.buffer)
-				__audio_channels[channel]:play()
+				if not __audio_channels[channel]:isPlaying() and __audio_channels[channel]:getFreeBufferCount() < 2 then
+					__audio_channels[channel]:play()
+				end
 				ch.bufferpos = 0
 			end
 		end
@@ -1163,7 +1176,9 @@ function love.keypressed(key)
 		reload()
 	elseif key == 'q' and love.keyboard.isDown('lctrl') then
 		love.event.quit()
-	elseif key == 'pause' then
+	elseif key == 'm' and love.keyboard.isDown('lctrl') then
+		muted = not muted
+	elseif key == 'pause' or key == 'escape' then
 		paused = not paused
 	elseif key == 'f6' then
 		-- screenshot

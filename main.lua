@@ -343,7 +343,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	camera()
 	pal()
 	palt()
-  color(6)
+	color(6)
 
 	_load(argv[2] or 'nocart.p8')
 	run()
@@ -953,17 +953,17 @@ end
 
 note_map = {
 	[0] = 'C-',
-		  'C#',
-		  'D-',
-		  'D#',
-		  'E-',
-		  'F-',
-		  'F#',
-		  'G-',
-		  'G#',
-		  'A-',
-		  'A#',
-		  'B-',
+	'C#',
+	'D-',
+	'D#',
+	'E-',
+	'F-',
+	'F#',
+	'G-',
+	'G#',
+	'A-',
+	'A#',
+	'B-',
 }
 
 function note_to_string(note)
@@ -1117,7 +1117,7 @@ function flip_screen()
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
-  -- love.graphics.setColor(255,255,255,255)
+	-- love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 
 	love.graphics.clear()
@@ -1701,7 +1701,7 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 	else
 		local id = string.format("%d-%d-%d",n,w,h)
 		if __pico_quads[id] then
-			q =  __pico_quads[id]
+			q = __pico_quads[id]
 		else
 			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
 			__pico_quads[id] = q

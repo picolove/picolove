@@ -24,6 +24,9 @@ function _keydown(key)
 			load(linebuffer:sub(6,#linebuffer))
 			run()
 			return
+		elseif linebuffer == 'shutdown' then
+			shutdown()
+			return
 		end
 		linebuffer = ''
 		line+=1

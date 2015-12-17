@@ -821,6 +821,7 @@ function load_p8(filename)
 		bnot=bnot,
 		shl=shl,
 		shr=shr,
+		shutdown=shutdown,
 		sub=sub,
 		stat=stat,
 		-- deprecated pico-8 function aliases
@@ -1956,6 +1957,10 @@ shl = bit.lshift
 shr = bit.rshift
 
 sub = string.sub
+
+function shutdown()
+	love.event.quit()
+end
 
 function stat(x)
 	return 0

@@ -1121,6 +1121,7 @@ function flip_screen()
 	-- love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 
+	love.graphics.setBackgroundColor(3, 5, 10)
 	love.graphics.clear()
 
 	local screen_w,screen_h = love.graphics.getDimensions()

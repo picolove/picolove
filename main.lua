@@ -1255,6 +1255,7 @@ function music(n,fade_len,channel_mask)
 end
 
 function love.textinput(text)
+	text = text:lower()
 	if cart and cart._textinput then return cart._textinput(text) end
 end
 

@@ -771,6 +771,7 @@ function load_p8(filename)
 		fget=fget,
 		fset=fset,
 		flip=flip,
+		folder=folder,
 		print=print,
 		cursor=cursor,
 		color=color,
@@ -1375,6 +1376,10 @@ end
 function flip()
 	flip_screen()
 	love.timer.sleep(frametime)
+end
+
+function folder()
+	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
 end
 
 log = print

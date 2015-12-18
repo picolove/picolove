@@ -778,8 +778,10 @@ function load_p8(filename)
 		camera=camera,
 		circ=circ,
 		circfill=circfill,
+		dir=ls,
 		line=line,
 		load=_load,
+		ls=ls,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -1597,6 +1599,18 @@ function _load(_cartname)
 	restore_clip()
 	cartname = _cartname
 	cart = load_p8(_cartname)
+end
+
+function ls()
+	local files = love.filesystem.getDirectoryItems('')
+	print("directory: /", nil, nil, 12)
+	for _, file in ipairs(files) do
+		if love.filesystem.isDirectory(file) then
+			print(file:lower(), nil, nil, 14)
+		else
+			print(file:lower(), nil, nil, 6)
+		end
+	end
 end
 
 function rect(x0,y0,x1,y1,col)

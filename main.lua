@@ -1160,9 +1160,6 @@ function love.draw()
 end
 
 function love.keypressed(key)
-	if cart and cart._keydown then
-		return cart._keydown(key)
-	end
 	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		reload()
 	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
@@ -1198,12 +1195,12 @@ function love.keypressed(key)
 			end
 		end
 	end
+	if cart and cart._keydown then
+		return cart._keydown(key)
+	end
 end
 
 function love.keyreleased(key)
-	if cart and cart._keyup then
-		return cart._keyup(key)
-	end
 	for p=0,1 do
 		for i=0,#__keymap[p] do
 			for _,testkey in pairs(__keymap[p][i]) do
@@ -1213,6 +1210,9 @@ function love.keyreleased(key)
 				end
 			end
 		end
+	end
+	if cart and cart._keyup then
+		return cart._keyup(key)
 	end
 end
 

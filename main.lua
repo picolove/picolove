@@ -1593,6 +1593,15 @@ function line(x0,y0,x1,y1,col)
 end
 
 function _load(_cartname)
+	if love.filesystem.isFile(_cartname) then
+	elseif love.filesystem.isFile(_cartname..'.p8') then
+		_cartname = _cartname..'.p8'
+	elseif love.filesystem.isFile(_cartname..'.p8.png') then
+		_cartname = _cartname..'.p8.png'
+	else
+		print('could not load', nil, nil, 6)
+		return
+	end
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.origin()
@@ -1600,6 +1609,7 @@ function _load(_cartname)
 	restore_clip()
 	cartname = _cartname
 	cart = load_p8(_cartname)
+	print('loaded '.._cartname, nil, nil, 6)
 end
 
 function rect(x0,y0,x1,y1,col)

@@ -2039,16 +2039,10 @@ end
 sgn = function(x)
 	if x < 0 then
 		return -1
-	elseif x > 0 then
-		return 1
 	else
-		return 0
+		return 1
 	end
 end
-
-assert(sgn(-10) == -1)
-assert(sgn(10) == 1)
-assert(sgn(0) == 0)
 
 local bit = require("bit")
 

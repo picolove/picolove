@@ -1430,7 +1430,7 @@ __pico_camera_x = 0
 __pico_camera_y = 0
 
 function camera(x,y)
-	if x ~= nil then
+	if type(x) == 'number' then
 		__pico_camera_x = flr(x)
 		__pico_camera_y = flr(y)
 	else
@@ -1684,7 +1684,7 @@ end
 local __palette_modified = true
 
 function pal(c0,c1,p)
-	if c0 == nil then
+	if type(c0) ~= 'number' then
 		if __palette_modified == false then return end
 		for i=1,16 do
 			__draw_palette[i] = i
@@ -1717,7 +1717,7 @@ function pal(c0,c1,p)
 end
 
 function palt(c,t)
-	if c == nil then
+	if type(c) ~= 'number' then
 		for i=1,16 do
 			__pico_pal_transparent[i] = i == 1 and 0 or 1
 		end

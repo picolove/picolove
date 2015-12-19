@@ -1163,6 +1163,7 @@ end
 function love.keypressed(key)
 	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		reload()
+		run()
 	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		love.event.quit()
 	elseif key == 'pause' then
@@ -1647,9 +1648,9 @@ function run()
 	if cart._init then cart._init() end
 end
 
-function reload()
+function reload(dest_addr,source_addr,len)
+	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
 	_load(cartname)
-	run()
 end
 
 local __palette_modified = true

@@ -1814,22 +1814,54 @@ __keymap = {
 }
 
 function btn(i,p)
-	p = p or 0
-	if __keymap[p][i] then
-		return __pico_keypressed[p][i] ~= nil
+	if type(i) == 'number' then
+		p = p or 0
+		if __keymap[p][i] then
+			return __pico_keypressed[p][i] ~= nil
+		end
+		return false
+	else
+		-- return bitfield of buttons
+		local bitfield = 0
+		for i=0,5 do
+			if __pico_keypressed[0][i] then
+				bitfield = bitfield + bit.lshift(1,i+1)
+			end
+		end
+		for i=6,13 do
+			if __pico_keypressed[1][i] then
+				bitfield = bitfield + bit.lshift(1,i+1)
+			end
+		end
+		return bitfield
 	end
-	return false
 end
 
 function btnp(i,p)
-	p = p or 0
-	if __keymap[p][i] then
-		local v = __pico_keypressed[p][i]
-		if v and (v == 0 or v == 12 or (v > 12 and v % 4 == 0)) then
-			return true
+	if type(i) == 'number' then
+		p = p or 0
+		if __keymap[p][i] then
+			local v = __pico_keypressed[p][i]
+			if v and (v == 0 or v == 12 or (v > 12 and v % 4 == 0)) then
+				return true
+			end
 		end
+		return false
+	else
+		-- return bitfield of buttons
+		local bitfield = 0
+		for i=0,5 do
+			if __pico_keypressed[0][i] then
+				bitfield = bitfield + bit.lshift(1,i+1)
+			end
+		end
+		for i=6,13 do
+			if __pico_keypressed[1][i] then
+				bitfield = bitfield + bit.lshift(1,i+1)
+			end
+		end
+		return bitfield
 	end
-	return false
 end
 
 function mget(x,y)

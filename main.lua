@@ -1222,7 +1222,7 @@ end
 function music(n,fade_len,channel_mask)
 	if n == -1 then
 		for i=0,3 do
-			if __pico_music[__pico_current_music.music][i] < 64 then
+			if __pico_current_music and __pico_music[__pico_current_music.music][i] < 64 then
 				__pico_audio_channels[i].sfx = nil
 				__pico_audio_channels[i].offset = 0
 				__pico_audio_channels[i].last_step = -1
@@ -1232,6 +1232,10 @@ function music(n,fade_len,channel_mask)
 		return
 	end
 	local m = __pico_music[n]
+	if not m then
+		warning(string.format("music %d does not exist",n))
+		return
+	end
 	local slowest_speed = nil
 	local slowest_channel = nil
 	for i=0,3 do

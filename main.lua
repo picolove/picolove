@@ -109,7 +109,7 @@ local __pico_palette = {
 	{255,241,232,255},
 	{255,0,77,255},
 	{255,163,0,255},
-	{255,255,39,255},
+	{255,240,36,255},
 	{0,231,86,255},
 	{41,173,255,255},
 	{131,118,156,255},
@@ -457,7 +457,7 @@ function load_p8(filename)
 		log('codelen',codelen)
 		if version == 0 then
 			lua = code
-		elseif version == 1 then
+		elseif version == 1 or version == 5 then
 			-- decompress code
 			local mode = 0
 			local copy = nil

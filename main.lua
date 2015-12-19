@@ -1936,10 +1936,25 @@ function memcpy(dest_addr,source_addr,len)
 	end
 end
 
-function peek(...)
+function peek(addr, val)
+	-- TODO: implement for non screen space
+	if addr >= 0x6000 and addr < 0x8000 then
+		local dx = flr(addr-0x6000)%64
+		local dy = flr((addr-0x6000)/64)
+		local low = pget(dx, dy)
+		local high = bit.lshift(pget(dx + 1, dy))
+		return bit.band(low, high)
+	end
 end
 
-function poke(...)
+function poke(addr, val)
+	-- TODO: implement for non screen space
+	if addr >= 0x6000 and addr < 0x8000 then
+		local dx = flr(addr-0x6000)%64*2
+		local dy = flr((addr-0x6000)/64)
+		pset(dx, dy, bit.band(val, 15))
+		pset(dx + 1, dy, bit.rshift(val, 4))
+	end
 end
 
 function min(a,b)

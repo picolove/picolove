@@ -772,6 +772,7 @@ function load_p8(filename)
 		flip=flip,
 		folder=folder,
 		print=print,
+		printh=log,
 		cursor=cursor,
 		color=color,
 		cls=cls,

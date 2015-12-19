@@ -27,11 +27,6 @@ mt.__newindex = function (t, n, v)
 end
 
 mt.__index = function (t, n)
-	if n == 'MOAIUntzSystem' or n == 'MOAIAppAndroid' or n == 'MOAIDialogAndroid'
-	  or n == 'MOAIFacebookAndroid' or n == 'MOAIKeyboardAndroid'
-	  or n == 'MOAINotifications' or n == 'MOAIBrowserAndroid' then
-		return rawget(t,n)
-	end
 	if not mt.__declared[n] and debug.getinfo(2, "S").what ~= "C" then
 		error("variable '"..n.."' is not declared", 2)
 	end

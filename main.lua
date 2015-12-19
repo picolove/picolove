@@ -778,6 +778,7 @@ function load_p8(filename)
 		camera=camera,
 		circ=circ,
 		circfill=circfill,
+		help=help,
 		line=line,
 		load=_load,
 		rect=rect,
@@ -1517,6 +1518,28 @@ function circfill(cx,cy,r,col)
 	lineMesh:setDrawRange(1,#points)
 	love.graphics.draw(lineMesh)
 
+end
+
+function help()
+	print('')
+	color(12)
+	print('commands')
+	print('')
+	color(6)
+	print('load <filename>  save <filename>')
+	print('run              resume')
+	print('shutdown         reboot')
+	print('install_demos    dir')
+	print('cd <dirname>     mkdir <dirname>')
+	print('cd ..   go up a directory')
+	print('alt+enter to toggle fullscreen')
+	print('alt+f4 or command+q to fastquit')
+	print('')
+	color(12)
+	print('alt+f4 or command+q to fastquit')
+	print('read picolove.txt for more info')
+	print('or see github.com/ftsf/picolove')
+	print('')
 end
 
 function line(x0,y0,x1,y1,col)

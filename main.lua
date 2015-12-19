@@ -2010,6 +2010,9 @@ function max(a,b)
 end
 
 function mid(x,y,z)
+	x = x or 0
+	y = y or 0
+	z = z or 0
 	return x > y and x or y > z and z or y
 end
 

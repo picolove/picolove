@@ -822,6 +822,7 @@ function load_p8(filename)
 		bnot=bnot,
 		shl=shl,
 		shr=shr,
+		exit=shutdown,
 		shutdown=shutdown,
 		sub=sub,
 		stat=stat,

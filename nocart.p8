@@ -27,6 +27,8 @@ function _keydown(key)
 		elseif linebuffer == 'shutdown' then
 			shutdown()
 			return
+		elseif linebuffer == 'folder' then
+			folder()
 		end
 		linebuffer = ''
 		line+=1

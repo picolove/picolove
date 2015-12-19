@@ -7,8 +7,8 @@ function _init()
 	line = 4
 	cls()
 	spr(32,0,3,6,1)
-	spr(38,40,0)
-	print("picolove-0.2",0,14,6)
+	spr(38,45,0)
+	print("picolove",0,14,6)
 	print("a pico-8 clone made with love <3",0,14+8,6)
 end
 

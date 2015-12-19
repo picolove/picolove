@@ -1608,7 +1608,13 @@ function ls()
 		if love.filesystem.isDirectory(file) then
 			print(file:lower(), nil, nil, 14)
 		else
-			print(file:lower(), nil, nil, 6)
+			file = file:lower()
+			if file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
+				color(6)
+			else
+				color(5)
+			end
+			print(file)
 		end
 	end
 end

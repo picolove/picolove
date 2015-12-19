@@ -827,6 +827,7 @@ function load_p8(filename)
 		shutdown=shutdown,
 		sub=sub,
 		stat=stat,
+		time=function() return host_time end,
 		-- deprecated pico-8 function aliases
 		mapdraw=map
 	}
@@ -927,6 +928,7 @@ function love.run()
 		local render = false
 		while dt > frametime do
 			host_time = host_time + dt
+			if host_time > 65536 then host_time = host_time - 65536 end
 			if paused or not focus then
 			else
 				if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
@@ -2034,6 +2036,7 @@ sqrt = math.sqrt
 abs = math.abs
 rnd = function(x) return love.math.random()*(x or 1) end
 srand = function(seed)
+	if seed == 0 then seed = 1 end
 	return love.math.setRandomSeed(flr(seed*32768))
 end
 sgn = function(x)

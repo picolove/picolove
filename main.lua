@@ -733,14 +733,14 @@ function load_p8(filename)
 	end
 
 	-- patch the lua
-	--lua = lua:gsub("%-%-[^\n]*\n","\n")
+	lua = lua:gsub("%-%-[^\n]*\n","\n")
 	lua = lua:gsub("!=","~=")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
 		local nl = a:find('\n')
 		local th = b:find('%f[%w]then%f[%W]')
 		local an = b:find('%f[%w]and%f[%W]')
-		local o = b:find('%f[%w]or%f[W]')
+		local o = b:find('%f[%w]or%f[%W]')
 		if nl or th or an or o then
 			return string.format('if %s %s\n',a,b)
 		else

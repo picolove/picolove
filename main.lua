@@ -1292,7 +1292,7 @@ function sfx(n,channel,offset)
 end
 
 function clip(x,y,w,h)
-	if x then
+	if type(x) == "number" then
 		love.graphics.setScissor(x,y,w,h)
 		__pico_clip = {x,y,w,h}
 	else

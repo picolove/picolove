@@ -733,7 +733,6 @@ function load_p8(filename)
 	end
 
 	-- patch the lua
-	lua = lua:gsub("%-%-[^\n]*\n","\n")
 	lua = lua:gsub("!=","~=")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)

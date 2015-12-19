@@ -1759,7 +1759,9 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(x)+(w*8*(flip_x and 1 or 0)),
 		flr(y)+(h*8*(flip_y and 1 or 0)),
-		0,flip_x and -1 or 1,flip_y and -1 or 1)
+		0,
+		flip_x and -1 or 1,
+		flip_y and -1 or 1)
 	love.graphics.setShader(__draw_shader)
 end
 
@@ -1773,11 +1775,15 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad
-	-- FIXME handle flipping
 	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
-	love.graphics.draw(__pico_spritesheet,q,flr(dx),flr(dy),0,dw/sw,dh/sh)
+	love.graphics.draw(__pico_spritesheet,q,
+		flr(dx)+(dw*(flip_x and 1 or 0)),
+		flr(dy)+(dh*(flip_y and 1 or 0)),
+		0,
+		flip_x and -1 or 1 * (dw/sw),
+		flip_y and -1 or 1 * (dh/sh))
 	love.graphics.setShader(__draw_shader)
 end
 

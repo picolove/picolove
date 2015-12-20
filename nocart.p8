@@ -26,7 +26,7 @@ function _keydown(key)
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		linebuffer = linebuffer:sub(1,#linebuffer-1)
-	elseif key == 'return' then
+	elseif key == 'return' or key == 'kpenter' then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		--render command

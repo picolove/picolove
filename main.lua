@@ -944,11 +944,7 @@ function love.run()
 
 		if render and love.window and love.graphics and love.window.isCreated() then
 			love.graphics.origin()
-			if paused or not focus then
-				rectfill(64-4*4,60,64+4*4-2,64+4+4,1)
-				print("paused",64 - 3*4,64,(host_time*20)%8<4 and 7 or 13)
-				flip_screen()
-			else
+			if not paused and focus then
 				if love.draw then love.draw() end
 			end
 		end

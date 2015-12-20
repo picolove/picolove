@@ -758,6 +758,7 @@ function load_p8(filename)
 		ipairs=ipairs,
 		warning=warning,
 		setfps=setfps,
+		_call=_call,
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
@@ -1630,6 +1631,28 @@ function line(x0,y0,x1,y1,col)
 	love.graphics.draw(lineMesh)
 end
 
+function _call(code)
+	--TODO: set environment
+	local ok,f,e = pcall(load,code)
+	if not ok or f==nil then
+		log('=======8<========')
+		log(code)
+		log('=======>8========')
+		return false
+	else
+		local result
+		ok,result = pcall(f)
+		if not ok then
+			log("error running lua: "..tostring(result))
+			print("syntax error", nil, nil, 14)
+			print("error running lua: "..tostring(result), nil, nil, 6)
+		else
+			log("lua completed")
+		end
+	end
+	log("finished runnig code")
+	return true
+end
 function _load(_cartname)
 	if love.filesystem.isFile(_cartname) then
 	elseif love.filesystem.isFile(_cartname..'.p8') then

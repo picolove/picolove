@@ -88,6 +88,7 @@ local scale = 4
 local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
+local loaded_code = nil
 
 local __audio_buffer_size = 1024
 
@@ -750,116 +751,11 @@ function load_p8(filename)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 
-	local cart_G = {
-		-- extra functions provided by picolove
-		assert=assert,
-		error=error,
-		log=log,
-		pairs=pairs,
-		ipairs=ipairs,
-		warning=warning,
-		setfps=setfps,
-		_keydown=nil,
-		_keyup=nil,
-		_textinput=nil,
-		_getcursorx=_getcursorx,
-		_getcursory=_getcursory,
-		-- pico8 api functions go here
-		clip=clip,
-		pget=pget,
-		pset=pset,
-		sget=sget,
-		sset=sset,
-		fget=fget,
-		fset=fset,
-		flip=flip,
-		folder=folder,
-		print=print,
-		printh=log,
-		cursor=cursor,
-		color=color,
-		cls=cls,
-		camera=camera,
-		circ=circ,
-		circfill=circfill,
-		help=help,
-		dir=ls,
-		line=line,
-		load=_load,
-		ls=ls,
-		rect=rect,
-		rectfill=rectfill,
-		run=run,
-		reload=reload,
-		pal=pal,
-		palt=palt,
-		spr=spr,
-		sspr=sspr,
-		add=add,
-		del=del,
-		foreach=foreach,
-		count=count,
-		all=all,
-		btn=btn,
-		btnp=btnp,
-		sfx=sfx,
-		music=music,
-		mget=mget,
-		mset=mset,
-		map=map,
-		memcpy=memcpy,
-		peek=peek,
-		poke=poke,
-		max=max,
-		min=min,
-		mid=mid,
-		flr=flr,
-		cos=cos,
-		sin=sin,
-		atan2=atan2,
-		sqrt=sqrt,
-		abs=abs,
-		rnd=rnd,
-		srand=srand,
-		sgn=sgn,
-		band=band,
-		bor=bor,
-		bxor=bxor,
-		bnot=bnot,
-		shl=shl,
-		shr=shr,
-		exit=shutdown,
-		shutdown=shutdown,
-		sub=sub,
-		stat=stat,
-		time=function() return host_time end,
-		-- deprecated pico-8 function aliases
-		mapdraw=map
-	}
-
-	local ok,f,e = pcall(load,lua,cartname)
-	if not ok or f==nil then
-		log('=======8<========')
-		log(lua)
-		log('=======>8========')
-		error("Error loading lua: "..tostring(e))
-	else
-		local result
-		setfenv(f,cart_G)
-		love.graphics.setShader(__draw_shader)
-		love.graphics.setCanvas(__screen)
-		love.graphics.origin()
-		restore_clip()
-		ok,result = pcall(f)
-		if not ok then
-			error("Error running lua: "..tostring(result))
-		else
-			log("lua completed")
-		end
-	end
 	log("finished loading cart",filename)
 
-	return cart_G
+	loaded_code = lua
+
+	return true
 end
 
 function love.update(dt)
@@ -1718,6 +1614,115 @@ function run()
 	love.graphics.setShader(__draw_shader)
 	restore_clip()
 	love.graphics.origin()
+
+	cart = {
+		-- extra functions provided by picolove
+		assert=assert,
+		error=error,
+		log=log,
+		pairs=pairs,
+		ipairs=ipairs,
+		warning=warning,
+		setfps=setfps,
+		_keydown=nil,
+		_keyup=nil,
+		_textinput=nil,
+		_getcursorx=_getcursorx,
+		_getcursory=_getcursory,
+		-- pico8 api functions go here
+		clip=clip,
+		pget=pget,
+		pset=pset,
+		sget=sget,
+		sset=sset,
+		fget=fget,
+		fset=fset,
+		flip=flip,
+		folder=folder,
+		print=print,
+		printh=log,
+		cursor=cursor,
+		color=color,
+		cls=cls,
+		camera=camera,
+		circ=circ,
+		circfill=circfill,
+		help=help,
+		dir=ls,
+		line=line,
+		load=_load,
+		ls=ls,
+		rect=rect,
+		rectfill=rectfill,
+		run=run,
+		reload=reload,
+		pal=pal,
+		palt=palt,
+		spr=spr,
+		sspr=sspr,
+		add=add,
+		del=del,
+		foreach=foreach,
+		count=count,
+		all=all,
+		btn=btn,
+		btnp=btnp,
+		sfx=sfx,
+		music=music,
+		mget=mget,
+		mset=mset,
+		map=map,
+		memcpy=memcpy,
+		peek=peek,
+		poke=poke,
+		max=max,
+		min=min,
+		mid=mid,
+		flr=flr,
+		cos=cos,
+		sin=sin,
+		atan2=atan2,
+		sqrt=sqrt,
+		abs=abs,
+		rnd=rnd,
+		srand=srand,
+		sgn=sgn,
+		band=band,
+		bor=bor,
+		bxor=bxor,
+		bnot=bnot,
+		shl=shl,
+		shr=shr,
+		exit=shutdown,
+		shutdown=shutdown,
+		sub=sub,
+		stat=stat,
+		time=function() return host_time end,
+		-- deprecated pico-8 function aliases
+		mapdraw=map
+	}
+
+	local ok,f,e = pcall(load,loaded_code,cartname)
+	if not ok or f==nil then
+		log('=======8<========')
+		log(loaded_code)
+		log('=======>8========')
+		error("Error loading lua: "..tostring(e))
+	else
+		local result
+		setfenv(f,cart)
+		love.graphics.setShader(__draw_shader)
+		love.graphics.setCanvas(__screen)
+		love.graphics.origin()
+		restore_clip()
+		ok,result = pcall(f)
+		if not ok then
+			error("Error running lua: "..tostring(result))
+		else
+			log("lua completed")
+		end
+	end
+
 	if cart._init then cart._init() end
 end
 

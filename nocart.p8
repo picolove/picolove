@@ -37,7 +37,6 @@ function _keydown(key)
 			ls()
 		elseif linebuffer:sub(1,5) == 'load ' then
 			load(linebuffer:sub(6,#linebuffer))
-			run()
 			return
 		elseif linebuffer == 'cls' then
 			line=-1
@@ -49,6 +48,8 @@ function _keydown(key)
 			return
 		elseif linebuffer == 'folder' then
 			folder()
+		elseif linebuffer == 'run' then
+			run()
 		end
 		linebuffer = ''
 	end

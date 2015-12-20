@@ -270,6 +270,7 @@ function love.load(argv)
 	font:setFilter('nearest','nearest')
 
 	love.mouse.setVisible(false)
+	love.keyboard.setKeyRepeat(true)
 	love.window.setTitle("picolove")
 	love.graphics.setLineStyle('rough')
 	love.graphics.setPointStyle('rough')

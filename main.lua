@@ -1980,14 +1980,23 @@ function memcpy(dest_addr,source_addr,len)
 			return
 		end
 		local img = __screen:getImageData()
-		for i=1,len do
-			local x = flr(source_addr-0x6000+i)%128
+		for i=0,len-1 do
+			local x = flr(source_addr-0x6000+i)%64*2
 			local y = flr((source_addr-0x6000+i)/64)
-			local c = flr(img:getPixel(x,y)/16)
+			--TODO: why are colors broken?
+			local c = ceil(img:getPixel(x,y)/16)
+			local d = ceil(img:getPixel(x+1,y)/16)
+			if c ~= 0 then
+				c = c - 1
+			end
+			if d ~= 0 then
+				d = d - 1
+			end
 
-			local dx = flr(dest_addr-0x6000+i)%128
+			local dx = flr(dest_addr-0x6000+i)%64*2
 			local dy = flr((dest_addr-0x6000+i)/64)
 			pset(dx,dy,c)
+			pset(dx+1,dy,d)
 		end
 	end
 end
@@ -2048,6 +2057,7 @@ function __pico_angle(a)
 end
 
 flr = math.floor
+ceil = math.ceil
 cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
 sin = function(x) return math.sin(-(x or 0)*(math.pi*2)) end
 atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end

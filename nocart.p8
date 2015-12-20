@@ -4,12 +4,17 @@ __lua__
 function _init()
 	t=0
 	linebuffer = ""
-	line = 4
+	line = 0
 	cls()
 	spr(32,0,3,6,1)
 	spr(38,45,0)
-	print("picolove",0,14,6)
-	print("a pico-8 clone made with love <3",0,14+8,6)
+	print('')
+	print('')
+
+	print('')
+	print("picolove")
+	print("a pico-8 clone made with love <3")
+	print('')
 end
 
 function _update()
@@ -18,8 +23,14 @@ end
 
 function _keydown(key)
 	if key == 'backspace' then
+		--delete carret
+		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		linebuffer = linebuffer:sub(1,#linebuffer-1)
 	elseif key == 'return' then
+		--delete text and carret
+		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		--render command
+		print("> "..linebuffer, nil, nil, 7)
 		if linebuffer:sub(1,3) == 'dir' or  linebuffer:sub(1,2) == 'ls' then
 			ls()
 		elseif linebuffer:sub(1,5) == 'load ' then
@@ -38,8 +49,6 @@ function _keydown(key)
 			folder()
 		end
 		linebuffer = ''
-		line+=1
-		cursor(1,line*8)
 	end
 end
 
@@ -48,11 +57,18 @@ function _textinput(text)
 end
 
 function _draw()
-	rectfill(0,line*8,127,(line+1)*8,0)
-	color(7)
-	print("> "..linebuffer,0,line*8)
+	-- stay on screen
+	if _getcursory() > 121 then
+		print('') -- scroll text
+		cursor(0, 120)
+	end
+	-- delete text and carret
+	rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+	-- render text
+	print("> "..linebuffer,0,_getcursory(),7)
+	-- render carret
 	if t % 16 < 8 then
-		rectfill((#linebuffer+2)*4,line*8,(#linebuffer+2)*4+3,line*8+4,8)
+		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,8)
 	end
 end
 

@@ -1399,6 +1399,13 @@ function folder()
 	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
 end
 
+function scroll(pixels)
+	local base = 0x6000
+	local delta = base + pixels*0x40
+	local basehigh = 0x7fff
+	memcpy(base, delta, basehigh-delta)
+end
+
 log = print
 function print(str,x,y,col)
 	if col then color(col) end
@@ -1408,6 +1415,14 @@ function print(str,x,y,col)
 	end
 	if x==nil then
 		x = __pico_cursor[1]
+	end
+	if y > 121 then
+		local c = col or __pico_color
+		scroll(6)
+		y = 120
+		rectfill(0,y,127,y+6,0)
+		color(c)
+		cursor(0, y+6)
 	end
 	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))

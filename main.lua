@@ -1565,8 +1565,9 @@ function _load(_cartname)
 	camera()
 	restore_clip()
 	cartname = _cartname
-	cart = load_p8(_cartname)
-	print('loaded '.._cartname, nil, nil, 6)
+	if load_p8(_cartname) then
+		print('loaded '.._cartname, nil, nil, 6)
+	end
 end
 
 function ls()

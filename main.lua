@@ -761,6 +761,8 @@ function load_p8(filename)
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
+		_getcursorx=_getcursorx,
+		_getcursory=_getcursory,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -1397,6 +1399,13 @@ function folder()
 	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
 end
 
+function scroll(pixels)
+	local base = 0x6000
+	local delta = base + pixels*0x40
+	local basehigh = 0x7fff
+	memcpy(base, delta, basehigh-delta)
+end
+
 log = print
 function print(str,x,y,col)
 	if col then color(col) end
@@ -1407,6 +1416,14 @@ function print(str,x,y,col)
 	if x==nil then
 		x = __pico_cursor[1]
 	end
+	if y > 121 then
+		local c = col or __pico_color
+		scroll(6)
+		y = 120
+		rectfill(0,y,127,y+6,0)
+		color(c)
+		cursor(0, y+6)
+	end
 	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))
 	love.graphics.setShader(__text_shader)
@@ -1416,6 +1433,14 @@ __pico_cursor = {0,0}
 
 function cursor(x,y)
 	__pico_cursor = {x,y}
+end
+
+function _getcursorx()
+	return __pico_cursor[1]
+end
+
+function _getcursory()
+	return __pico_cursor[2]
 end
 
 function color(c)
@@ -1980,14 +2005,23 @@ function memcpy(dest_addr,source_addr,len)
 			return
 		end
 		local img = __screen:getImageData()
-		for i=1,len do
-			local x = flr(source_addr-0x6000+i)%128
+		for i=0,len-1 do
+			local x = flr(source_addr-0x6000+i)%64*2
 			local y = flr((source_addr-0x6000+i)/64)
-			local c = flr(img:getPixel(x,y)/16)
+			--TODO: why are colors broken?
+			local c = ceil(img:getPixel(x,y)/16)
+			local d = ceil(img:getPixel(x+1,y)/16)
+			if c ~= 0 then
+				c = c - 1
+			end
+			if d ~= 0 then
+				d = d - 1
+			end
 
-			local dx = flr(dest_addr-0x6000+i)%128
+			local dx = flr(dest_addr-0x6000+i)%64*2
 			local dy = flr((dest_addr-0x6000+i)/64)
 			pset(dx,dy,c)
+			pset(dx+1,dy,d)
 		end
 	end
 end
@@ -2048,6 +2082,7 @@ function __pico_angle(a)
 end
 
 flr = math.floor
+ceil = math.ceil
 cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
 sin = function(x) return math.sin(-(x or 0)*(math.pi*2)) end
 atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end

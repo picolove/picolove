@@ -761,6 +761,8 @@ function load_p8(filename)
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
+		_getcursorx=_getcursorx,
+		_getcursory=_getcursory,
 		-- pico8 api functions go here
 		clip=clip,
 		pget=pget,
@@ -1416,6 +1418,14 @@ __pico_cursor = {0,0}
 
 function cursor(x,y)
 	__pico_cursor = {x,y}
+end
+
+function _getcursorx()
+	return __pico_cursor[1]
+end
+
+function _getcursory()
+	return __pico_cursor[2]
 end
 
 function color(c)

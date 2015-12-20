@@ -31,7 +31,9 @@ function _keydown(key)
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		--render command
 		print("> "..linebuffer, nil, nil, 7)
-		if linebuffer:sub(1,3) == 'dir' or  linebuffer:sub(1,2) == 'ls' then
+		if linebuffer == 'dir' or linebuffer == 'ls'
+			or (#linebuffer > 4 and linebuffer:sub(1,4) == 'dir ')
+			or (#linebuffer > 3 and linebuffer:sub(1,3) == 'ls ') then
 			ls()
 		elseif linebuffer:sub(1,5) == 'load ' then
 			load(linebuffer:sub(6,#linebuffer))

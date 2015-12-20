@@ -20,7 +20,9 @@ function _keydown(key)
 	if key == 'backspace' then
 		linebuffer = linebuffer:sub(1,#linebuffer-1)
 	elseif key == 'return' then
-		if linebuffer:sub(1,3) == 'dir' or  linebuffer:sub(1,2) == 'ls' then
+		if linebuffer == 'dir' or linebuffer == 'ls'
+			or (#linebuffer > 4 and linebuffer:sub(1,4) == 'dir ')
+			or (#linebuffer > 3 and linebuffer:sub(1,3) == 'ls ') then
 			ls()
 		elseif linebuffer:sub(1,5) == 'load ' then
 			load(linebuffer:sub(6,#linebuffer))

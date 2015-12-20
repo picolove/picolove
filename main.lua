@@ -1406,6 +1406,7 @@ end
 log = print
 function print(str,x,y,col)
 	if col then color(col) end
+	local canscroll = y==nil
 	if y==nil then
 		y = __pico_cursor[2]
 		__pico_cursor[2] = __pico_cursor[2] + 6
@@ -1413,7 +1414,7 @@ function print(str,x,y,col)
 	if x==nil then
 		x = __pico_cursor[1]
 	end
-	if y > 121 then
+	if canscroll and y > 121 then
 		local c = col or __pico_color
 		scroll(6)
 		y = 120

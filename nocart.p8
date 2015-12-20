@@ -49,6 +49,8 @@ function _keydown(key)
 			return
 		elseif linebuffer == 'folder' then
 			folder()
+		else
+			_call(linebuffer)
 		end
 		linebuffer = ''
 	end

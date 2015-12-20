@@ -1571,6 +1571,8 @@ function _load(_cartname)
 end
 
 function ls()
+	-- TODO: add support for other directories
+	-- TODO: paginate results
 	local files = love.filesystem.getDirectoryItems('')
 	print("directory: /", nil, nil, 12)
 	for _, file in ipairs(files) do
@@ -1584,6 +1586,7 @@ function ls()
 				color(5)
 			end
 			print(file)
+			flip()
 		end
 	end
 end

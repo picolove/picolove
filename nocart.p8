@@ -37,7 +37,6 @@ function _keydown(key)
 			ls()
 		elseif linebuffer:sub(1,5) == 'load ' then
 			load(linebuffer:sub(6,#linebuffer))
-			return
 		elseif linebuffer == 'cls' then
 			line=-1
 			cls()
@@ -45,7 +44,6 @@ function _keydown(key)
 			help()
 		elseif linebuffer == 'shutdown' then
 			shutdown()
-			return
 		elseif linebuffer == 'folder' then
 			folder()
 		elseif linebuffer == 'run' then

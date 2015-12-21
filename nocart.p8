@@ -48,6 +48,8 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == 'run' then
 			run()
+		else
+			_call(linebuffer)
 		end
 		linebuffer = ''
 	end

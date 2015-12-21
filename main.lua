@@ -145,6 +145,8 @@ local __pico_music = {}
 
 local __pico_current_music = nil
 
+local currentDirectory = '/'
+
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
@@ -390,6 +392,7 @@ function new_sandbox()
 		line=line,
 		load=_load,
 		ls=ls,
+		mkdir=mkdir,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -1696,6 +1699,15 @@ function ls()
 			print(file)
 			flip()
 		end
+	end
+end
+
+function mkdir(name)
+	if name == nil then
+		color(6)
+		print('mkdir [name]')
+	else
+		love.filesystem.createDirectory(currentDirectory..name)
 	end
 end
 

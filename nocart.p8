@@ -48,6 +48,10 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == 'run' then
 			run()
+		elseif linebuffer == 'mkdir' then
+			mkdir()
+		elseif linebuffer:sub(1,6) == 'mkdir ' and #linebuffer>6 then
+			mkdir(linebuffer:sub(7))
 		else
 			_call(linebuffer)
 		end

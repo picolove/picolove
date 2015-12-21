@@ -48,6 +48,12 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == 'run' then
 			run()
+		elseif linebuffer == 'resume' then
+			--TODO
+		elseif linebuffer == 'reboot' then
+			--TODO
+		elseif linebuffer:sub(1,5) == 'save ' then
+			--TODO
 		else
 			_call(linebuffer)
 		end

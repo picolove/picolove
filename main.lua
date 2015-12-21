@@ -351,6 +351,96 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	run()
 end
 
+function new_sandbox()
+	return {
+		-- extra functions provided by picolove
+		assert=assert,
+		error=error,
+		log=log,
+		pairs=pairs,
+		ipairs=ipairs,
+		warning=warning,
+		setfps=setfps,
+		_call=_call,
+		_keydown=nil,
+		_keyup=nil,
+		_textinput=nil,
+		_getcursorx=_getcursorx,
+		_getcursory=_getcursory,
+		-- pico8 api functions go here
+		clip=clip,
+		pget=pget,
+		pset=pset,
+		sget=sget,
+		sset=sset,
+		fget=fget,
+		fset=fset,
+		flip=flip,
+		folder=folder,
+		print=print,
+		printh=log,
+		cursor=cursor,
+		color=color,
+		cls=cls,
+		camera=camera,
+		circ=circ,
+		circfill=circfill,
+		help=help,
+		dir=ls,
+		line=line,
+		load=_load,
+		ls=ls,
+		rect=rect,
+		rectfill=rectfill,
+		run=run,
+		reload=reload,
+		pal=pal,
+		palt=palt,
+		spr=spr,
+		sspr=sspr,
+		add=add,
+		del=del,
+		foreach=foreach,
+		count=count,
+		all=all,
+		btn=btn,
+		btnp=btnp,
+		sfx=sfx,
+		music=music,
+		mget=mget,
+		mset=mset,
+		map=map,
+		memcpy=memcpy,
+		peek=peek,
+		poke=poke,
+		max=max,
+		min=min,
+		mid=mid,
+		flr=flr,
+		cos=cos,
+		sin=sin,
+		atan2=atan2,
+		sqrt=sqrt,
+		abs=abs,
+		rnd=rnd,
+		srand=srand,
+		sgn=sgn,
+		band=band,
+		bor=bor,
+		bxor=bxor,
+		bnot=bnot,
+		shl=shl,
+		shr=shr,
+		exit=shutdown,
+		shutdown=shutdown,
+		sub=sub,
+		stat=stat,
+		time=function() return host_time end,
+		-- deprecated pico-8 function aliases
+		mapdraw=map
+	}
+end
+
 function load_p8(filename)
 	log("Loading",filename)
 
@@ -1550,25 +1640,20 @@ function line(x0,y0,x1,y1,col)
 end
 
 function _call(code)
-	--TODO: set environment
-	local ok,f,e = pcall(load,code)
+	local ok,f,e = pcall(load,code,"repl")
 	if not ok or f==nil then
-		log('=======8<========')
-		log(code)
-		log('=======>8========')
+		print("syntax error", nil, nil, 14)
+		print(sub(e,20), nil, nil, 6)
 		return false
 	else
 		local result
-		ok,result = pcall(f)
+		setfenv(f,cart)
+		ok,e = pcall(f)
 		if not ok then
-			log("error running lua: "..tostring(result))
-			print("syntax error", nil, nil, 14)
-			print("error running lua: "..tostring(result), nil, nil, 6)
-		else
-			log("lua completed")
+			print("runtime error", nil, nil, 14)
+			print(sub(e,20), nil, nil, 6)
 		end
 	end
-	log("finished runnig code")
 	return true
 end
 
@@ -1642,92 +1727,7 @@ function run()
 	restore_clip()
 	love.graphics.origin()
 
-	cart = {
-		-- extra functions provided by picolove
-		assert=assert,
-		error=error,
-		log=log,
-		pairs=pairs,
-		ipairs=ipairs,
-		warning=warning,
-		setfps=setfps,
-		_keydown=nil,
-		_keyup=nil,
-		_textinput=nil,
-		_getcursorx=_getcursorx,
-		_getcursory=_getcursory,
-		-- pico8 api functions go here
-		clip=clip,
-		pget=pget,
-		pset=pset,
-		sget=sget,
-		sset=sset,
-		fget=fget,
-		fset=fset,
-		flip=flip,
-		folder=folder,
-		print=print,
-		printh=log,
-		cursor=cursor,
-		color=color,
-		cls=cls,
-		camera=camera,
-		circ=circ,
-		circfill=circfill,
-		help=help,
-		dir=ls,
-		line=line,
-		load=_load,
-		ls=ls,
-		rect=rect,
-		rectfill=rectfill,
-		run=run,
-		reload=reload,
-		pal=pal,
-		palt=palt,
-		spr=spr,
-		sspr=sspr,
-		add=add,
-		del=del,
-		foreach=foreach,
-		count=count,
-		all=all,
-		btn=btn,
-		btnp=btnp,
-		sfx=sfx,
-		music=music,
-		mget=mget,
-		mset=mset,
-		map=map,
-		memcpy=memcpy,
-		peek=peek,
-		poke=poke,
-		max=max,
-		min=min,
-		mid=mid,
-		flr=flr,
-		cos=cos,
-		sin=sin,
-		atan2=atan2,
-		sqrt=sqrt,
-		abs=abs,
-		rnd=rnd,
-		srand=srand,
-		sgn=sgn,
-		band=band,
-		bor=bor,
-		bxor=bxor,
-		bnot=bnot,
-		shl=shl,
-		shr=shr,
-		exit=shutdown,
-		shutdown=shutdown,
-		sub=sub,
-		stat=stat,
-		time=function() return host_time end,
-		-- deprecated pico-8 function aliases
-		mapdraw=map
-	}
+	cart = new_sandbox()
 
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then

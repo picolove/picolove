@@ -1661,10 +1661,10 @@ function _call(code)
 end
 
 function _load(_cartname)
-	if love.filesystem.isFile(_cartname) then
-	elseif love.filesystem.isFile(_cartname..'.p8') then
+	if love.filesystem.isFile(currentDirectory.._cartname) then
+	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8') then
 		_cartname = _cartname..'.p8'
-	elseif love.filesystem.isFile(_cartname..'.p8.png') then
+	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8.png') then
 		_cartname = _cartname..'.p8.png'
 	else
 		print('could not load', nil, nil, 6)
@@ -1676,7 +1676,7 @@ function _load(_cartname)
 	camera()
 	restore_clip()
 	cartname = _cartname
-	if load_p8(_cartname) then
+	if load_p8(currentDirectory.._cartname) then
 		print('loaded '.._cartname, nil, nil, 6)
 	end
 end

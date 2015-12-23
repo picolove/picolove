@@ -54,6 +54,12 @@ function _keydown(key)
 			mkdir(linebuffer:sub(7))
 		elseif #linebuffer == 0 then
 			--do nothing
+		elseif linebuffer == 'resume' then
+			--TODO
+		elseif linebuffer == 'reboot' then
+			--TODO
+		elseif linebuffer:sub(1,5) == 'save ' then
+			--TODO
 		else
 			_call(linebuffer)
 		end

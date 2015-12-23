@@ -394,6 +394,7 @@ function new_sandbox()
 		line=line,
 		load=_load,
 		ls=ls,
+		mkdir=mkdir,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -1769,6 +1770,15 @@ function cd(name)
 	else
 		color(7)
 		print(output)
+	end
+end
+
+function mkdir(name)
+	if name == nil then
+		color(6)
+		print('mkdir [name]')
+	else
+		love.filesystem.createDirectory(currentDirectory..name)
 	end
 end
 

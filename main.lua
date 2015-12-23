@@ -146,6 +146,7 @@ local __pico_music = {}
 local __pico_current_music = nil
 
 local currentDirectory = '/'
+local fontchars = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
@@ -268,7 +269,7 @@ function love.load(argv)
 	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png","abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ ")
+	local font = love.graphics.newImageFont("font.png", fontchars)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -1256,7 +1257,16 @@ end
 
 function love.textinput(text)
 	text = text:lower()
-	if cart and cart._textinput then return cart._textinput(text) end
+	local validchar = false
+	for i = 1,#fontchars do
+		if fontchars:sub(i,i) == text then
+			validchar = true
+			break
+		end
+	end
+	if validchar and cart and cart._textinput then
+		return cart._textinput(text)
+	end
 end
 
 function sfx(n,channel,offset)

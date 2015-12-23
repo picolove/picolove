@@ -1695,27 +1695,33 @@ end
 function ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
 	print("directory: "..currentDirectory, nil, nil, 12)
+	local output = {}
+	for _, file in ipairs(files) do
+		if love.filesystem.isDirectory(currentDirectory..file) then
+			output[#output+1] = {name=file:lower(), color=14}
+		end
+	end
+	for _, file in ipairs(files) do
+		if love.filesystem.isDirectory(currentDirectory..file) then
+		elseif file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
+			output[#output+1] = {name=file:lower(), color=6}
+		else
+			output[#output+1] = {name=file:lower(), color=5}
+		end
+	end
 	local count = 0
 	local col = nil
 	love.keyboard.setTextInput(false)
-	for _, file in ipairs(files) do
-		file = file:lower()
-		if love.filesystem.isDirectory(currentDirectory..'/'..file) then
-			col = 14
-		else
-			if file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
-				col = 6
-			else
-				col = 5
-			end
-		end
-		for i=1,#file,32 do
-			print(file:sub(i,i+32),nil,nil,col)
+	for i, item in ipairs(output) do
+		color(item.color)
+		for j=1,#item.name,32 do
+			print(item.name:sub(j,j+32))
 			flip_screen()
 			count = count + 1
 			if count == 20 then
 				print("--more--", nil, nil, 12)
 				flip_screen()
+				color(item.color)
 				while true do
 					local e = love.event.wait()
 					if e == 'keypressed' then

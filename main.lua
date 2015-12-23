@@ -1696,33 +1696,34 @@ function ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
 	print("directory: "..currentDirectory, nil, nil, 12)
 	local count = 0
+	local col = nil
 	love.keyboard.setTextInput(false)
 	for _, file in ipairs(files) do
 		file = file:lower()
-		if count == 20 then
-			print("--more--", nil, nil, 12)
-			flip_screen()
-			while true do
-				local e = love.event.wait()
-				if e == 'keypressed' then
-					break
-				end
-			end
-			count = 0
-		end
 		if love.filesystem.isDirectory(currentDirectory..'/'..file) then
-			color(14)
+			col = 14
 		else
 			if file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
-				color(6)
+				col = 6
 			else
-				color(5)
+				col = 5
 			end
 		end
 		for i=1,#file,32 do
-			print(file:sub(i,i+32))
+			print(file:sub(i,i+32),nil,nil,col)
 			flip_screen()
 			count = count + 1
+			if count == 20 then
+				print("--more--", nil, nil, 12)
+				flip_screen()
+				while true do
+					local e = love.event.wait()
+					if e == 'keypressed' then
+						break
+					end
+				end
+				count = 0
+			end
 		end
 	end
 	love.keyboard.setTextInput(true)

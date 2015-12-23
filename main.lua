@@ -1684,15 +1684,22 @@ function ls()
 	local files = love.filesystem.getDirectoryItems('')
 	print("directory: /", nil, nil, 12)
 	for _, file in ipairs(files) do
+		file = file:lower()
 		if love.filesystem.isDirectory(file) then
-			print(file:lower(), nil, nil, 14)
+			color(14)
 		else
-			file = file:lower()
 			if file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
 				color(6)
 			else
 				color(5)
 			end
+		end
+		if #file > 32 then
+			for i=1,#file,32 do
+				print(file:sub(i,i+32))
+				flip()
+			end
+		else
 			print(file)
 			flip()
 		end

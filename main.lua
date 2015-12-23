@@ -1682,11 +1682,23 @@ function _load(_cartname)
 end
 
 function ls()
-	-- TODO: paginate results
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
 	print("directory: "..currentDirectory, nil, nil, 12)
+	local count = 0
+	love.keyboard.setTextInput(false)
 	for _, file in ipairs(files) do
 		file = file:lower()
+		if count == 20 then
+			print("--more--", nil, nil, 12)
+			flip_screen()
+			while true do
+				local e = love.event.wait()
+				if e == 'keypressed' then
+					break
+				end
+			end
+			count = 0
+		end
 		if love.filesystem.isDirectory(currentDirectory..'/'..file) then
 			color(14)
 		else
@@ -1696,16 +1708,13 @@ function ls()
 				color(5)
 			end
 		end
-		if #file > 32 then
-			for i=1,#file,32 do
-				print(file:sub(i,i+32))
-				flip()
-			end
-		else
-			print(file)
-			flip()
+		for i=1,#file,32 do
+			print(file:sub(i,i+32))
+			flip_screen()
+			count = count + 1
 		end
 	end
+	love.keyboard.setTextInput(true)
 end
 
 function cd(name)

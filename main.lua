@@ -1442,7 +1442,7 @@ function _getcursory()
 end
 
 function color(c)
-	c = flr(c)
+	c = c and flr(c) or 0
 	assert(c >= 0 and c <= 16,string.format("c is %s",c))
 	__pico_color = c
 	love.graphics.setColor(c*16,0,0,255)

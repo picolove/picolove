@@ -1682,13 +1682,12 @@ function _load(_cartname)
 end
 
 function ls()
-	-- TODO: add support for other directories
 	-- TODO: paginate results
-	local files = love.filesystem.getDirectoryItems('')
-	print("directory: /", nil, nil, 12)
+	local files = love.filesystem.getDirectoryItems(currentDirectory)
+	print("directory: "..currentDirectory, nil, nil, 12)
 	for _, file in ipairs(files) do
 		file = file:lower()
-		if love.filesystem.isDirectory(file) then
+		if love.filesystem.isDirectory(currentDirectory..'/'..file) then
 			color(14)
 		else
 			if file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then

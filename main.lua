@@ -1758,14 +1758,10 @@ function pal(c0,c1,p)
 	elseif p == 1 and c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
 		__display_palette[c0] = c1
 	elseif c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
 		__draw_palette[c0] = c1
 	end
 end

@@ -1308,7 +1308,7 @@ function scroll(pixels)
 end
 
 function draw_glyph(glyph,dx,dy,c)
-	local index = fontchars:find(glyph)
+	local index = fontchars:find(glyph,nil,true)
 	if not index then
 		return
 	end

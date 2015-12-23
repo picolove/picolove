@@ -95,6 +95,19 @@ local __audio_buffer_size = 1024
 local __pico_pal_transparent = {
 }
 
+local ffi = require "ffi"
+ffi.cdef[[
+typedef union {
+	struct {
+		unsigned int low  : 4;
+		unsigned int high : 4;
+	};
+	unsigned int byte : 8;
+} byte_t;
+]]
+
+local memory = ffi.new("byte_t[?]",0x8000)
+
 __pico_resolution = {128,128}
 
 local lineMesh = love.graphics.newMesh(128,nil,"points")
@@ -1116,6 +1129,15 @@ function flip_screen()
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
+	-- copy video memory to screen
+	local __screen_data = love.image.newImageData(128,128)
+	__screen_data:mapPixel(function(x,y,r,g,b,a)
+		local byte = memory[0x6000+64*y+x]
+		local color = __pico_palette[(x%2 == 0) and byte.low+1 or byte.high+1]
+		return unpack(color)
+	end)
+	local __screen_img = love.graphics.newImage(__screen_data)
+
 	-- love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 
@@ -2120,21 +2142,24 @@ end
 
 function memset(dest_addr,val,len)
 	-- only for range 0x6000+0x8000
-	if dest_addr >= 0x6000 then
+	--[[if dest_addr >= 0x6000 then
 		for i=0,len-1 do
 			local dx = flr(dest_addr-0x6000+i)%64*2
 			local dy = flr((dest_addr-0x6000+i)/64)
-			local low = val
-			local high = bit.lshift(val,4)
+			local low = bit.band(0x0f,val)
+			local high = bit.band(0x0f,bit.lshift(val,4))
 			pset(dx,dy,high)
 			pset(dx+1,dy,low)
 		end
+	end]]
+	for i=0,len-1 do
+		memory[dest_addr+i].byte = val
 	end
 end
 
 function memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
-	if source_addr >= 0x6000 and dest_addr >= 0x6000 then
+	--[[if source_addr >= 0x6000 and dest_addr >= 0x6000 then
 		if source_addr + len >= 0x8000 then
 			return
 		end
@@ -2160,28 +2185,33 @@ function memcpy(dest_addr,source_addr,len)
 			pset(dx,dy,c)
 			pset(dx+1,dy,d)
 		end
+	end]]
+	for i=0,len-1 do
+		memory[dest_addr+i] = memory[source_addr+i]
 	end
 end
 
-function peek(addr, val)
+function peek(addr)
+	return memory[addr].byte
 	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64
-		local dy = flr((addr-0x6000)/64)
-		local low = pget(dx, dy)
-		local high = bit.lshift(pget(dx + 1, dy))
-		return bit.band(low, high)
-	end
+	--if addr >= 0x6000 and addr < 0x8000 then
+	--	local dx = flr(addr-0x6000)%64
+	--	local dy = flr((addr-0x6000)/64)
+	--	local low = pget(dx, dy)
+	--	local high = bit.lshift(pget(dx + 1, dy),4)
+	--	return bit.band(low, high)
+	--end
 end
 
 function poke(addr, val)
+	memory[addr].byte = val
 	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64*2
-		local dy = flr((addr-0x6000)/64)
-		pset(dx, dy, bit.band(val, 15))
-		pset(dx + 1, dy, bit.rshift(val, 4))
-	end
+	--if addr >= 0x6000 and addr < 0x8000 then
+	--	local dx = flr(addr-0x6000)%64*2
+	--	local dy = flr((addr-0x6000)/64)
+	--	pset(dx, dy, bit.band(val, 15))
+	--	pset(dx + 1, dy, bit.rshift(val, 4))
+	--end
 end
 
 function min(a,b)

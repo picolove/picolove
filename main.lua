@@ -1325,6 +1325,7 @@ end
 
 log = print
 function print(str,x,y,col)
+	str = tostring(str)
 	if col then color(col) end
 	local canscroll = y==nil
 	if y==nil then

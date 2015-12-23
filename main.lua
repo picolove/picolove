@@ -284,7 +284,6 @@ function love.load(argv)
 	love.graphics.setLineWidth(1)
 
 	love.graphics.origin()
-	restore_clip()
 
 	__draw_palette = {}
 	__display_palette = {}
@@ -1030,12 +1029,10 @@ function flip_screen()
 		table.insert(video_frames,tmp:getImageData())
 	end
 	-- get ready for next time
-	restore_clip()
 	restore_camera()
 end
 
 function love.draw()
-	restore_clip()
 	restore_camera()
 
 	-- run the cart's draw function
@@ -1191,9 +1188,6 @@ function clip(x,y,w,h)
 	else
 		__pico_clip = {0,0,127,127}
 	end
-end
-
-function restore_clip()
 end
 
 function pget(x,y)
@@ -1590,7 +1584,6 @@ function _load(_cartname)
 	end
 	love.graphics.origin()
 	camera()
-	restore_clip()
 	cartname = _cartname
 	if load_p8(currentDirectory.._cartname) then
 		print('loaded '.._cartname, nil, nil, 6)
@@ -1737,7 +1730,6 @@ function run()
 		local result
 		setfenv(f,cart)
 		love.graphics.origin()
-		restore_clip()
 		ok,result = pcall(f)
 		if not ok then
 			error("Error running lua: "..tostring(result))

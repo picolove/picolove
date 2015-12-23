@@ -48,6 +48,8 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == 'run' then
 			run()
+		elseif linebuffer == 'cd' or linebuffer:sub(1,3) == 'cd ' then
+			cd(linebuffer:sub(4))
 		else
 			_call(linebuffer)
 		end

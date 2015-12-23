@@ -145,6 +145,8 @@ local __pico_music = {}
 
 local __pico_current_music = nil
 
+local currentDirectory = '/'
+
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
@@ -379,6 +381,7 @@ function new_sandbox()
 		folder=folder,
 		print=print,
 		printh=log,
+		cd=cd,
 		cursor=cursor,
 		color=color,
 		cls=cls,
@@ -1658,10 +1661,10 @@ function _call(code)
 end
 
 function _load(_cartname)
-	if love.filesystem.isFile(_cartname) then
-	elseif love.filesystem.isFile(_cartname..'.p8') then
+	if love.filesystem.isFile(currentDirectory.._cartname) then
+	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8') then
 		_cartname = _cartname..'.p8'
-	elseif love.filesystem.isFile(_cartname..'.p8.png') then
+	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8.png') then
 		_cartname = _cartname..'.p8.png'
 	else
 		print('could not load', nil, nil, 6)
@@ -1673,7 +1676,7 @@ function _load(_cartname)
 	camera()
 	restore_clip()
 	cartname = _cartname
-	if load_p8(_cartname) then
+	if load_p8(currentDirectory.._cartname) then
 		print('loaded '.._cartname, nil, nil, 6)
 	end
 end
@@ -1703,6 +1706,51 @@ function ls()
 			print(file)
 			flip()
 		end
+	end
+end
+
+function cd(name)
+	local output = ''
+	local newDirectory = currentDirectory..name..'/'
+
+	-- filter /TEXT/../ -> /
+	local count = 1
+	while count > 0 do
+		newDirectory, count = newDirectory:gsub('/[^/]*/%.%./','/')
+	end
+
+	-- filter /TEXT/..$ -> /
+	count = 1
+	while count > 0 do
+		newDirectory, count = newDirectory:gsub('/[^/]*/%.%.$','/')
+	end
+
+	local failed = newDirectory:find('%.%.') ~= nil
+
+	if #name == 0 then
+		output = 'directory: '..currentDirectory
+	elseif failed then
+		if newDirectory == '/../' then
+			output = 'cd: failed'
+		else
+			output = 'directory not found'
+		end
+	elseif love.filesystem.exists(newDirectory) then
+		currentDirectory = newDirectory
+		output = currentDirectory
+	else
+		failed = true
+		output = 'directory not found'
+	end
+
+	if not failed then
+		color(12)
+		for i=1,#output,32 do
+			print(output:sub(i,i+32))
+		end
+	else
+		color(7)
+		print(output)
 	end
 end
 

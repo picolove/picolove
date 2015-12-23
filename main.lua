@@ -416,6 +416,7 @@ function new_sandbox()
 		mset=mset,
 		map=map,
 		memcpy=memcpy,
+		memset=memset,
 		peek=peek,
 		poke=poke,
 		max=max,
@@ -1951,10 +1952,18 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 end
 
 function add(a,v)
+	if a == nil then
+		warning('add to nil')
+		return
+	end
 	table.insert(a,v)
 end
 
 function del(a,dv)
+	if a == nil then
+		warning('del from nil')
+		return
+	end
 	for i,v in ipairs(a) do
 		if v==dv then
 			table.remove(a,i)
@@ -2077,6 +2086,8 @@ function mset(x,y,v)
 end
 
 function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
+	cel_x = cel_x or 0
+	cel_y = cel_y or 0
 	love.graphics.setShader(__sprite_shader)
 	love.graphics.setColor(255,255,255,255)
 	cel_x = flr(cel_x)
@@ -2107,7 +2118,19 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	love.graphics.setShader(__draw_shader)
 end
 
--- memory functions excluded
+function memset(dest_addr,val,len)
+	-- only for range 0x6000+0x8000
+	if dest_addr >= 0x6000 then
+		for i=0,len-1 do
+			local dx = flr(dest_addr-0x6000+i)%64*2
+			local dy = flr((dest_addr-0x6000+i)/64)
+			local low = val
+			local high = bit.lshift(val,4)
+			pset(dx,dy,high)
+			pset(dx+1,dy,low)
+		end
+	end
+end
 
 function memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000

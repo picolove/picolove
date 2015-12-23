@@ -1202,7 +1202,7 @@ end
 
 function pset_draw(x,y,c)
 	c = c and flr(c) or 0
-	local dc = __draw_palette[c]
+	local dc = __draw_palette[c%16]
 	x = flr(x - __pico_camera_x)
 	y = flr(y - __pico_camera_y)
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
@@ -1221,7 +1221,7 @@ function pset(x,y,c)
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
 	c = c and flr(c) or 0
 	color(c)
-	local dc = __draw_palette[c]
+	local dc = __draw_palette[c%16]
 	if x%2 == 0 then
 		memory[0x6000+y*64+flr(x/2)].low = dc
 	else

@@ -2025,12 +2025,12 @@ function btn(i,p)
 		local bitfield = 0
 		for i=0,5 do
 			if __pico_keypressed[0][i] then
-				bitfield = bitfield + bit.lshift(1,i+1)
+				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		for i=6,13 do
 			if __pico_keypressed[1][i] then
-				bitfield = bitfield + bit.lshift(1,i+1)
+				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		return bitfield
@@ -2052,12 +2052,12 @@ function btnp(i,p)
 		local bitfield = 0
 		for i=0,5 do
 			if __pico_keypressed[0][i] then
-				bitfield = bitfield + bit.lshift(1,i+1)
+				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		for i=6,13 do
 			if __pico_keypressed[1][i] then
-				bitfield = bitfield + bit.lshift(1,i+1)
+				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		return bitfield

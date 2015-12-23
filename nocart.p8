@@ -52,6 +52,8 @@ function _keydown(key)
 			cd(linebuffer:sub(4))
 		elseif linebuffer:sub(1,6) == 'mkdir ' and #linebuffer>6 then
 			mkdir(linebuffer:sub(7))
+		elseif #linebuffer == 0 then
+			--do nothing
 		else
 			_call(linebuffer)
 		end

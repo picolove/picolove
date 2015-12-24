@@ -1704,14 +1704,13 @@ function ls()
 	end
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
-		elseif file:sub(-3) == '.p8' or file:sub(-7) == '.p8.png' then
+		elseif file:sub(-3) == '.p8' or file:sub(-4) == '.png' then
 			output[#output+1] = {name=file:lower(), color=6}
 		else
 			output[#output+1] = {name=file:lower(), color=5}
 		end
 	end
 	local count = 0
-	local col = nil
 	love.keyboard.setTextInput(false)
 	for i, item in ipairs(output) do
 		color(item.color)

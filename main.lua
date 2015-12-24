@@ -1308,7 +1308,11 @@ end
 log = print
 function print(str,x,y,col)
 	str = tostring(str)
-	if col then color(col) end
+	if col then
+		color(col)
+	else
+		col = __pico_color
+	end
 	local canscroll = y==nil
 	if y==nil then
 		y = __pico_cursor[2]

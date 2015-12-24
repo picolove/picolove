@@ -103,8 +103,6 @@ local memory = ffi.new("byte_t[?]",0x8000)
 
 __pico_resolution = {128,128}
 
-local lineMesh = love.graphics.newMesh(128,nil,"points")
-
 local __pico_palette = {
 	{0,0,0,255},
 	{29,43,83,255},
@@ -270,7 +268,6 @@ function love.load(argv)
 		__audio_channels[i]:play()
 	end
 
-	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
 
 	font_img = love.image.newImageData("font.png")
@@ -278,12 +275,6 @@ function love.load(argv)
 	love.mouse.setVisible(false)
 	love.keyboard.setKeyRepeat(true)
 	love.window.setTitle("picolove")
-	love.graphics.setLineStyle('rough')
-	love.graphics.setPointStyle('rough')
-	love.graphics.setPointSize(1)
-	love.graphics.setLineWidth(1)
-
-	love.graphics.origin()
 
 	__draw_palette = {}
 	__display_palette = {}
@@ -758,7 +749,6 @@ function love.update(dt)
 end
 
 function love.resize(w,h)
-	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
 		scale = h/(__pico_resolution[2]+ypadding*2)
@@ -823,7 +813,6 @@ function love.run()
 		end
 
 		if render and love.window and love.graphics and love.window.isCreated() then
-			love.graphics.origin()
 			if not paused and focus then
 				if love.draw then love.draw() end
 			end
@@ -997,9 +986,6 @@ function update_audio(time)
 end
 
 function flip_screen()
-	love.graphics.setCanvas()
-	love.graphics.origin()
-
 	-- copy video memory to screen image
 	__screen_data:mapPixel(function(x,y,r,g,b,a)
 		local byte = memory[0x6000+64*y+flr(x/2)]
@@ -1028,13 +1014,9 @@ function flip_screen()
 		love.graphics.draw(__screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
 	end
-	-- get ready for next time
-	restore_camera()
 end
 
 function love.draw()
-	restore_camera()
-
 	-- run the cart's draw function
 	if cart._draw then cart._draw() end
 
@@ -1383,12 +1365,6 @@ function camera(x,y)
 		__pico_camera_x = 0
 		__pico_camera_y = 0
 	end
-	restore_camera()
-end
-
-function restore_camera()
-	love.graphics.origin()
-	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
 end
 
 function circ(ox,oy,r,col)
@@ -1583,8 +1559,6 @@ function _load(_cartname)
 		print('could not load', nil, nil, 6)
 		return
 	end
-	love.graphics.origin()
-	camera()
 	cartname = _cartname
 	if load_p8(currentDirectory.._cartname) then
 		print('loaded '.._cartname, nil, nil, 6)
@@ -1717,7 +1691,6 @@ end
 
 function run()
 	clip()
-	love.graphics.origin()
 
 	cart = new_sandbox()
 
@@ -1730,7 +1703,6 @@ function run()
 	else
 		local result
 		setfenv(f,cart)
-		love.graphics.origin()
 		ok,result = pcall(f)
 		if not ok then
 			error("Error running lua: "..tostring(result))
@@ -1964,7 +1936,6 @@ end
 function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_x = cel_x or 0
 	cel_y = cel_y or 0
-	love.graphics.setColor(255,255,255,255)
 	cel_x = flr(cel_x)
 	cel_y = flr(cel_y)
 	sx = flr(sx)
@@ -2083,10 +2054,6 @@ end
 
 function stat(x)
 	return 0
-end
-
-love.graphics.point = function(x,y)
-	love.graphics.rectangle('fill',x,y,1,1)
 end
 
 setfps = function(fps)

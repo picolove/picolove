@@ -1950,7 +1950,9 @@ function mget(x,y)
 end
 
 function mset(x,y,v)
-	if x >= 0 and x < 128 and y >= 0 and y < 64 then
+	x = flr(x)
+	y = flr(y)
+	if x >= 0 and x < 127 and y >= 0 and y < 63 then
 		memory[0x2000+y*128+x].byte = v
 	end
 end
@@ -1968,7 +1970,7 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do
 				if cel_x+x < 128 and cel_x+x >= 0 then
-					local v = mget(flr(cel_x+x),flr(cel_y+y))
+					local v = mget(cel_x+x,cel_y+y)
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
 							spr(v,sx+x*8,sy+y*8)

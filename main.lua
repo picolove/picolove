@@ -100,6 +100,7 @@ typedef union {
 ]]
 
 local memory = ffi.new("byte_t[?]",0x8000)
+local rom = ffi.new("byte_t[?]",0x4300)
 
 __pico_resolution = {128,128}
 
@@ -724,6 +725,11 @@ function load_p8(filename)
 	end)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
+
+	-- save memory to rom
+	for i=0,0x4300-1 do
+		rom[i].byte = memory[i].byte
+	end
 
 	log("finished loading cart",filename)
 
@@ -1714,21 +1720,32 @@ function run()
 		setfenv(f,cart)
 		ok,result = pcall(f)
 		if not ok then
-			error("Error running lua: "..tostring(result))
+			cls()
+			print(tostring(result),nil,nil,6)
 		else
 			log("lua completed")
 		end
 	end
 
-	if cart._init then cart._init() end
+	if cart._init then
+		local ok,result = pcall(cart._init)
+		if not ok then
+			cls()
+			print(tostring(result),nil,nil,6)
+		end
+	end
 end
 
 function reload(dest_addr,source_addr,len)
-	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
-	_load(cartname)
+	if type(dest_addr) ~= 'number' then
+		dest_addr = 0
+		source_addr = 0
+		len = 0x4300
+	end
+	for i=0,len-1 do
+		memory[dest_addr+i].byte = rom[source_addr+i].byte
+	end
 end
-
-local __palette_modified = true
 
 function pal(c0,c1,p)
 	if type(c0) ~= 'number' then

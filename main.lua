@@ -1186,13 +1186,13 @@ function pget(x,y)
 	end
 end
 
-function pset_draw(x,y,c)
+function pset_draw(x,y,c,transparency)
 	c = c and flr(c) or 0
 	local dc = __draw_palette[c%16]
 	x = flr(x - __pico_camera_x)
 	y = flr(y - __pico_camera_y)
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
-	if not __pico_pal_transparent[c] then
+	if not transparency or not __pico_pal_transparent[c] then
 		if x%2 == 0 then
 			memory[0x6000+y*64+flr(x/2)].low = dc
 		else
@@ -1786,13 +1786,13 @@ function spr(n,dx,dy,w,h,flip_x,flip_y)
 	for x=0,w*8-1 do
 		for y=0,h*8-1 do
 			if flip_x and flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+h*8-y))
+				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+h*8-y),true)
 			elseif flip_x then
-				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+y))
+				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+y),true)
 			elseif flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+x,sy+h*8-y))
+				pset_draw(dx+x,dy+y,sget(sx+x,sy+h*8-y),true)
 			else
-				pset_draw(dx+x,dy+y,sget(sx+x,sy+y))
+				pset_draw(dx+x,dy+y,sget(sx+x,sy+y),true)
 			end
 		end
 	end
@@ -1808,11 +1808,11 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dw = dw or sw
 	dh = dh or sh
 
-	for x=0,dw do
+	for x=0,dw-1 do
 		local sxx = sx + x*(sw/dw)
-		for y=0,dh do
+		for y=0,dh-1 do
 			local syy = sy + y*(sh/dh)
-			pset_draw(dx+x,dy+y,sget(sxx,syy))
+			pset_draw(dx+x,dy+y,sget(sxx,syy),true)
 		end
 	end
 end

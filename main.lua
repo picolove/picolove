@@ -1240,10 +1240,6 @@ function fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
-		if not memory[0x3000+flr(n)].byte then
-			warning(string.format('fget(%d,%d)',n,f))
-			return 0
-		end
 		return band(memory[0x3000+flr(n)].byte,shl(1,flr(f))) ~= 0
 	end
 	return memory[0x3000+flr(n)].byte
@@ -1943,6 +1939,8 @@ end
 
 function mget(x,y)
 	if x == nil or y == nil then return 0 end
+	x = flr(x)
+	y = flr(y)
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
 	if y > 32 then
 		return memory[0x1000+(y-32)*128+x].byte

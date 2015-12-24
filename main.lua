@@ -1786,11 +1786,11 @@ function spr(n,dx,dy,w,h,flip_x,flip_y)
 	for x=0,w*8-1 do
 		for y=0,h*8-1 do
 			if flip_x and flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+h*8-y),true)
+				pset_draw(dx+x,dy+y,sget(sx+(w*8-1)-x,sy+(h*8-1)-y),true)
 			elseif flip_x then
-				pset_draw(dx+x,dy+y,sget(sx+w*8-x,sy+y),true)
+				pset_draw(dx+x,dy+y,sget(sx+(w*8-1)-x,sy+y),true)
 			elseif flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+x,sy+h*8-y),true)
+				pset_draw(dx+x,dy+y,sget(sx+x,sy+(h*8-1)-y),true)
 			else
 				pset_draw(dx+x,dy+y,sget(sx+x,sy+y),true)
 			end
@@ -1809,9 +1809,9 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dh = dh or sh
 
 	for x=0,dw-1 do
-		local sxx = sx + x*(sw/dw)
+		local sxx = sx + (flip_x and dw-x-1 or x)*(sw/dw)
 		for y=0,dh-1 do
-			local syy = sy + y*(sh/dh)
+			local syy = sy + (flip_y and dh-y-1 or y)*(sh/dh)
 			pset_draw(dx+x,dy+y,sget(sxx,syy),true)
 		end
 	end

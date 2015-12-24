@@ -669,8 +669,6 @@ function load_p8(filename)
 			next_line = sfxdata:find("\n",end_of_line)+1
 		end
 
-		assert(_sfx == 64)
-
 		-- load music
 		local music_start = data:find("__music__") + 10
 		local music_end = #data-1

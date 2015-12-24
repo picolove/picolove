@@ -1722,6 +1722,9 @@ function ls()
 			if count == 20 then
 				print("--more--", nil, nil, 12)
 				flip_screen()
+				local y = _getcursory() - 6
+				cursor(0, y)
+				rectfill(0, y, 127, y+6, 0)
 				color(item.color)
 				while true do
 					local e = love.event.wait()

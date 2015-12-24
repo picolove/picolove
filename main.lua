@@ -1694,7 +1694,12 @@ function rectfill(x0,y0,x1,y1,col)
 end
 
 function run()
+	-- reset state
 	clip()
+	camera()
+	pal()
+	palt()
+	color(6)
 
 	cart = new_sandbox()
 

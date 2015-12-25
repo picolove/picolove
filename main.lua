@@ -92,10 +92,10 @@ local ffi = require "ffi"
 ffi.cdef[[
 typedef union {
 	struct {
-		unsigned int low  : 4;
-		unsigned int high : 4;
+		unsigned char low  : 4;
+		unsigned char high : 4;
 	};
-	unsigned int byte : 8;
+	unsigned char byte : 8;
 } byte_t;
 ]]
 
@@ -1354,7 +1354,7 @@ function color(c)
 end
 
 function cls()
-	memset(0x6000,0,8192)
+	memset(0x6000,0,8191)
 	__pico_cursor = {0,0}
 end
 
@@ -1953,7 +1953,11 @@ function mset(x,y,v)
 	x = flr(x)
 	y = flr(y)
 	if x >= 0 and x < 127 and y >= 0 and y < 63 then
-		memory[0x2000+y*128+x].byte = v
+		if y > 31 then
+			memory[0x1000+(y-32)*128+x].byte = v
+		else
+			memory[0x2000+y*128+x].byte = v
+		end
 	end
 end
 
@@ -1987,15 +1991,19 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 end
 
 function memset(dest_addr,val,len)
-	for i=0,len-1 do
-		memory[dest_addr+i].byte = val
+	if dest_addr < 0 or dest_addr + len >= 0x8000 then
+		warning(string.format("memset, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
+		return
 	end
+	ffi.fill(memory+dest_addr,len,val)
 end
 
 function memcpy(dest_addr,source_addr,len)
-	for i=0,len-1 do
-		memory[dest_addr+i] = memory[source_addr+i]
+	if dest_addr < 0 or source_addr < 0 or dest_addr + len >= 0x8000 or source_addr + len >= 0x8000 then
+		warning(string.format("memcpy, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
+		return
 	end
+	ffi.copy(memory[dest_addr],memory[source_addr],len)
 end
 
 function peek(addr)

@@ -99,6 +99,12 @@ typedef union {
 } byte_t;
 ]]
 
+ffi.cdef[[
+ void *memmove(void *dest, const void *src, size_t n);
+]]
+
+local C = ffi.C
+
 local memory = ffi.new("byte_t[?]",0x8000)
 local rom = ffi.new("byte_t[?]",0x4300)
 
@@ -2026,9 +2032,8 @@ function memcpy(dest_addr,source_addr,len)
 	if len < 1 then return end
 	if dest_addr < 0 or source_addr < 0 or dest_addr + len-1 >= 0x8000 or source_addr + len-1 >= 0x8000 then
 		warning(string.format("memcpy, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
-		return
 	end
-	ffi.copy(memory[dest_addr],memory[source_addr],len-1)
+	C.memmove(memory[dest_addr],memory[source_addr],len-1)
 end
 
 function peek(addr)

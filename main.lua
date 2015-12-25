@@ -1942,7 +1942,7 @@ function mget(x,y)
 	x = flr(x)
 	y = flr(y)
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
-	if y > 32 then
+	if y > 31 then
 		return memory[0x1000+(y-32)*128+x].byte
 	else
 		return memory[0x2000+y*128+x].byte

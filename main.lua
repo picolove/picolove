@@ -1383,8 +1383,17 @@ function circ(ox,oy,r,col)
 	ox = flr(ox)
 	oy = flr(oy)
 	r = flr(r)
-	local x = r
-	local y = 0
+
+	if r == 1 then
+		pset_draw(cx-1,cy,col)
+		pset_draw(cx+1,cy,col)
+		pset_draw(cx,cy-1,col)
+		pset_draw(cx,cy+1,col)
+		return
+	end
+
+	local x = r + 0.5
+	local y = 0 + 0.5
 	local decisionOver2 = 1 - x
 
 	while y <= x do
@@ -1427,6 +1436,15 @@ function circfill(cx,cy,r,col)
 	cx = flr(cx)
 	cy = flr(cy)
 	r = flr(r)
+
+	if r == 1 then
+		pset_draw(cx,cy,col)
+		pset_draw(cx-1,cy,col)
+		pset_draw(cx+1,cy,col)
+		pset_draw(cx,cy-1,col)
+		pset_draw(cx,cy+1,col)
+		return
+	end
 	local x = r
 	local y = 0
 	local err = -r

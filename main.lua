@@ -97,7 +97,7 @@ local __pico_pal_transparent = {
 
 __pico_resolution = {128,128}
 
-local lineMesh = love.graphics.newMesh(128,nil,"points")
+local lineMesh = love.graphics.newMesh(128,"points")
 
 local __pico_palette = {
 	{0,0,0,255},
@@ -269,7 +269,7 @@ function love.load(argv)
 	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png", fontchars)
+	local font = love.graphics.newImageFont("font.png", fontchars, 1)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -277,7 +277,6 @@ function love.load(argv)
 	love.keyboard.setKeyRepeat(true)
 	love.window.setTitle("picolove")
 	love.graphics.setLineStyle('rough')
-	love.graphics.setPointStyle('rough')
 	love.graphics.setPointSize(1)
 	love.graphics.setLineWidth(1)
 
@@ -1450,7 +1449,7 @@ function color(c)
 end
 
 function cls()
-	__screen:clear(0,0,0,255)
+	love.graphics.clear(0,0,0,255)
 	__pico_cursor = {0,0}
 end
 
@@ -2147,7 +2146,7 @@ function memcpy(dest_addr,source_addr,len)
 		if dest_addr + len >= 0x8000 then
 			return
 		end
-		local img = __screen:getImageData()
+		local img = __screen:newImageData()
 		for i=0,len-1 do
 			local x = flr(source_addr-0x6000+i)%64*2
 			local y = flr((source_addr-0x6000+i)/64)

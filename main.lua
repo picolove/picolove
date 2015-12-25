@@ -1360,7 +1360,7 @@ function color(c)
 end
 
 function cls()
-	memset(0x6000,0,8191)
+	ffi.fill(memory+0x6000,8191,0)
 	__pico_cursor = {0,0}
 end
 

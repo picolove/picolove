@@ -1179,6 +1179,7 @@ end
 function pget(x,y)
 	x = flr(x - __pico_camera_x)
 	y = flr(y - __pico_camera_y)
+	if x < 0 or x > 127 or y < 0 or y > 127 then return 0 end
 	if x%2 == 0 then
 		return memory[0x6000+y*64+flr(x/2)].low
 	else
@@ -1191,6 +1192,7 @@ function pset_draw(x,y,c,transparency)
 	local dc = __draw_palette[c%16]
 	x = flr(x - __pico_camera_x)
 	y = flr(y - __pico_camera_y)
+	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
 	if not transparency or not __pico_pal_transparent[c] then
 		if x%2 == 0 then
@@ -1204,6 +1206,7 @@ end
 function pset(x,y,c)
 	x = flr(x - __pico_camera_x)
 	y = flr(y - __pico_camera_y)
+	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
 	c = c and flr(c) or 0
 	color(c)
@@ -1216,9 +1219,10 @@ function pset(x,y,c)
 end
 
 function sget(x,y)
+	-- return the color from the spritesheet
 	x = flr(x)
 	y = flr(y)
-	-- return the color from the spritesheet
+	if x < 0 or x > 127 or y < 0 or y > 127 then return 0 end
 	if x%2 == 0 then
 		return memory[0x0000+y*64+flr(x/2)].low
 	else
@@ -1229,6 +1233,7 @@ end
 function sset(x,y,c)
 	x = flr(x)
 	y = flr(y)
+	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x%2 == 0 then
 		memory[0x000+y*64+flr(x/2)].low = c
 	else
@@ -1238,6 +1243,7 @@ end
 
 function fget(n,f)
 	if n == nil then return nil end
+	if n < 0 or n > 127 then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
 		return band(memory[0x3000+flr(n)].byte,shl(1,flr(f))) ~= 0
@@ -1991,26 +1997,35 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 end
 
 function memset(dest_addr,val,len)
-	if dest_addr < 0 or dest_addr + len >= 0x8000 then
+	if dest_addr < 0 or dest_addr + len-1 >= 0x8000 then
 		warning(string.format("memset, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
 		return
 	end
-	ffi.fill(memory+dest_addr,len,val)
+	ffi.fill(memory+dest_addr,len-1,val)
 end
 
 function memcpy(dest_addr,source_addr,len)
-	if dest_addr < 0 or source_addr < 0 or dest_addr + len >= 0x8000 or source_addr + len >= 0x8000 then
+	if len < 1 then return end
+	if dest_addr < 0 or source_addr < 0 or dest_addr + len-1 >= 0x8000 or source_addr + len-1 >= 0x8000 then
 		warning(string.format("memcpy, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
 		return
 	end
-	ffi.copy(memory[dest_addr],memory[source_addr],len)
+	ffi.copy(memory[dest_addr],memory[source_addr],len-1)
 end
 
 function peek(addr)
+	if addr < 0 or addr >= 0x8000 then
+		warning(string.format('peek(0x%x)',addr))
+		return
+	end
 	return memory[addr].byte
 end
 
 function poke(addr, val)
+	if addr < 0 or addr >= 0x8000 then
+		warning(string.format('poke(0x%x)',addr))
+		return
+	end
 	memory[addr].byte = val
 end
 

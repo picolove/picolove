@@ -84,6 +84,12 @@ local xpadding = 8.5
 local ypadding = 3.5
 local __accum = 0
 local loaded_code = nil
+local __cartdata_id = nil
+local __cartdata = {}
+
+for i=0,63 do
+	__cartdata[i] = 0
+end
 
 local __audio_buffer_size = 1024
 
@@ -333,6 +339,7 @@ function new_sandbox()
 		folder=folder,
 		print=print,
 		printh=log,
+		cartdata=cartdata,
 		cd=cd,
 		cursor=cursor,
 		color=color,
@@ -342,6 +349,8 @@ function new_sandbox()
 		circfill=circfill,
 		help=help,
 		dir=ls,
+		dget=dget,
+		dset=dset,
 		line=line,
 		load=_load,
 		ls=ls,
@@ -722,6 +731,7 @@ function load_p8(filename)
 			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
 		end
 	end)
+
 
 	do
 		local st, ast = parselua.ParseLua(lua)
@@ -2175,6 +2185,71 @@ shl = bit.lshift
 shr = bit.rshift
 
 sub = string.sub
+
+function cartdata(id)
+	local datafile
+	if id:match("[%W_]") then
+		__cartdata_id = id
+		datafile = love.filesystem.newFile(string.format("%s.cartdata",id))
+		datafile:open('r')
+		local cartdata, bytesread = datafile:read(256)
+		if cartdata then
+			datafile:close()
+			__cartdata = {}
+			for i=0,63 do
+				__cartdata[i] = bytes_to_number(cartdata:sub(i*4,i*4+3))
+			end
+		end
+
+		return cartdata ~= nil
+	else
+		__cartdata_id = nil
+		error(string.format('invalid cartdata id "%s", alphanumeric and _ only',id))
+	end
+end
+
+function dget(index)
+	return __cartdata[index]
+end
+
+function dset(index,value)
+	if __cartdata_id then
+		__cartdata[index] = (type(value) == 'number' and value) or 0
+		save_cartdata()
+	end
+end
+
+function bytes_to_number(bytes)
+	-- takes a string of 4 bytes and returns a number AB.CD
+	if type(bytes) ~= 'string' or #bytes < 4 then return 0 end
+	local a = bit.lshift(string.byte(string.sub(bytes,1,1)),24)
+	local b = bit.lshift(string.byte(string.sub(bytes,2,2)),16)
+	local c = bit.lshift(string.byte(string.sub(bytes,3,3)),8)
+	local d = string.byte(string.sub(bytes,4,4))
+	local n = (a+b+c+d) / 65536
+	return n
+end
+
+function number_to_bytes(fixed)
+	-- takes a number and returns 4 bytes. AB.CD
+	if type(fixed) ~= 'number' then fixed = 0 end
+	local i = math.floor(fixed * 65536)
+	local a,b = bit.rshift(bit.band(0xff000000,i),24), bit.rshift(bit.band(0x00ff0000,i),16)
+	local c,d = bit.rshift(bit.band(0x0000ff00,i),8),  bit.band(0x000000ff,i)
+	log(a,b,c,d)
+	return table.concat({ string.char(a), string.char(b), string.char(c), string.char(d) })
+end
+
+function save_cartdata()
+	local file = love.filesystem.newFile(string.format("%s.cartdata",__cartdata_id))
+	if file:open('w') then
+		-- write data as bytes, 4 bytes per number
+		for i=0,63 do
+			file:write(number_to_bytes(__cartdata_id[i]))
+		end
+		file:close()
+	end
+end
 
 function shutdown()
 	love.event.quit()

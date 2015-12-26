@@ -710,7 +710,7 @@ function load_p8(filename)
 	lua = lua_comment_remover(lua)
 
 	-- apply if shorthand macro
-	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
+	lua = lua:gsub("%f[%a]if%s*(%b())%s*([^\n]*)\n",function(a,b)
 		local nl = a:find('\n')
 		local th = b:find('%f[%w]then%f[%W]')
 		local an = b:find('%f[%w]and%f[%W]')

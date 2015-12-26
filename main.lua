@@ -108,6 +108,8 @@ ffi.cdef[[
 local C = ffi.C
 
 local memory = ffi.new("byte_t[?]",0x8000)
+-- shared map memory is a bit strange, mset/mget only look at map_data
+local map_memory = ffi.new("byte_t[?]",0x1000)
 local rom = ffi.new("byte_t[?]",0x4300)
 
 __pico_resolution = {128,128}
@@ -737,6 +739,9 @@ function load_p8(filename)
 	for i=0,0x4300-1 do
 		rom[i].byte = memory[i].byte
 	end
+
+	-- copy memory to map_memory
+	ffi.copy(map_memory[0],memory[0x1000],0x1000)
 
 	log("finished loading cart",filename)
 
@@ -1981,7 +1986,7 @@ function mget(x,y)
 	y = flr(y)
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
 	if y > 31 then
-		return memory[0x1000+(y-32)*128+x].byte
+		return map_memory[(y-32)*128+x].byte
 	else
 		return memory[0x2000+y*128+x].byte
 	end
@@ -1992,7 +1997,7 @@ function mset(x,y,v)
 	y = flr(y)
 	if x >= 0 and x < 127 and y >= 0 and y < 63 then
 		if y > 31 then
-			memory[0x1000+(y-32)*128+x].byte = v
+			map_memory[(y-32)*128+x].byte = v
 		else
 			memory[0x2000+y*128+x].byte = v
 		end

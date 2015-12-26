@@ -1382,7 +1382,16 @@ function print_wrap(str,col)
 	end
 end
 
-log = print
+local real_print = print
+log = function(...)
+	local args = {...}
+	for k,v in pairs(args) do
+		io.stderr:write(tostring(v))
+		io.stderr:write(' ')
+	end
+	io.stderr:write('\n')
+end
+
 function print(str,x,y,col)
 	str = tostring(str)
 	if col then
@@ -1936,6 +1945,12 @@ end
 
 function warning(msg)
 	log(debug.traceback("WARNING: "..msg,3))
+end
+
+local olderror = error
+function error(msg)
+	log(debug.traceback("ERROR: "..msg,3))
+	olderror(msg)
 end
 
 function foreach(a,f)

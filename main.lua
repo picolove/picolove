@@ -1936,28 +1936,68 @@ function palt(c,t)
 	end
 end
 
+function raw_pset(x,y,c)
+	--if x < 0 or x > 127 or y < 0 or y > 127 then
+	--	error(string.format('raw_pset %d,%d = %d',x,y,c))
+	--	return
+	--end
+	if x%2 == 0 then
+		memory[0x6000+y*64+floor(x/2)].low = c
+	else
+		memory[0x6000+y*64+floor(x/2)].high = c
+	end
+end
+
 function spr(n,dx,dy,w,h,flip_x,flip_y)
 	-- blit sprite n to screen at x,y
+	-- if it's outside of the screen just skip it
+	dx = floor(dx - __pico_camera_x)
+	dy = floor(dy - __pico_camera_y)
 	n = flr(n)
 	w = w or 1
 	h = h or 1
-
-	local sy = flr(n/16)*8
-	local sx = (n%16)*8
-
-	for x=0,w*8-1 do
-		for y=0,h*8-1 do
-			if flip_x and flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+(w*8-1)-x,sy+(h*8-1)-y),true)
-			elseif flip_x then
-				pset_draw(dx+x,dy+y,sget(sx+(w*8-1)-x,sy+y),true)
-			elseif flip_y then
-				pset_draw(dx+x,dy+y,sget(sx+x,sy+(h*8-1)-y),true)
-			else
-				pset_draw(dx+x,dy+y,sget(sx+x,sy+y),true)
-			end
-		end
+	if
+		dx + w*8-1 < __pico_clip[1] or
+		dy + h*8-1 < __pico_clip[2] or
+		dx > __pico_clip[3] or
+		dy > __pico_clip[4]
+	then
+		return
 	end
+	local minx = max(dx,__pico_clip[1])
+	local maxx = min(dx+w*8-1,__pico_clip[3])
+	local miny = max(dy,__pico_clip[2])
+	local maxy = min(dy+h*8-1,__pico_clip[4])
+	local sx2
+	local sx
+	local sy = flr(n/16)*8 + (flip_y and h*8-1 or 0) + (miny - dy) * (flip_y and -1 or 1)
+	local srow
+	local sc
+	for y=miny,maxy do
+		srow = 0x0000+sy*64
+		sx = (n%16)*8 + (flip_x and w*8-1 or 0) + (minx - dx) * (flip_x and -1 or 1)
+		for x=minx,maxx do
+			sx2 = floor(sx/2)
+			sc = map_color(sx%2 == 0 and
+				memory[srow+sx2].low or
+				memory[srow+sx2].high)
+			if sc ~= nil then
+				raw_pset(
+					x,
+					y,
+					sc)
+			end
+			sx = sx + (flip_x and -1 or 1)
+		end
+		sy = sy + (flip_y and -1 or 1)
+	end
+end
+
+function map_color(x)
+	-- return the color from the palette, or nil if transparent
+	x = floor(x) or 0
+	if __pico_pal_transparent[x] then return nil end
+	return __draw_palette[x%16]
 end
 
 function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)

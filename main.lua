@@ -1391,10 +1391,10 @@ function circ(ox,oy,r,col)
 	r = flr(r)
 
 	if r == 1 then
-		pset_draw(cx-1,cy,col)
-		pset_draw(cx+1,cy,col)
-		pset_draw(cx,cy-1,col)
-		pset_draw(cx,cy+1,col)
+		pset_draw(ox-1,oy,col)
+		pset_draw(ox+1,oy,col)
+		pset_draw(ox,oy-1,col)
+		pset_draw(ox,oy+1,col)
 		return
 	end
 

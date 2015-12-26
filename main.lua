@@ -1824,6 +1824,9 @@ function run()
 		if not ok then
 			cls()
 			print(tostring(result),nil,nil,6)
+			log(tostring(result))
+			cart._update = nil
+			cart._draw = nil
 		end
 	end
 end

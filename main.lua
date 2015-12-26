@@ -2,6 +2,8 @@ require "strict"
 
 local __pico_fps=30
 
+local parselua = require('ParseLua')
+
 local frametime = 1/__pico_fps
 
 local __compression_map = {
@@ -702,20 +704,10 @@ function load_p8(filename)
 		end
 	end
 
-	-- export spritesheet
-	local imgdata = love.image.newImageData(128,128)
-	imgdata:mapPixel(function(x,y,r,g,b,a)
-		local byte = memory[0x0000+64*y+flr(x/2)]
-		local color = __pico_palette[(x%2 == 0) and byte.low+1 or byte.high+1]
-		return unpack(color)
-	end)
-	imgdata:encode('test.png')
-	log('saved test.png')
-
-
 	-- patch the lua
-	lua = lua:gsub("!=","~=")
-	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
+	lua = lua_comment_remover(lua)
+
+	-- apply if shorthand macro
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
 		local nl = a:find('\n')
 		local th = b:find('%f[%w]then%f[%W]')
@@ -727,8 +719,19 @@ function load_p8(filename)
 			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
 		end
 	end)
-	-- rewrite assignment operators
-	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
+
+	do
+		local st, ast = parselua.ParseLua(lua)
+		if not st then
+			error(ast,0)
+		end
+		local util = require('Util')
+		local format = require('FormatIdentity')
+		st, lua = format(ast)
+		if not st then
+			error(lua,0)
+		end
+	end
 
 	-- save memory to rom
 	for i=0,0x4300-1 do
@@ -2136,4 +2139,69 @@ end
 
 function lerp(a,b,t)
 	return (1-t)*a+t*b
+end
+
+function lua_comment_remover(lua)
+	-- TODO: handle multiline comments
+	local comment = false
+	local string = false
+	local escapenext = false
+	local output = {}
+	for i=1,#lua do
+		local char = lua:sub(i,i)
+		if string == false then
+			if not comment then
+				if char == '-' then
+					local nextchar = lua:sub(i+1,i+1)
+					if nextchar == '-' then
+						comment = true
+					end
+				elseif char == '"' then
+					string = '"'
+				elseif char == '\'' then
+					string = '\''
+				elseif char == '[' then
+					local nextchar = lua:sub(i+1,i+1)
+					if nextchar == '[' then
+						string = '['
+					end
+				end
+			elseif comment then
+				if comment == 'multiline' then
+					if char == ']' then
+						local nextchar = lua:sub(i+1,i+1)
+						if nextchar == ']' then
+							comment = false
+						end
+					end
+				elseif comment == true then
+					if char == '\n' then
+						comment = false
+					elseif char == '[' then
+						local nextchar = lua:sub(i+1,i+1)
+						if nextchar == '[' then
+							comment = 'multiline'
+						end
+					end
+				end
+			end
+		elseif string and escapenext ~= i then
+			if string == '"' and char == '"' then
+				string = false
+			elseif string == '\'' and char == '\'' then
+				string = false
+			elseif string == '[' and char == ']' then
+				local nextchar = lua:sub(i+1,i+1)
+				if nextchar == ']' then
+					string = false
+				end
+			elseif char == '\\' then
+				escapenext = i+1
+			end
+		end
+		if not comment then
+			table.insert(output,char)
+		end
+	end
+	return table.concat(output)
 end

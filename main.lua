@@ -1251,8 +1251,8 @@ function sset(x,y,c)
 end
 
 function fget(n,f)
-	if n == nil then return nil end
-	if n < 0 or n > 127 then return nil end
+	if n == nil then return 0 end
+	if n < 0 or n > 127 then return 0 end
 	if f ~= nil then
 		-- return just that bit as a boolean
 		return band(memory[0x3000+flr(n)].byte,shl(1,flr(f))) ~= 0

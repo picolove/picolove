@@ -2174,8 +2174,11 @@ function __pico_angle(a)
 	return (((a - math.pi) / (math.pi*2)) + 0.25) % 1.0
 end
 
-flr = math.floor
-ceil = math.ceil
+flr = function(x)
+	if x ~= x then return 0 end
+	return math.floor(x)
+end
+ceil = function(x) return -flr(-x) end
 cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
 sin = function(x) return math.sin(-(x or 0)*(math.pi*2)) end
 atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end

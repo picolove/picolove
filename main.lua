@@ -763,7 +763,18 @@ function love.update(dt)
 			end
 		end
 	end
-	if cart._update then cart._update() end
+	if cart._update then
+		local ok,result = pcall(cart._update)
+		if not ok then
+			cls()
+			log(result)
+			result = result:sub(#cartname + 13)
+			print("runtime error", nil, nil, 14)
+			print_wrap(tostring(result),6)
+			cart._update = nil
+			cart._draw = nil
+		end
+	end
 end
 
 function love.resize(w,h)
@@ -1036,7 +1047,19 @@ end
 
 function love.draw()
 	-- run the cart's draw function
-	if cart._draw then cart._draw() end
+	if cart._draw then
+		local ok,result = pcall(cart._draw)
+		if not ok then
+			cls()
+			log(result)
+			result = result:sub(#cartname + 13)
+			print("runtime error", nil, nil, 14)
+			print_wrap(tostring(result),6)
+			cart._update = nil
+			cart._draw = nil
+
+		end
+	end
 
 	-- draw the contents of pico screen to our screen
 	flip_screen()
@@ -1323,6 +1346,13 @@ function draw_glyph(glyph,dx,dy,c)
 				pset_draw(dx+x,dy+y,c)
 			end
 		end
+	end
+end
+
+function print_wrap(str,col)
+	str = tostring(str)
+	for i=1,#str,32 do
+		print(str:sub(i,i+31),nil,nil,col)
 	end
 end
 

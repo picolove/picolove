@@ -2029,6 +2029,7 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 end
 
 function memset(dest_addr,val,len)
+	if len < 1 then return end
 	if dest_addr < 0 or dest_addr + len-1 >= 0x8000 then
 		warning(string.format("memset, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
 		return

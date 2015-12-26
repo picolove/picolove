@@ -717,6 +717,8 @@ function load_p8(filename)
 
 	-- patch the lua
 	local original_lua = lua
+	-- ensure there is a newline at end of lua
+	lua = lua .. '\n'
 	lua = lua_comment_remover(lua)
 
 	-- apply if shorthand macro

@@ -1197,6 +1197,7 @@ function pget(x,y)
 end
 
 function pset_draw(x,y,c,transparency)
+	if type(c) ~= 'number' then c = 0 end
 	c = c and flr(c) or 0
 	local dc = __draw_palette[c%16]
 	x = flr(x - __pico_camera_x)
@@ -1364,6 +1365,9 @@ function _getcursory()
 end
 
 function color(c)
+	if type(c) ~= 'number' then
+		c = 0
+	end
 	c = c and flr(c) or 0
 	__pico_color = c
 end
@@ -1847,16 +1851,16 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 end
 
 function add(a,v)
-	if a == nil then
-		warning('add to nil')
+	if type(a) ~= 'table' then
+		warning('add to non-table')
 		return
 	end
 	table.insert(a,v)
 end
 
 function del(a,dv)
-	if a == nil then
-		warning('del from nil')
+	if type(a) ~= 'table' then
+		warning('del from non-table')
 		return
 	end
 	for i,v in ipairs(a) do
@@ -1871,8 +1875,8 @@ function warning(msg)
 end
 
 function foreach(a,f)
-	if not a then
-		warning("foreach got a nil value")
+	if type(a) ~= 'table' then
+		warning("foreach got a non-table value")
 		return
 	end
 	for i,v in ipairs(a) do
@@ -1885,6 +1889,7 @@ function count(a)
 end
 
 function all(a)
+	a = a or {}
 	local i = 0
 	local n = table.getn(a)
 	return function()

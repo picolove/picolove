@@ -1051,16 +1051,70 @@ function flip_screen()
 	__screen = love.graphics.newImage(__screen_data)
 
 	-- fill background
-	love.graphics.setScissor()
 	love.graphics.setBackgroundColor(3, 5, 10)
 	love.graphics.clear()
 
 	local screen_w,screen_h = love.graphics.getDimensions()
-	if screen_w > screen_h then
-		love.graphics.draw(__screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
+	local draw_mode = peek(0x5f2c)
+	local min_x,max_x,min_y,max_y
+	local w,h
+	if screen_w >= screen_h then
+		min_x = screen_w/2-64*scale
+		max_x = screen_w/2+64*scale
+		min_y = ypadding*scale
+		max_y = screen_h-ypadding*scale
+		w = max_x - min_x
+		h = max_y - min_y
 	else
-		love.graphics.draw(__screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
+		min_x = xpadding*scale
+		max_x = screen_w-xpadding*scale
+		min_y = screen_h/2-64*scale
+		max_y = screen_h/2+64*scale
+		w = max_x - min_x
+		h = max_y - min_y
 	end
+
+	love.graphics.setScissor(min_x,min_y,w,h)
+	if draw_mode == 1 then
+		love.graphics.draw(__screen,min_x,min_y,0,scale*2,scale)
+	elseif draw_mode == 2 then
+		love.graphics.draw(__screen,min_x,min_y,0,scale,scale*2)
+	elseif draw_mode == 3 then
+		love.graphics.draw(__screen,min_x,min_y,0,scale*2,scale*2)
+	elseif draw_mode == 5 then
+		-- horizontal mirror
+		love.graphics.setScissor(min_x,min_y,w/2,h)
+		love.graphics.draw(__screen,min_x,min_y,0,scale,scale)
+		love.graphics.setScissor(min_x+w/2,min_y,w/2,h)
+		love.graphics.draw(__screen,max_x,min_y,0,-scale,scale)
+	elseif draw_mode == 6 then
+		-- vertical mirror
+		love.graphics.setScissor(min_x,min_y,w,h/2)
+		love.graphics.draw(__screen,min_x,min_y,0,scale,scale)
+		love.graphics.setScissor(min_x,min_y+h/2,w,h)
+		love.graphics.draw(__screen,min_x,max_y,0,scale,-scale)
+	elseif draw_mode == 7 then
+		-- both mirror
+
+		-- top left
+		love.graphics.setScissor(min_x,min_y,w/2,h/2)
+		love.graphics.draw(__screen,min_x,min_y,0,scale,scale)
+
+		-- top right
+		love.graphics.setScissor(min_x+w/2,min_y,w/2,h/2)
+		love.graphics.draw(__screen,max_x,min_y,0,-scale,scale)
+
+		-- bottom left
+		love.graphics.setScissor(min_x,min_y+h/2,w/2,h/2)
+		love.graphics.draw(__screen,min_x,max_y,0,scale,-scale)
+
+		-- bottom right
+		love.graphics.setScissor(min_x+w/2,min_y+h/2,w/2,h/2)
+		love.graphics.draw(__screen,max_x,max_y,0,-scale,-scale)
+	else
+		love.graphics.draw(__screen,min_x,min_y,0,scale,scale)
+	end
+	love.graphics.setScissor()
 
 	love.graphics.present()
 

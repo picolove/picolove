@@ -707,6 +707,7 @@ function load_p8(filename)
 	end
 
 	-- patch the lua
+	local original_lua = lua
 	lua = lua_comment_remover(lua)
 
 	-- apply if shorthand macro
@@ -725,7 +726,13 @@ function load_p8(filename)
 	do
 		local st, ast = parselua.ParseLua(lua)
 		if not st then
-			error(ast,0)
+			local fp = io.open(cartname..'.lua','w')
+			fp:write(lua)
+			fp:close()
+			local fp = io.open(cartname..'.orig.lua','w')
+			fp:write(original_lua)
+			fp:close()
+			error(ast)
 		end
 		local util = require('Util')
 		local format = require('FormatIdentity')
@@ -744,6 +751,13 @@ function load_p8(filename)
 	ffi.copy(map_memory[0],memory[0x1000],0x1000)
 
 	log("finished loading cart",filename)
+
+	local fp = io.open(cartname..'.lua','w')
+	fp:write(lua)
+	fp:close()
+	local fp = io.open(cartname..'.orig.lua','w')
+	fp:write(original_lua)
+	fp:close()
 
 	loaded_code = lua
 

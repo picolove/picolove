@@ -1499,7 +1499,7 @@ function color(c)
 end
 
 function cls()
-	ffi.fill(memory+0x6000,8191,0)
+	ffi.fill(memory+0x6000,8192,0)
 	__pico_cursor = {0,0}
 end
 

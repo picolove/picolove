@@ -86,6 +86,7 @@ local __accum = 0
 local loaded_code = nil
 local __cartdata_id = nil
 local __cartdata = {}
+local __cart_version = 5
 
 for i=0,63 do
 	__cartdata[i] = 0
@@ -311,12 +312,12 @@ function love.load(argv)
 	run()
 end
 
-function new_sandbox()
+function new_sandbox(version)
+	version = version or 5
 	return {
 		-- extra functions provided by picolove
 		assert=assert,
 		error=error,
-		log=log,
 		pairs=pairs,
 		ipairs=ipairs,
 		warning=warning,
@@ -363,11 +364,11 @@ function new_sandbox()
 		palt=palt,
 		spr=spr,
 		sspr=sspr,
-		add=add,
-		del=del,
-		foreach=foreach,
-		count=count,
-		all=all,
+		add=version <= 4 and v4_add or add,
+		del=version <= 4 and v4_del or del,
+		foreach=version <= 4 and v4_foreach or foreach,
+		count=version <= 4 and v4_count or count,
+		all=version <= 4 and v4_all or all,
 		btn=btn,
 		btnp=btnp,
 		sfx=sfx,
@@ -411,6 +412,7 @@ function load_p8(filename)
 	log("Loading",filename)
 
 	local lua = ""
+	local version = nil
 	if filename:sub(#filename-3,#filename) == '.png' then
 		local img = love.graphics.newImage(filename)
 		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
@@ -424,10 +426,10 @@ function load_p8(filename)
 		local lastbyte = nil
 		local mapY = 32
 		local mapX = 0
-		local version = nil
 		local codelen = nil
 		local code = ""
 		local sprite = 0
+		local eat_code = true
 		for y=0,204 do
 			for x=0,159 do
 				local r,g,b,a = data:getPixel(x,y)
@@ -452,14 +454,15 @@ function load_p8(filename)
 					memory[inbyte].byte = byte
 				elseif inbyte == 0x8000 then
 					version = byte
-				else
-					-- code, possibly compressed
-					if inbyte == 0x4305 then
-						codelen = bit.lshift(lastbyte,8) + byte
-					elseif inbyte >= 0x4308 then
-						code = code .. string.char(byte)
+				elseif inbyte >= 0x4300 and eat_code then
+					local c = string.char(byte)
+					if c == '\0' then
+						eat_code = false
+						io.stdout:write('EOF')
+					else
+						code = code .. c
+						io.stdout:write(c)
 					end
-					lastbyte = byte
 				end
 				inbyte = inbyte + 1
 			end
@@ -467,10 +470,12 @@ function load_p8(filename)
 
 		-- decompress code
 		log('version',version)
-		log('codelen',codelen)
 		if version == 0 then
-			lua = code
+			-- code is just ascii encoded, no decoding necessary
+			lua = code -- look for null
 		elseif version == 1 or version == 5 then
+			codelen = string.byte(code,4,5)
+			log('codelen',codelen)
 			-- decompress code
 			local mode = 0
 			local copy = nil
@@ -530,7 +535,7 @@ function load_p8(filename)
 		end
 		local next_line = data:find("\n",start+#header)
 		local version_str = data:sub(start+#header,next_line-1)
-		local version = tonumber(version_str)
+		version = tonumber(version_str)
 		log("version",version)
 		-- extract the lua
 		local lua_start = data:find("__lua__") + 8
@@ -772,6 +777,8 @@ function load_p8(filename)
 	fp:close()
 
 	loaded_code = lua
+
+	__cart_version = version
 
 	return true
 end
@@ -1864,7 +1871,7 @@ function run()
 	palt()
 	color(6)
 
-	cart = new_sandbox()
+	cart = new_sandbox(__cart_version)
 
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then
@@ -2451,6 +2458,111 @@ function lua_comment_remover(lua)
 		if not comment then
 			table.insert(output,char)
 		end
+		i = i + 1
 	end
 	return table.concat(output)
 end
+
+function get_json(url)
+	local r,c,h = http.request{
+		method='GET',
+		url=url,
+		headers={ Accept = "application/json" }
+	}
+	if c == 200 then
+		return json.decode(r)
+	else
+		return nil
+	end
+end
+
+
+function getfps()
+	return love.timer.getFPS()
+end
+
+-- 0.1.1 container API
+
+function _v4_validate(c)
+	if (c._num==nil) then
+		local i=0 while(c[i+1]~=nil) do i=i+1 end c._num=i c._max=i 	c._min=i+1 c._num = i c._ci = i
+	end
+end
+
+function v4_foreach(c, f)
+	if c == nil then
+		return
+	end
+	_v4_validate(c)
+	if c._max == nil then
+		return
+	end
+	for i=1,c._max do
+		if (c[i] ~= nil) then
+			c._ci = i f(c[i])
+		end
+	end
+end
+
+function v4_all(c)
+	if (c == nil) then
+		return function() end
+	end
+	_v4_validate(c)
+	local i=0
+	return function()
+		i=i+1
+		while c[i]==nil and i<c._max do
+			i=i+1
+		end
+		if c[i] ~= nil then
+			c._ci=i
+			return c[i]
+		end
+	end
+end
+
+function v4_add(c, i)
+	if c == nil then return end
+	_v4_validate(c)
+	for j=c._min,c._max+1 do
+		if c[j] == nil then
+			c._max = max(c._max,j)
+			c._min = j+1
+			c._num = c._num+1
+			c[j]=i
+			return i
+		end
+	end
+end
+
+function v4_count(c)
+	if c == nil then return 0 end
+	_v4_validate(c)
+	return c._num
+end
+
+function v4_del(c,i)
+	if c == nil then return end
+	_v4_validate(c)
+	if i==nil then return end
+	if c._ci==i then
+		c[c._ci]=nil
+		c._min=min(c._min, c._ci)
+		c._num=c._num-1
+		return
+	else
+		for j=1,c._max do
+			if (c[j]==i) then
+				c[j]=nil
+				c._min=min(c._min,j)
+				c._num=c._num-1
+				return
+			end
+		end
+	end
+	while c._max>1 and c[c._max]==nil do
+		c._max=c._max-1
+	end
+end
+

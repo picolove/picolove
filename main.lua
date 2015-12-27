@@ -429,7 +429,6 @@ function load_p8(filename)
 		local codelen = nil
 		local code = ""
 		local sprite = 0
-		local eat_code = true
 		for y=0,204 do
 			for x=0,159 do
 				local r,g,b,a = data:getPixel(x,y)
@@ -454,15 +453,9 @@ function load_p8(filename)
 					memory[inbyte].byte = byte
 				elseif inbyte == 0x8000 then
 					version = byte
-				elseif inbyte >= 0x4300 and eat_code then
+				elseif inbyte >= 0x4300 then
 					local c = string.char(byte)
-					if c == '\0' then
-						eat_code = false
-						io.stdout:write('EOF')
-					else
-						code = code .. c
-						io.stdout:write(c)
-					end
+					code = code .. c
 				end
 				inbyte = inbyte + 1
 			end
@@ -472,10 +465,20 @@ function load_p8(filename)
 		log('version',version)
 		if version == 0 then
 			-- code is just ascii encoded, no decoding necessary
-			lua = code -- look for null
+			for i=1,#code do
+				if code:sub(i,i) == '\0' then
+					code = code:sub(1,i-1)
+					io.stdout:write(code)
+					break
+				end
+			end
+			lua = code
 		elseif version == 1 or version == 5 then
-			codelen = string.byte(code,4,5)
+			local high = string.byte(code,5)
+			local low = string.byte(code,6)
+			codelen = bit.lshift(high,8) + low
 			log('codelen',codelen)
+			code = code:sub(9)
 			-- decompress code
 			local mode = 0
 			local copy = nil

@@ -97,6 +97,10 @@ local __audio_buffer_size = 1024
 local __pico_pal_transparent = {
 }
 
+
+-- local aliases
+local floor = math.floor
+
 local ffi = require "ffi"
 ffi.cdef[[
 typedef union {
@@ -570,9 +574,9 @@ function load_p8(filename)
 				local v = line:sub(i,i)
 				v = tonumber(v,16)
 				if col % 2 == 0 then
-					memory[0x0000+row*64+flr(col/2)].low = v
+					memory[0x0000+row*64+floor(col/2)].low = v
 				else
-					memory[0x0000+row*64+flr(col/2)].high = v
+					memory[0x0000+row*64+floor(col/2)].high = v
 				end
 
 				col = col + 1
@@ -908,8 +912,8 @@ note_map = {
 }
 
 function note_to_string(note)
-	local octave = flr(note/12)
-	local note = flr(note%12)
+	local octave = floor(note/12)
+	local note = floor(note%12)
 	return string.format("%s%d",note_map[note],octave)
 end
 
@@ -919,7 +923,7 @@ end
 
 function update_audio(time)
 	-- check what sfx should be playing
-	local samples = flr(time*__sample_rate)
+	local samples = floor(time*__sample_rate)
 
 	for i=0,samples-1 do
 		if __pico_current_music then
@@ -974,9 +978,9 @@ function update_audio(time)
 			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
 				-- when we pass a new step
-				if flr(ch.offset) > ch.last_step then
+				if floor(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
-					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
+					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[floor(ch.offset)])
 					ch.osc = osc[ch.instr]()
 					if ch.fx == 2 then
 						ch.lfo = osc[0]()
@@ -986,7 +990,7 @@ function update_audio(time)
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
 					end
-					ch.last_step = flr(ch.offset)
+					ch.last_step = floor(ch.offset)
 				end
 				if ch.vol and ch.vol > 0 then
 					local vol = ch.vol
@@ -1010,17 +1014,17 @@ function update_audio(time)
 						vol = lerp(ch.vol,0,ch.offset%1)
 					elseif ch.fx == 6 then
 						-- fast appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(8)*4)
+						local off = bit.band(floor(ch.offset),0xfc)
+						local lfo = floor(ch.lfo(8)*4)
 						off = off + lfo
-						local note = sfx[flr(off)][1]
+						local note = sfx[floor(off)][1]
 						ch.freq = note_to_hz(note)
 					elseif ch.fx == 7 then
 						-- slow appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(4)*4)
+						local off = bit.band(floor(ch.offset),0xfc)
+						local lfo = floor(ch.lfo(4)*4)
 						off = off + lfo
-						local note = sfx[flr(off)][1]
+						local note = sfx[floor(off)][1]
 						ch.freq = note_to_hz(note)
 					end
 					ch.sample = ch.osc(ch.freq) * vol/7
@@ -1054,7 +1058,7 @@ end
 function flip_screen()
 	-- copy video memory to screen image
 	__screen_data:mapPixel(function(x,y,r,g,b,a)
-		local byte = memory[0x6000+64*y+flr(x/2)]
+		local byte = memory[0x6000+64*y+floor(x/2)]
 		local color = __pico_palette[__display_palette[(x%2 == 0) and byte.low or byte.high]+1]
 		return unpack(color)
 	end)
@@ -1299,75 +1303,80 @@ end
 
 function clip(x,y,w,h)
 	if type(x) == "number" then
-		__pico_clip = {x,y,x+w,y+h}
+		__pico_clip = {
+			max(floor(x),0),
+			max(floor(y),0),
+			min(floor(x+w-1),127),
+			min(floor(y+h-1),127)
+		}
 	else
 		__pico_clip = {0,0,127,127}
 	end
 end
 
 function pget(x,y)
-	x = flr(x - __pico_camera_x)
-	y = flr(y - __pico_camera_y)
+	x = floor(x - __pico_camera_x)
+	y = floor(y - __pico_camera_y)
 	if x < 0 or x > 127 or y < 0 or y > 127 then return 0 end
 	if x%2 == 0 then
-		return memory[0x6000+y*64+flr(x/2)].low
+		return memory[0x6000+y*64+floor(x/2)].low
 	else
-		return memory[0x6000+y*64+flr(x/2)].high
+		return memory[0x6000+y*64+floor(x/2)].high
 	end
 end
 
 function pset_draw(x,y,c,transparency)
 	if type(c) ~= 'number' then c = 0 end
-	c = c and flr(c) or 0
+	c = c and floor(c) or 0
 	local dc = __draw_palette[c%16]
-	x = flr(x - __pico_camera_x)
-	y = flr(y - __pico_camera_y)
+	x = floor(x - __pico_camera_x)
+	y = floor(y - __pico_camera_y)
 	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
 	if not transparency or not __pico_pal_transparent[c] then
 		if x%2 == 0 then
-			memory[0x6000+y*64+flr(x/2)].low = dc
+			memory[0x6000+y*64+floor(x/2)].low = dc
 		else
-			memory[0x6000+y*64+flr(x/2)].high = dc
+			memory[0x6000+y*64+floor(x/2)].high = dc
 		end
 	end
 end
 
 function pset(x,y,c)
-	x = flr(x - __pico_camera_x)
-	y = flr(y - __pico_camera_y)
+	x = floor(x - __pico_camera_x)
+	y = floor(y - __pico_camera_y)
 	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x < __pico_clip[1] or x > __pico_clip[3] or y < __pico_clip[2] or y > __pico_clip[4] then return end
-	c = c and flr(c) or 0
+	c = c and floor(c) or 0
 	color(c)
 	local dc = __draw_palette[c%16]
 	if x%2 == 0 then
-		memory[0x6000+y*64+flr(x/2)].low = dc
+		memory[0x6000+y*64+floor(x/2)].low = dc
 	else
-		memory[0x6000+y*64+flr(x/2)].high = dc
+		memory[0x6000+y*64+floor(x/2)].high = dc
 	end
 end
 
 function sget(x,y)
 	-- return the color from the spritesheet
-	x = flr(x)
-	y = flr(y)
+	x = floor(x)
+	y = floor(y)
 	if x < 0 or x > 127 or y < 0 or y > 127 then return 0 end
 	if x%2 == 0 then
-		return memory[0x0000+y*64+flr(x/2)].low
+		return memory[0x0000+y*64+floor(x/2)].low
 	else
-		return memory[0x0000+y*64+flr(x/2)].high
+		return memory[0x0000+y*64+floor(x/2)].high
 	end
 end
 
 function sset(x,y,c)
-	x = flr(x)
-	y = flr(y)
+	x = floor(x)
+	y = floor(y)
 	if x < 0 or x > 127 or y < 0 or y > 127 then return end
 	if x%2 == 0 then
-		memory[0x000+y*64+flr(x/2)].low = c
+		memory[0x000+y*64+floor(x/2)].low = c
 	else
-		memory[0x000+y*64+flr(x/2)].high = c
+		memory[0x000+y*64+floor(x/2)].high = c
 	end
 end
 
@@ -1376,9 +1385,9 @@ function fget(n,f)
 	if n < 0 or n > 127 then return 0 end
 	if f ~= nil then
 		-- return just that bit as a boolean
-		return band(memory[0x3000+flr(n)].byte,shl(1,flr(f))) ~= 0
+		return band(memory[0x3000+floor(n)].byte,shl(1,floor(f))) ~= 0
 	end
-	return memory[0x3000+flr(n)].byte
+	return memory[0x3000+floor(n)].byte
 end
 
 assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
@@ -1504,7 +1513,7 @@ function color(c)
 	if type(c) ~= 'number' then
 		c = 0
 	end
-	c = c and flr(c) or 0
+	c = c and floor(c) or 0
 	__pico_color = c
 end
 
@@ -1518,8 +1527,8 @@ __pico_camera_y = 0
 
 function camera(x,y)
 	if type(x) == 'number' then
-		__pico_camera_x = flr(x)
-		__pico_camera_y = flr(y)
+		__pico_camera_x = floor(x)
+		__pico_camera_y = floor(y)
 	else
 		__pico_camera_x = 0
 		__pico_camera_y = 0
@@ -1529,9 +1538,9 @@ end
 function circ(ox,oy,r,col)
 	col = col or __pico_color
 	color(col)
-	ox = flr(ox)
-	oy = flr(oy)
-	r = flr(r)
+	ox = floor(ox)
+	oy = floor(oy)
+	r = floor(r)
 
 	if r == 1 then
 		pset_draw(ox-1,oy,col)
@@ -1582,9 +1591,9 @@ end
 function circfill(cx,cy,r,col)
 	col = col or __pico_color
 	color(col)
-	cx = flr(cx)
-	cy = flr(cy)
-	r = flr(r)
+	cx = floor(cx)
+	cy = floor(cy)
+	r = floor(r)
 
 	if r == 1 then
 		pset_draw(cx,cy,col)
@@ -1640,15 +1649,25 @@ function line(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
 
-	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
-		warning("line has NaN value")
+	if x0 ~= x0 then
+		warning('line arg 1 is NaN')
+		return
+	elseif y0 ~= y0 then
+		warning('line arg 2 is NaN')
+		return
+	elseif x1 ~= x1 then
+		warning('line arg 3 is NaN')
+		return
+	elseif y1 ~= y1 then
+		warning('line arg 4 is NaN')
 		return
 	end
 
-	x0 = flr(x0)
-	y0 = flr(y0)
-	x1 = flr(x1)
-	y1 = flr(y1)
+
+	x0 = floor(x0)
+	y0 = floor(y0)
+	x1 = floor(x1)
+	y1 = floor(y1)
 
 
 	local dx = x1 - x0
@@ -1924,12 +1943,12 @@ function pal(c0,c1,p)
 			__display_palette[i] = i
 		end
 	elseif p == 1 and c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = floor(c0)%16
+		c1 = floor(c1)%16
 		__display_palette[c0] = c1
 	elseif c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = floor(c0)%16
+		c1 = floor(c1)%16
 		__draw_palette[c0] = c1
 	end
 end
@@ -1941,7 +1960,7 @@ function palt(c,t)
 			__pico_pal_transparent[i] = false
 		end
 	else
-		c = flr(c)%16
+		c = floor(c)%16
 		__pico_pal_transparent[c] = t
 	end
 end
@@ -1963,7 +1982,7 @@ function spr(n,dx,dy,w,h,flip_x,flip_y)
 	-- if it's outside of the screen just skip it
 	dx = floor(dx - __pico_camera_x)
 	dy = floor(dy - __pico_camera_y)
-	n = flr(n)
+	n = floor(n)
 	w = w or 1
 	h = h or 1
 	if
@@ -1980,7 +1999,7 @@ function spr(n,dx,dy,w,h,flip_x,flip_y)
 	local maxy = min(dy+h*8-1,__pico_clip[4])
 	local sx2
 	local sx
-	local sy = flr(n/16)*8 + (flip_y and h*8-1 or 0) + (miny - dy) * (flip_y and -1 or 1)
+	local sy = floor(n/16)*8 + (flip_y and h*8-1 or 0) + (miny - dy) * (flip_y and -1 or 1)
 	local srow
 	local sc
 	for y=miny,maxy do
@@ -2162,8 +2181,8 @@ end
 
 function mget(x,y)
 	if x == nil or y == nil then return 0 end
-	x = flr(x)
-	y = flr(y)
+	x = floor(x)
+	y = floor(y)
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
 	if y > 31 then
 		return map_memory[(y-32)*128+x].byte
@@ -2173,8 +2192,8 @@ function mget(x,y)
 end
 
 function mset(x,y,v)
-	x = flr(x)
-	y = flr(y)
+	x = floor(x)
+	y = floor(y)
 	if x >= 0 and x < 127 and y >= 0 and y < 63 then
 		if y > 31 then
 			map_memory[(y-32)*128+x].byte = v
@@ -2187,12 +2206,13 @@ end
 function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_x = cel_x or 0
 	cel_y = cel_y or 0
-	cel_x = flr(cel_x)
-	cel_y = flr(cel_y)
-	sx = flr(sx)
-	sy = flr(sy)
-	cel_w = flr(cel_w)
-	cel_h = flr(cel_h)
+	cel_x = floor(cel_x)
+	cel_y = floor(cel_y)
+	sx = floor(sx)
+	sy = floor(sy)
+	cel_w = floor(cel_w)
+	cel_h = floor(cel_h)
+
 	for y=0,cel_h-1 do
 		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do
@@ -2214,6 +2234,9 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 end
 
 function memset(dest_addr,val,len)
+	dest_addr = floor(dest_addr)
+	val = floor(val)
+	len = floor(len)
 	if len < 1 then return end
 	if dest_addr < 0 or dest_addr + len-1 >= 0x8000 then
 		warning(string.format("memset, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
@@ -2223,6 +2246,9 @@ function memset(dest_addr,val,len)
 end
 
 function memcpy(dest_addr,source_addr,len)
+	len = floor(len)
+	dest_addr = floor(dest_addr)
+	source_addr = floor(source_addr)
 	if len < 1 then return end
 	if dest_addr < 0 or source_addr < 0 or dest_addr + len-1 >= 0x8000 or source_addr + len-1 >= 0x8000 then
 		warning(string.format("memcpy, accessing outside bounds: 0x%x + %d = 0x%x", dest_addr, len, dest_addr + len))
@@ -2231,6 +2257,7 @@ function memcpy(dest_addr,source_addr,len)
 end
 
 function peek(addr)
+	addr = floor(addr)
 	if addr < 0 or addr >= 0x8000 then
 		warning(string.format('peek(0x%x)',addr))
 		return
@@ -2239,6 +2266,7 @@ function peek(addr)
 end
 
 function poke(addr, val)
+	addr = floor(addr)
 	if addr < 0 or addr >= 0x8000 then
 		warning(string.format('poke(0x%x)',addr))
 		return
@@ -2271,18 +2299,15 @@ function mid(x,y,z)
 	return x > y and x or y > z and z or y
 end
 
-assert(mid(1,5,6) == 5)
-assert(mid(3,2,6) == 3)
-assert(mid(3,9,6) == 6)
-
 function __pico_angle(a)
 	-- FIXME: why does this work?
 	return (((a - math.pi) / (math.pi*2)) + 0.25) % 1.0
 end
 
 flr = function(x)
+	if x == nil then return 0 end
 	if x ~= x then return 0 end
-	return math.floor(x)
+	return floor(x)
 end
 ceil = function(x) return -flr(-x) end
 cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
@@ -2294,7 +2319,7 @@ abs = math.abs
 rnd = function(x) return love.math.random()*(x or 1) end
 srand = function(seed)
 	if seed == 0 then seed = 1 end
-	return love.math.setRandomSeed(flr(seed*32768))
+	return love.math.setRandomSeed(floor(seed*32768))
 end
 sgn = function(x)
 	if x < 0 then
@@ -2362,7 +2387,7 @@ end
 function number_to_bytes(fixed)
 	-- takes a number and returns 4 bytes. AB.CD
 	if type(fixed) ~= 'number' then fixed = 0 end
-	local i = math.floor(fixed * 65536)
+	local i = floor(fixed * 65536)
 	local a,b = bit.rshift(bit.band(0xff000000,i),24), bit.rshift(bit.band(0x00ff0000,i),16)
 	local c,d = bit.rshift(bit.band(0x0000ff00,i),8),  bit.band(0x000000ff,i)
 	log(a,b,c,d)
@@ -2389,7 +2414,7 @@ function stat(x)
 end
 
 setfps = function(fps)
-	__pico_fps = flr(fps)
+	__pico_fps = floor(fps)
 	if __pico_fps <= 0 then
 		__pico_fps = 30
 	end

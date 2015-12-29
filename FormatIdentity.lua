@@ -290,9 +290,12 @@ local function Format_Identity(ast)
 			formatExpr(statement.Lhs,false)
 			appendStrNoWhite(' ')
 			appendStrNoWhite(statement.IncrementType)
+			tok_it = tok_it + 2
 			appendStrNoWhite(' ')
 			formatExpr(statement.Rhs,false)
 			appendStrNoWhite(' )')
+
+
 
 		elseif statement.AstType == 'CallStatement' then
 			formatExpr(statement.Expression)

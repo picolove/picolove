@@ -935,10 +935,11 @@ local function ParseLua(src)
 	local unops = lookupify{'-', 'not', '#'}
 	local unopprio = 8
 	local priority = {
+		['^='] = {1,1};
+		['/='] = {1,1};
+		['*='] = {1,1};
 		['+='] = {1,1};
 		['-='] = {1,1};
-		['*='] = {1,1};
-		['/='] = {1,1};
 		['%='] = {1,1};
 		['+'] = {6,6};
 		['-'] = {6,6};
@@ -1318,7 +1319,7 @@ local function ParseLua(src)
 			local st, suffixed = ParseSuffixedExpr(scope)
 			if not st then return false, suffixed end
 
-			if tok:IsSymbol('+') or tok:IsSymbol('-') or tok:IsSymbol('*') or tok:IsSymbol('/') or tok:IsSymbol('%') then
+			if tok:IsSymbol('+') or tok:IsSymbol('-') or tok:IsSymbol('*') or tok:IsSymbol('/') or tok:IsSymbol('%') or tok:IsSymbol('^') then
 				if tok:Peek(1).Data == '=' then
 
 					local operator = nil
@@ -1327,6 +1328,7 @@ local function ParseLua(src)
 					if tok:ConsumeSymbol('*', tokenList) then operator = '*' end
 					if tok:ConsumeSymbol('/', tokenList) then operator = '/' end
 					if tok:ConsumeSymbol('%', tokenList) then operator = '%' end
+					if tok:ConsumeSymbol('^', tokenList) then operator = '^' end
 
 					tok:ConsumeSymbol('=', tokenList)
 					local lhs = { suffixed }

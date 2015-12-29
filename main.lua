@@ -1678,13 +1678,13 @@ function line(x0,y0,x1,y1,col)
 		-- simple case draw a vertical line
 		if y0 > y1 then y0,y1 = y1,y0 end
 		for y=y0,y1 do
-			pset(x0,y,col)
+			pset_draw(x0,y,col)
 		end
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
 		if x0 > x1 then x0,x1 = x1,x0 end
 		for x=x0,x1 do
-			pset(x,y0,col)
+			pset_draw(x,y0,col)
 		end
 	else
 		if dy < 0 then
@@ -1710,7 +1710,7 @@ function line(x0,y0,x1,y1,col)
 				end
 				x0 = x0 + stepx
 				fraction = fraction + dy
-				pset(x0,y0,col)
+				pset_draw(x0,y0,col)
 			end
 		else
 			local fraction = dx - bit.rshift(dy, 1)
@@ -1721,7 +1721,7 @@ function line(x0,y0,x1,y1,col)
 				end
 				y0 = y0 + stepy
 				fraction = fraction + dx
-				pset(x0,y0,col)
+				pset_draw(x0,y0,col)
 			end
 		end
 	end

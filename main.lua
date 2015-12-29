@@ -2433,7 +2433,8 @@ function lua_comment_remover(lua)
 	local string = false
 	local escapenext = false
 	local output = {}
-	for i=1,#lua do
+	local i = 1
+	while i < #lua do
 		local char = lua:sub(i,i)
 		if string == false then
 			if not comment then
@@ -2458,6 +2459,8 @@ function lua_comment_remover(lua)
 						local nextchar = lua:sub(i+1,i+1)
 						if nextchar == ']' then
 							comment = false
+							i = i + 2
+							char = ''
 						end
 					end
 				elseif comment == true then
@@ -2480,6 +2483,7 @@ function lua_comment_remover(lua)
 				local nextchar = lua:sub(i+1,i+1)
 				if nextchar == ']' then
 					string = false
+					i = i + 1
 				end
 			elseif char == '\\' then
 				escapenext = i+1

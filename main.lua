@@ -2505,10 +2505,6 @@ function get_json(url)
 end
 
 
-function getfps()
-	return love.timer.getFPS()
-end
-
 -- 0.1.1 container API
 
 function _v4_validate(c)

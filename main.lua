@@ -1923,6 +1923,10 @@ function run()
 			cart._draw = nil
 		end
 	end
+
+	if not cart._update and not cart._draw then
+		shutdown()
+	end
 end
 
 function reload(dest_addr,source_addr,len)

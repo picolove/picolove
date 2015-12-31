@@ -129,10 +129,10 @@ local host_time = 0
 local retro_mode = false
 
 local __pico_audio_channels = {
-	[0]={},
-	[1]={},
-	[2]={},
-	[3]={}
+	[0]={oscpos=0},
+	[1]={oscpos=0},
+	[2]={oscpos=0},
+	[3]={oscpos=0}
 }
 
 local __pico_sfx = {}
@@ -174,83 +174,55 @@ function love.load(argv)
 	end
 
 	osc = {}
-	osc[0] = function()
-		-- tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5) * 0.5
-		end
+	-- tri
+	osc[0] = function(x)
+		x = x * 2
+		return (abs((x%2)-1)-0.5) * 4/3
 	end
-	osc[1] = function()
-		-- uneven tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			local t = x%1
-			return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
-		end
+	-- uneven tri
+	osc[1] = function(x)
+		local t = x%1
+		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.6
 	end
-	osc[2] = function()
-		-- saw
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%1-0.5) * 0.333
-		end
+	-- saw
+	osc[2] = function(x)
+		return (x%1-0.5) * 0.9
 	end
-	osc[3] = function()
-		-- sqr
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%2 < 0.5 and 1 or -1) * 0.25
-		end
+	-- sqr
+	osc[3] = function(x)
+		return (x%1 < 0.5 and 1 or -1) * 1/3
 	end
+	-- pulse
 	osc[4] = function(x)
-		-- pulse
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%2 < 0.25 and 1 or -1) * 0.25
-		end
+		return (x%1 < 0.3 and 1 or -1) * 1/3
 	end
+	-- tri/2
 	osc[5] = function(x)
-		-- tri/2
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
-		end
+		x = x * 4
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2-0.1)*0.7
 	end
-	osc[6] = function(x)
+	osc[6] = function()
 		-- noise FIXME: (zep said this is brown noise)
-		local x = 0
-		local last_samples = {0}
-		return function(freq)
-			local y = last_samples[#last_samples] + (love.math.random()*2-1)/10
-			y = lowpass(last_samples[#last_samples],y,freq)
-			table.insert(last_samples,y)
-			table.remove(last_samples,1)
-			return mid(-1,y * 1.666,1)
-			--return y * 0.666
+		local lastx = 0
+		local sample = 0
+		local lsample = 0
+		local tscale = note_to_hz(63)/__sample_rate
+		return function(x)
+			local scale = (x-lastx)/tscale
+			lsample = sample
+			sample = (lsample+scale*(math.random()*2-1))/(1+scale)
+			lastx = x
+			return mid(-1,(lsample+sample)*4/3*(1.75-scale),1)
 		end
 	end
+	-- detuned tri
 	osc[7] = function(x)
-		-- detuned tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
-		end
+		x = x * 2
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.9925)%2)-1)-0.5)/2) - 1/5
 	end
-	osc["saw_lfo"] = function()
-		-- saw from 0 to 1, used for arppregiator
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return x%1
-		end
+	-- saw from 0 to 1, used for arppregiator
+	osc["saw_lfo"] = function(x)
+		return x%1
 	end
 
 	__audio_channels = {
@@ -262,6 +234,7 @@ function love.load(argv)
 
 	for i=0,3 do
 		__audio_channels[i]:play()
+		__pico_audio_channels[i].noise = osc[6]()
 	end
 
 	love.graphics.clear()
@@ -975,13 +948,21 @@ function note_to_hz(note)
 	return 440*math.pow(2,(note-33)/12)
 end
 
+function oldosc(osc)
+	local x = 0
+	return function(freq)
+		x = x + freq/__sample_rate
+		return osc(x)
+	end
+end
+
 function update_audio(time)
 	-- check what sfx should be playing
 	local samples = flr(time*__sample_rate)
 
 	for i=0,samples-1 do
 		if __pico_current_music then
-			__pico_current_music.offset = __pico_current_music.offset + 1/(48*16)*(1/__pico_current_music.speed*4)
+			__pico_current_music.offset = __pico_current_music.offset + 1/(48*15.25)*(1/__pico_current_music.speed*4)
 			if __pico_current_music.offset >= 32 then
 				local next_track = __pico_current_music.music
 				if __pico_music[next_track].loop == 2 then
@@ -1017,7 +998,7 @@ function update_audio(time)
 			end
 			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
-				ch.offset = ch.offset + 1/(48*16)*(1/sfx.speed*4)
+				ch.offset = ch.offset + 1/(48*15.25)*(1/sfx.speed*4)
 				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
 						ch.last_step = -1
@@ -1035,11 +1016,15 @@ function update_audio(time)
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
 					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
-					ch.osc = osc[ch.instr]()
+					if ch.instr ~= 6 then
+						ch.osc = osc[ch.instr]
+					else
+						ch.osc = ch.noise
+					end
 					if ch.fx == 2 then
-						ch.lfo = osc[0]()
+						ch.lfo = oldosc(osc[0])
 					elseif ch.fx >= 6 then
-						ch.lfo = osc["saw_lfo"]()
+						ch.lfo = oldosc(osc["saw_lfo"])
 					end
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
@@ -1053,7 +1038,7 @@ function update_audio(time)
 						ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
-						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),ch.lfo(4))
+						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),ch.lfo(8))
 					elseif ch.fx == 3 then
 						-- drop/bomb slide from note to c-0
 						local off = ch.offset%1
@@ -1081,14 +1066,8 @@ function update_audio(time)
 						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
-					ch.sample = ch.osc(ch.freq) * vol/7
-					if ch.offset%1 < 0.1 then
-						-- ramp up to avoid pops
-						ch.sample = lerp(0,ch.sample,ch.offset%0.1*10)
-					elseif ch.offset%1 > 0.9 then
-						-- ramp down to avoid pops
-						ch.sample = lerp(ch.sample,0,(ch.offset+0.8)%0.1*10)
-					end
+					ch.sample = ch.osc(ch.oscpos) * vol/7
+					ch.oscpos = ch.oscpos + ch.freq/__sample_rate
 					ch.buffer:setSample(ch.bufferpos,ch.sample)
 				else
 					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
@@ -2277,5 +2256,5 @@ setfps = function(fps)
 end
 
 function lerp(a,b,t)
-	return (1-t)*a+t*b
+	return (b-a)*t+a
 end

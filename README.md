@@ -3,7 +3,7 @@ PICOLOVE
 
 Implementation of PICO8 API for LOVE
 
-On github at: https://github.com/ftsf/picolove
+On github at: https://github.com/picolove/picolove
 
 Requires Love 0.9.x
 

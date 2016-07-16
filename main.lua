@@ -1570,8 +1570,8 @@ function help()
 	print('alt+f4 or command+q to fastquit')
 	print('')
 	color(12)
-	print('see readme.md for more info or')
-	print('visit github.com/ftsf/picolove')
+	print('see readme.md for more info')
+	print('or visit: github.com/picolove')
 	print('')
 end
 

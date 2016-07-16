@@ -97,7 +97,7 @@ local __pico_pal_transparent = {
 
 __pico_resolution = {128,128}
 
-local lineMesh = love.graphics.newMesh(128,"points")
+local lineMesh = love.graphics.newMesh(128,'points')
 
 local __pico_palette = {
 	{0,0,0,255},
@@ -269,7 +269,7 @@ function love.load(argv)
 	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png", fontchars, 1)
+	local font = love.graphics.newImageFont('font.png', fontchars, 1)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 

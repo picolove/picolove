@@ -2253,18 +2253,18 @@ end
 
 flr = math.floor
 ceil = math.ceil
-cos = function(x) return math.cos((x or 0)*(math.pi*2)) end
-sin = function(x) return math.sin(-(x or 0)*(math.pi*2)) end
-atan2 = function(y,x) return __pico_angle(math.atan2(y,x)) end
+function cos(x) return math.cos((x or 0)*(math.pi*2)) end
+function sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
+function atan2(y,x) return __pico_angle(math.atan2(y,x)) end
 
 sqrt = math.sqrt
 abs = math.abs
-rnd = function(x) return love.math.random()*(x or 1) end
-srand = function(seed)
+function rnd(x) return love.math.random()*(x or 1) end
+function srand(seed)
 	if seed == 0 then seed = 1 end
 	return love.math.setRandomSeed(flr(seed*32768))
 end
-sgn = function(x)
+function sgn(x)
 	if x < 0 then
 		return -1
 	else
@@ -2295,7 +2295,7 @@ love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end
 
-setfps = function(fps)
+function setfps(fps)
 	__pico_fps = flr(fps)
 	if __pico_fps <= 0 then
 		__pico_fps = 30

@@ -1,7 +1,7 @@
 PICOLOVE
 --------
 
-Implementation of PICO8 API for LOVE
+Implementation of PICO-8 API for LOVE
 
 On github at: https://github.com/picolove/picolove
 
@@ -9,7 +9,7 @@ Requires Love 0.10.x
 
 What it is:
 
- * An implementation of pico-8's api in love
+ * An implementation of PICO-8's api in love
 
 What is Pico-8:
 
@@ -33,11 +33,11 @@ Why:
 
 What it isn't:
 
- * A replacement for Pico-8
+ * A replacement for PICO-8
  * A perfect replica
  * No dev tools, no image editor, map editor, sfx editor, music editor
  * No modifying or saving carts
- * Not memory compatible with pico-8
+ * Not memory compatible with PICO-8
 
 Not Yet Implemented:
 

@@ -3,7 +3,7 @@ version 4
 __lua__
 function _init()
 	t=0
-	linebuffer = ""
+	linebuffer = ''
 	line = 0
 	cls()
 	spr(32,0,3,6,1)
@@ -12,8 +12,8 @@ function _init()
 	print('')
 
 	print('')
-	print("picolove")
-	print("a pico-8 clone made with love <3")
+	print('picolove')
+	print('a pico-8 clone made with love <3')
 	print('')
 end
 
@@ -30,7 +30,7 @@ function _keydown(key)
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		--render command
-		print("> "..linebuffer, nil, nil, 7)
+		print('> '..linebuffer, nil, nil, 7)
 		if linebuffer == 'dir' or linebuffer == 'ls'
 			or (#linebuffer > 4 and linebuffer:sub(1,4) == 'dir ')
 			or (#linebuffer > 3 and linebuffer:sub(1,3) == 'ls ') then
@@ -80,7 +80,7 @@ function _draw()
 	-- delete text and carret
 	rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 	-- render text
-	print("> "..linebuffer,0,_getcursory(),7)
+	print('> '..linebuffer,0,_getcursory(),7)
 	-- render carret
 	if t % 16 < 8 then
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,8)

@@ -1,4 +1,4 @@
-require "strict"
+require 'strict'
 
 local __pico_fps=30
 
@@ -97,7 +97,7 @@ local __pico_pal_transparent = {
 
 __pico_resolution = {128,128}
 
-local lineMesh = love.graphics.newMesh(128,nil,"points")
+local lineMesh = love.graphics.newMesh(128,nil,'points')
 
 local __pico_palette = {
 	{0,0,0,255},
@@ -146,14 +146,14 @@ local __pico_music = {}
 local __pico_current_music = nil
 
 local currentDirectory = '/'
-local fontchars = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
+local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
 end
 
-local QueueableSource = require "QueueableSource"
+local QueueableSource = require 'QueueableSource'
 
 function lowpass(y0,y1, cutoff)
 	local RC = 1.0/(cutoff*2*3.14)
@@ -167,7 +167,7 @@ local focus = true
 
 function love.load(argv)
 	love_args = argv
-	if love.system.getOS() == "Android" then
+	if love.system.getOS() == 'Android' then
 		love.resize(love.window.getDimensions())
 	else
 		love.window.setMode(__pico_resolution[1]*scale+xpadding*scale*2,__pico_resolution[2]*scale+ypadding*scale*2)
@@ -244,7 +244,7 @@ function love.load(argv)
 			return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
 		end
 	end
-	osc["saw_lfo"] = function()
+	osc['saw_lfo'] = function()
 		-- saw from 0 to 1, used for arppregiator
 		local x = 0
 		return function(freq)
@@ -269,13 +269,13 @@ function love.load(argv)
 	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 	__screen:setFilter('linear','nearest')
 
-	local font = love.graphics.newImageFont("font.png", fontchars)
+	local font = love.graphics.newImageFont('font.png', fontchars)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
 	love.mouse.setVisible(false)
 	love.keyboard.setKeyRepeat(true)
-	love.window.setTitle("picolove")
+	love.window.setTitle('picolove')
 	love.graphics.setLineStyle('rough')
 	love.graphics.setPointStyle('rough')
 	love.graphics.setPointSize(1)
@@ -449,9 +449,9 @@ function new_sandbox()
 end
 
 function load_p8(filename)
-	log("Loading",filename)
+	log('Loading',filename)
 
-	local lua = ""
+	local lua = ''
 	__pico_map = {}
 	__pico_quads = {}
 	for y=0,63 do
@@ -466,7 +466,7 @@ function load_p8(filename)
 	if filename:sub(#filename-3,#filename) == '.png' then
 		local img = love.graphics.newImage(filename)
 		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
-			error("Image is the wrong size")
+			error('Image is the wrong size')
 		end
 		local data = img:getData()
 
@@ -478,7 +478,7 @@ function load_p8(filename)
 		local mapX = 0
 		local version = nil
 		local codelen = nil
-		local code = ""
+		local code = ''
 		local sprite = 0
 		for y=0,204 do
 			for x=0,159 do
@@ -584,7 +584,7 @@ function load_p8(filename)
 						mode = 1
 					elseif byte == 0x01 then
 						-- output newline
-						lua = lua .. "\n"
+						lua = lua .. '\n'
 					elseif byte >= 0x02 and byte <= 0x3b then
 						-- output this byte from map
 						lua = lua .. __compression_map[byte]
@@ -602,32 +602,32 @@ function load_p8(filename)
 	else
 		local f = love.filesystem.newFile(filename,'r')
 		if not f then
-			error(string.format("Unable to open: %s",filename))
+			error(string.format('Unable to open: %s',filename))
 		end
 		local data,size = f:read()
 		f:close()
 		if not data then
-			error("invalid cart")
+			error('invalid cart')
 		end
-		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
+		local header = 'pico-8 cartridge // http://www.pico-8.com\nversion '
+		local start = data:find('pico%-8 cartridge // http://www.pico%-8.com\nversion ')
 		if start == nil then
-			error("invalid cart")
+			error('invalid cart')
 		end
-		local next_line = data:find("\n",start+#header)
+		local next_line = data:find('\n',start+#header)
 		local version_str = data:sub(start+#header,next_line-1)
 		local version = tonumber(version_str)
-		log("version",version)
+		log('version',version)
 		-- extract the lua
-		local lua_start = data:find("__lua__") + 8
-		local lua_end = data:find("__gfx__") - 1
+		local lua_start = data:find('__lua__') + 8
+		local lua_end = data:find('__gfx__') - 1
 
 		lua = data:sub(lua_start,lua_end)
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
-		local gfx_start = data:find("__gfx__") + 8
-		local gfx_end = data:find("__gff__") - 1
+		local gfx_start = data:find('__gfx__') + 8
+		local gfx_end = data:find('__gff__') - 1
 		local gfxdata = data:sub(gfx_start,gfx_end)
 
 		local row = 0
@@ -640,7 +640,7 @@ function load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = gfxdata:find("\n",next_line)
+			local end_of_line = gfxdata:find('\n',next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = gfxdata:sub(next_line,end_of_line)
@@ -655,7 +655,7 @@ function load_p8(filename)
 					row = row + 1
 				end
 			end
-			next_line = gfxdata:find("\n",end_of_line)+1
+			next_line = gfxdata:find('\n',end_of_line)+1
 		end
 
 		if version > 3 then
@@ -691,15 +691,15 @@ function load_p8(filename)
 
 		-- load the sprite flags
 
-		local gff_start = data:find("__gff__") + 8
-		local gff_end = data:find("__map__") - 1
+		local gff_start = data:find('__gff__') + 8
+		local gff_end = data:find('__map__') - 1
 		local gffdata = data:sub(gff_start,gff_end)
 
 		local sprite = 0
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = gffdata:find("\n",next_line)
+			local end_of_line = gffdata:find('\n',next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = gffdata:sub(next_line,end_of_line)
@@ -718,15 +718,15 @@ function load_p8(filename)
 					sprite = sprite + 1
 				end
 			end
-			next_line = gfxdata:find("\n",end_of_line)+1
+			next_line = gfxdata:find('\n',end_of_line)+1
 		end
 
-		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
+		assert(sprite == 256,'wrong number of spriteflags:'..sprite)
 
 		-- convert the tile data to a table
 
-		local map_start = data:find("__map__") + 8
-		local map_end = data:find("__sfx__") - 1
+		local map_start = data:find('__map__') + 8
+		local map_end = data:find('__sfx__') - 1
 		local mapdata = data:sub(map_start,map_end)
 
 		local row = 0
@@ -734,7 +734,7 @@ function load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = mapdata:find("\n",next_line)
+			local end_of_line = mapdata:find('\n',next_line)
 			if end_of_line == nil then
 				break
 			end
@@ -753,13 +753,13 @@ function load_p8(filename)
 					row = row + 1
 				end
 			end
-			next_line = mapdata:find("\n",end_of_line)+1
+			next_line = mapdata:find('\n',end_of_line)+1
 		end
-		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
+		assert(tiles + shared == 128 * 64,string.format('%d + %d != %d',tiles,shared,128*64))
 
 		-- load sfx
-		local sfx_start = data:find("__sfx__") + 8
-		local sfx_end = data:find("__music__") - 1
+		local sfx_start = data:find('__sfx__') + 8
+		local sfx_end = data:find('__music__') - 1
 		local sfxdata = data:sub(sfx_start,sfx_end)
 
 		__pico_sfx = {}
@@ -779,7 +779,7 @@ function load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = sfxdata:find("\n",next_line)
+			local end_of_line = sfxdata:find('\n',next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = sfxdata:sub(next_line,end_of_line)
@@ -799,13 +799,13 @@ function load_p8(filename)
 			end
 			_sfx = _sfx + 1
 			step = 0
-			next_line = sfxdata:find("\n",end_of_line)+1
+			next_line = sfxdata:find('\n',end_of_line)+1
 		end
 
 		assert(_sfx == 64)
 
 		-- load music
-		local music_start = data:find("__music__") + 10
+		local music_start = data:find('__music__') + 10
 		local music_end = #data-1
 		local musicdata = data:sub(music_start,music_end)
 
@@ -814,7 +814,7 @@ function load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = musicdata:find("\n",next_line)
+			local end_of_line = musicdata:find('\n',next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = musicdata:sub(next_line,end_of_line)
@@ -827,14 +827,14 @@ function load_p8(filename)
 				[3] = tonumber(line:sub(10,11),16)
 			}
 			_music = _music + 1
-			next_line = musicdata:find("\n",end_of_line)+1
+			next_line = musicdata:find('\n',end_of_line)+1
 		end
 	end
 
 	-- patch the lua
-	lua = lua:gsub("!=","~=")
+	lua = lua:gsub('!=','~=')
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
+	lua = lua:gsub('if%s*(%b())%s*([^\n]*)\n',function(a,b)
 		local nl = a:find('\n')
 		local th = b:find('%f[%w]then%f[%W]')
 		local an = b:find('%f[%w]and%f[%W]')
@@ -842,13 +842,13 @@ function load_p8(filename)
 		if nl or th or an or o then
 			return string.format('if %s %s\n',a,b)
 		else
-			return "if "..a:sub(2,#a-1).." then "..b.." end\n"
+			return 'if '..a:sub(2,#a-1)..' then '..b..' end\n'
 		end
 	end)
 	-- rewrite assignment operators
-	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
+	lua = lua:gsub('(%S+)%s*([%+-%*/%%])=','%1 = %1 %2 ')
 
-	log("finished loading cart",filename)
+	log('finished loading cart',filename)
 
 	loaded_code = lua
 
@@ -904,7 +904,7 @@ function love.run()
 		if love.event then
 			love.event.pump()
 			for e,a,b,c,d in love.event.poll() do
-				if e == "quit" then
+				if e == 'quit' then
 					if not love.quit or not love.quit() then
 						if love.audio then
 							love.audio.stop()
@@ -969,7 +969,7 @@ note_map = {
 function note_to_string(note)
 	local octave = flr(note/12)
 	local note = flr(note%12)
-	return string.format("%s%d",note_map[note],octave)
+	return string.format('%s%d',note_map[note],octave)
 end
 
 function note_to_hz(note)
@@ -1040,7 +1040,7 @@ function update_audio(time)
 					if ch.fx == 2 then
 						ch.lfo = osc[0]()
 					elseif ch.fx >= 6 then
-						ch.lfo = osc["saw_lfo"]()
+						ch.lfo = osc['saw_lfo']()
 					end
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
@@ -1180,12 +1180,12 @@ function love.keypressed(key)
 		-- stop recording and save
 		local basename = cartname..'-'..os.time()..'-'
 		for i,v in ipairs(video_frames) do
-			v:encode(string.format("%s%04d.png",basename,i))
+			v:encode(string.format('%s%04d.png',basename,i))
 		end
 		video_frames = nil
 		log('saved video to',basename)
 	elseif key == 'return' and (love.keyboard.isDown('lalt') or love.keyboard.isDown('ralt')) then
-		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
+		love.window.setFullscreen(not love.window.getFullscreen(), 'desktop')
 	else
 		for p=0,1 do
 			for i=0,#__keymap[p] do
@@ -1233,7 +1233,7 @@ function music(n,fade_len,channel_mask)
 	end
 	local m = __pico_music[n]
 	if not m then
-		warning(string.format("music %d does not exist",n))
+		warning(string.format('music %d does not exist',n))
 		return
 	end
 	local slowest_speed = nil
@@ -1300,7 +1300,7 @@ function sfx(n,channel,offset)
 end
 
 function clip(x,y,w,h)
-	if type(x) == "number" then
+	if type(x) == 'number' then
 		love.graphics.setScissor(x,y,w,h)
 		__pico_clip = {x,y,w,h}
 	else
@@ -1322,7 +1322,7 @@ function pget(x,y)
 		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
-		warning(string.format("pget out of screen %d,%d",x,y))
+		warning(string.format('pget out of screen %d,%d',x,y))
 		return 0
 	end
 end
@@ -1395,7 +1395,7 @@ function flip()
 end
 
 function folder()
-	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
+	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
 end
 
 function scroll(pixels)
@@ -1445,7 +1445,7 @@ end
 
 function color(c)
 	c = c and flr(c) or 0
-	assert(c >= 0 and c <= 16,string.format("c is %s",c))
+	assert(c >= 0 and c <= 16,string.format('c is %s',c))
 	__pico_color = c
 	love.graphics.setColor(c*16,0,0,255)
 end
@@ -1581,7 +1581,7 @@ function line(x0,y0,x1,y1,col)
 	color(col)
 
 	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
-		warning("line has NaN value")
+		warning('line has NaN value')
 		return
 	end
 
@@ -1656,9 +1656,9 @@ function line(x0,y0,x1,y1,col)
 end
 
 function _call(code)
-	local ok,f,e = pcall(load,code,"repl")
+	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then
-		print("syntax error", nil, nil, 14)
+		print('syntax error', nil, nil, 14)
 		print(sub(e,20), nil, nil, 6)
 		return false
 	else
@@ -1666,7 +1666,7 @@ function _call(code)
 		setfenv(f,cart)
 		ok,e = pcall(f)
 		if not ok then
-			print("runtime error", nil, nil, 14)
+			print('runtime error', nil, nil, 14)
 			print(sub(e,20), nil, nil, 6)
 		end
 	end
@@ -1715,7 +1715,7 @@ end
 
 function ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-	print("directory: "..currentDirectory, nil, nil, 12)
+	print('directory: '..currentDirectory, nil, nil, 12)
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
@@ -1739,7 +1739,7 @@ function ls()
 			flip_screen()
 			count = count + 1
 			if count == 20 then
-				print("--more--", nil, nil, 12)
+				print('--more--', nil, nil, 12)
 				flip_screen()
 				local y = _getcursory() - 6
 				cursor(0, y)
@@ -1815,7 +1815,7 @@ end
 function rect(x0,y0,x1,y1,col)
 	col = col or __pico_color
 	color(col)
-	love.graphics.rectangle("line",flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
+	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function rectfill(x0,y0,x1,y1,col)
@@ -1831,7 +1831,7 @@ function rectfill(x0,y0,x1,y1,col)
 		h = -h
 		y0 = y0-h
 	end
-	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
+	love.graphics.rectangle('fill',flr(x0),flr(y0),w,h)
 end
 
 function run()
@@ -1847,7 +1847,7 @@ function run()
 		log('=======8<========')
 		log(loaded_code)
 		log('=======>8========')
-		error("Error loading lua: "..tostring(e))
+		error('Error loading lua: '..tostring(e))
 	else
 		local result
 		setfenv(f,cart)
@@ -1857,9 +1857,9 @@ function run()
 		restore_clip()
 		ok,result = pcall(f)
 		if not ok then
-			error("Error running lua: "..tostring(result))
+			error('Error running lua: '..tostring(result))
 		else
-			log("lua completed")
+			log('lua completed')
 		end
 	end
 
@@ -1872,7 +1872,7 @@ function reboot()
 end
 
 function reload(dest_addr,source_addr,len)
-	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
+	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
 	_load(cartname)
 end
 
@@ -1942,7 +1942,7 @@ function spr(n,x,y,w,h,flip_x,flip_y)
 			return
 		end
 	else
-		local id = string.format("%d-%d-%d",n,w,h)
+		local id = string.format('%d-%d-%d',n,w,h)
 		if __pico_quads[id] then
 			q = __pico_quads[id]
 		else
@@ -2005,12 +2005,12 @@ function del(a,dv)
 end
 
 function warning(msg)
-	log(debug.traceback("WARNING: "..msg,3))
+	log(debug.traceback('WARNING: '..msg,3))
 end
 
 function foreach(a,f)
 	if not a then
-		warning("foreach got a nil value")
+		warning('foreach got a nil value')
 		return
 	end
 	for i,v in ipairs(a) do
@@ -2272,7 +2272,7 @@ sgn = function(x)
 	end
 end
 
-local bit = require("bit")
+local bit = require('bit')
 
 band = bit.band
 bor = bit.bor

@@ -5,7 +5,7 @@ Implementation of PICO8 API for LOVE
 
 On github at: https://github.com/picolove/picolove
 
-Requires Love 0.9.x
+Requires Love 0.10.x
 
 What it is:
 

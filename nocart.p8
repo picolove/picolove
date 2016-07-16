@@ -15,6 +15,8 @@ function _init()
 	print('picolove')
 	print('a pico-8 clone made with love <3')
 	print('')
+	print('type help for help')
+	print('')
 end
 
 function _update()

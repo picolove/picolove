@@ -1673,24 +1673,17 @@ function _call(code)
 end
 
 function _load(_cartname)
-	local ext        = {'',    '.p8','.p8.png','.png'}
-	local ext_p8     = {       '.p8','.p8.png'}
-	local ext_p8_png = {             '.p8.png'}
-	local ext_png    = {'.png',      '.p8.png'}
-
-	local ends_with_p8    = _cartname:sub(-3) == '.p8'
-	local ends_with_p8png = _cartname:sub(-7) == '.p8.png'
-	local ends_with_png   = _cartname:sub(-4) == '.png'
-
+	local ext = {'','.p8','.p8.png','.png'}
 	local cart_no_ext = _cartname
-	if ends_with_p8 then
-		ext = ext_p8
+
+	if _cartname:sub(-3) == '.p8' then
+		ext = {'.p8','.p8.png'}
 		cart_no_ext = _cartname:sub(1,-4)
-	elseif ends_with_p8png then
-		ext = ext_p8_png
+	elseif _cartname:sub(-7) == '.p8.png' then
+		ext = {'.p8.png'}
 		cart_no_ext = _cartname:sub(1,-8)
-	elseif ends_with_png then
-		ext = ext_png
+	elseif _cartname:sub(-4) == '.png' then
+		ext = {'.png', '.p8.png'}
 		cart_no_ext = _cartname:sub(1,-5)
 	end
 

@@ -399,6 +399,7 @@ function new_sandbox()
 		rectfill=rectfill,
 		run=run,
 		reload=reload,
+		reboot=reboot,
 		pal=pal,
 		palt=palt,
 		spr=spr,
@@ -1863,6 +1864,11 @@ function run()
 	end
 
 	if cart._init then cart._init() end
+end
+
+function reboot()
+	_load('nocart.p8')
+	run()
 end
 
 function reload(dest_addr,source_addr,len)

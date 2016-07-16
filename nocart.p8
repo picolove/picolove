@@ -57,7 +57,7 @@ function _keydown(key)
 		elseif linebuffer == 'resume' then
 			--TODO
 		elseif linebuffer == 'reboot' then
-			--TODO
+			reboot()
 		elseif linebuffer:sub(1,5) == 'save ' then
 			--TODO
 		else

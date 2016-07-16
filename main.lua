@@ -1673,15 +1673,34 @@ function _call(code)
 end
 
 function _load(_cartname)
-	if love.filesystem.isFile(currentDirectory.._cartname) then
-	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8') then
-		_cartname = _cartname..'.p8'
-	elseif love.filesystem.isFile(currentDirectory.._cartname..'.p8.png') then
-		_cartname = _cartname..'.p8.png'
-	else
+	local ext = {'','.p8','.p8.png','.png'}
+	local cart_no_ext = _cartname
+
+	if _cartname:sub(-3) == '.p8' then
+		ext = {'.p8','.p8.png'}
+		cart_no_ext = _cartname:sub(1,-4)
+	elseif _cartname:sub(-7) == '.p8.png' then
+		ext = {'.p8.png'}
+		cart_no_ext = _cartname:sub(1,-8)
+	elseif _cartname:sub(-4) == '.png' then
+		ext = {'.png', '.p8.png'}
+		cart_no_ext = _cartname:sub(1,-5)
+	end
+
+	local file_found = false
+	for i=1,#ext do
+		if love.filesystem.isFile(currentDirectory..cart_no_ext..ext[i]) then
+			file_found = true
+			_cartname = cart_no_ext..ext[i]
+			break
+		end
+	end
+
+	if not file_found then
 		print('could not load', nil, nil, 6)
 		return
 	end
+
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(__screen)
 	love.graphics.origin()

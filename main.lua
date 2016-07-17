@@ -1110,7 +1110,6 @@ function update_audio(time)
 end
 
 function flip_screen()
-	--love.graphics.setShader(__display_shader)
 	love.graphics.setShader(__display_shader)
 	__display_shader:send('palette',unpack(__display_palette))
 	love.graphics.setCanvas()
@@ -1425,7 +1424,6 @@ function print(str,x,y,col)
 	end
 	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))
-	love.graphics.setShader(__text_shader)
 end
 
 __pico_cursor = {0,0}

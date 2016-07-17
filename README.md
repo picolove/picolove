@@ -11,7 +11,7 @@ What it is:
 
  * An implementation of PICO-8's api in love
 
-What is Pico-8:
+What is PICO-8:
 
  * See http://www.lexaloffle.com/pico-8.php
 
@@ -22,7 +22,7 @@ What is Love:
 Why:
 
  * For a fun challenge!
- * Allow standalone publishing of pico-8 games on other platforms
+ * Allow standalone publishing of PICO-8 games on other platforms
   * should work on mobile devices
  * Configurable controls
  * Extendable

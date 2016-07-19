@@ -599,14 +599,9 @@ function load_p8(filename)
 		end
 
 	else
-		local f = love.filesystem.newFile(filename,'r')
-		if not f then
-			error(string.format('Unable to open: %s',filename))
-		end
-		local data,size = f:read()
-		f:close()
-		if not data then
-			error('invalid cart')
+		local data,size = love.filesystem.read(filename)
+		if not data or size == 0 then
+			error(string.format('Unable to open %s',filename))
 		end
 		local header = 'pico-8 cartridge // http://www.pico-8.com\nversion '
 		local start = data:find('pico%-8 cartridge // http://www.pico%-8.com\nversion ')

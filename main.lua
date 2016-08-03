@@ -1312,7 +1312,8 @@ end
 
 function pget(x,y)
 	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
-		local r,g,b,a = __screen:getPixel(flr(x),flr(y))
+		local __screen_img = __screen:newImageData()
+		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
 		warning(string.format('pget out of screen %d,%d',x,y))

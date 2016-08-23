@@ -2078,7 +2078,7 @@ function btnp(i,p)
 		p = p or 0
 		if __keymap[p][i] then
 			local v = __pico_keypressed[p][i]
-			if v and (v == 0 or v == 12 or (v > 12 and v % 4 == 0)) then
+			if v and (v == 0 or (v >= 12 and v % 4 == 0)) then
 				return true
 			end
 		end

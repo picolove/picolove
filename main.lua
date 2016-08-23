@@ -2216,8 +2216,7 @@ function min(a,b)
 		warning('min a or b are nil returning 0')
 		return 0
 	end
-	if a < b then return a end
-	return b
+	return a < b and a or b
 end
 
 function max(a,b)
@@ -2225,20 +2224,27 @@ function max(a,b)
 		warning('max a or b are nil returning 0')
 		return 0
 	end
-	if a > b then return a end
-	return b
+	return a > b and a or b
 end
 
 function mid(x,y,z)
-	x = x or 0
-	y = y or 0
-	z = z or 0
-	return x > y and x or y > z and z or y
+	x, y, z = x or 0, y or 0, z or 0
+	if x > y then x, y = y, x end
+	return max(x, min(y, z))
 end
 
-assert(mid(1,5,6) == 5)
-assert(mid(3,2,6) == 3)
-assert(mid(3,9,6) == 6)
+assert(min(1, 2) == 1)
+assert(min(2, 1) == 1)
+
+assert(max(1, 2) == 2)
+assert(max(2, 1) == 2)
+
+assert(mid(1, 2, 3) == 2)
+assert(mid(1, 3, 2) == 2)
+assert(mid(2, 1, 3) == 2)
+assert(mid(2, 3, 1) == 2)
+assert(mid(3, 1, 2) == 2)
+assert(mid(3, 2, 1) == 2)
 
 function __pico_angle(a)
 	-- FIXME: why does this work?

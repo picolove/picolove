@@ -1395,7 +1395,7 @@ end
 function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
-	local basehigh = 0x7fff
+	local basehigh = 0x8000
 	memcpy(base, delta, basehigh-delta)
 end
 
@@ -2161,32 +2161,33 @@ end
 
 function memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
-	if source_addr >= 0x6000 and dest_addr >= 0x6000 then
-		if source_addr + len >= 0x8000 then
-			return
+	if len <= 0 then
+		return
+	end
+	if source_addr < 0x6000 or dest_addr < 0x6000 then
+		return
+	end
+	if source_addr + len > 0x8000 or dest_addr + len > 0x8000 then
+		return
+	end
+	local img = __screen:newImageData()
+	for i=0,len-1 do
+		local x = flr(source_addr-0x6000+i)%64*2
+		local y = flr((source_addr-0x6000+i)/64)
+		--TODO: why are colors broken?
+		local c = ceil(img:getPixel(x,y)/16)
+		local d = ceil(img:getPixel(x+1,y)/16)
+		if c ~= 0 then
+			c = c - 1
 		end
-		if dest_addr + len >= 0x8000 then
-			return
+		if d ~= 0 then
+			d = d - 1
 		end
-		local img = __screen:newImageData()
-		for i=0,len-1 do
-			local x = flr(source_addr-0x6000+i)%64*2
-			local y = flr((source_addr-0x6000+i)/64)
-			--TODO: why are colors broken?
-			local c = ceil(img:getPixel(x,y)/16)
-			local d = ceil(img:getPixel(x+1,y)/16)
-			if c ~= 0 then
-				c = c - 1
-			end
-			if d ~= 0 then
-				d = d - 1
-			end
 
-			local dx = flr(dest_addr-0x6000+i)%64*2
-			local dy = flr((dest_addr-0x6000+i)/64)
-			pset(dx,dy,c)
-			pset(dx+1,dy,d)
-		end
+		local dx = flr(dest_addr-0x6000+i)%64*2
+		local dy = flr((dest_addr-0x6000+i)/64)
+		pset(dx,dy,c)
+		pset(dx+1,dy,d)
 	end
 end
 

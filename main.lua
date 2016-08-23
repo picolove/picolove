@@ -2246,16 +2246,16 @@ assert(mid(2, 3, 1) == 2)
 assert(mid(3, 1, 2) == 2)
 assert(mid(3, 2, 1) == 2)
 
-function __pico_angle(a)
-	-- FIXME: why does this work?
-	return (((a - math.pi) / (math.pi*2)) + 0.25) % 1.0
-end
-
 flr = math.floor
 ceil = math.ceil
 function cos(x) return math.cos((x or 0)*(math.pi*2)) end
 function sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
-function atan2(y,x) return __pico_angle(math.atan2(y,x)) end
+function atan2(x,y) return math.atan2(-y,x) / (math.pi * 2) % 1.0 end
+
+assert(atan2(1, 0) == 0)
+assert(atan2(0,-1) == 0.25)
+assert(atan2(-1,0) == 0.5)
+assert(atan2(0, 1) == 0.75)
 
 sqrt = math.sqrt
 abs = math.abs

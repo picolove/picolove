@@ -1004,7 +1004,7 @@ function update_audio(time)
 
 	for i=0,samples-1 do
 		if __pico_current_music then
-			__pico_current_music.offset = __pico_current_music.offset + 1/(48*16)*(1/__pico_current_music.speed*4)
+			__pico_current_music.offset = __pico_current_music.offset + 7350/(61*__pico_current_music.speed*__sample_rate)
 			if __pico_current_music.offset >= 32 then
 				local next_track = __pico_current_music.music
 				if __pico_music[next_track].loop == 2 then
@@ -1040,7 +1040,7 @@ function update_audio(time)
 			end
 			if ch.sfx and __pico_sfx[ch.sfx] then
 				local sfx = __pico_sfx[ch.sfx]
-				ch.offset = ch.offset + 1/(48*16)*(1/sfx.speed*4)
+				ch.offset = ch.offset + 7350/(61*sfx.speed*__sample_rate)
 				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
 						ch.last_step = -1

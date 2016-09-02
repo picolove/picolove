@@ -2251,7 +2251,7 @@ flr = math.floor
 ceil = math.ceil
 function cos(x) return math.cos((x or 0)*(math.pi*2)) end
 function sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
-function atan2(x,y) return math.atan2(-y,x) / (math.pi * 2) % 1.0 end
+function atan2(x,y) return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0 end
 
 assert(atan2(1, 0) == 0)
 assert(atan2(0,-1) == 0.25)

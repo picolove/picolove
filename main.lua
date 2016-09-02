@@ -462,6 +462,28 @@ function load_p8(filename)
 	__pico_spritesheet_data = love.image.newImageData(128,128)
 	__pico_spriteflags = {}
 
+	__pico_sfx = {}
+	for i=0,63 do
+		__pico_sfx[i] = {
+			speed=16,
+			loop_start=0,
+			loop_end=0
+		}
+		for j=0,31 do
+			__pico_sfx[i][j] = {0,0,0,0}
+		end
+	end
+	__pico_music = {}
+	for i=0,63 do
+		__pico_music[i] = {
+			loop = 0,
+			[0] = 1,
+			[1] = 2,
+			[2] = 3,
+			[3] = 4
+		}
+	end
+
 	if filename:sub(#filename-3,#filename) == '.png' then
 		local img = love.graphics.newImage(filename)
 		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
@@ -532,20 +554,35 @@ function load_p8(filename)
 					__pico_spriteflags[sprite] = byte
 					sprite = sprite + 1
 				elseif inbyte < 0x3200 then
-					-- load song
+					-- music
+					local _music = math.floor((inbyte-0x3100)/4)
+					__pico_music[_music][inbyte%4] = bit.band(byte,0x7F)
+					__pico_music[_music].loop = bit.bor(bit.rshift(bit.band(byte,0x80),7-inbyte%4),__pico_music[_music].loop)
 				elseif inbyte < 0x4300 then
 					-- sfx
-				elseif inbyte == 0x8000 then
-					version = byte
-				else
+					local _sfx = math.floor((inbyte-0x3200)/68)
+					local step = (inbyte-0x3200)%68
+					if step < 64 and inbyte%2 == 1 then
+						local note = bit.lshift(byte,8)+lastbyte
+						__pico_sfx[_sfx][(step-1)/2] = {bit.band(note,0x3f),bit.rshift(bit.band(note,0x1c0),6),bit.rshift(bit.band(note, 0xe00),9),bit.rshift(bit.band(note,0x7000),12)}
+					elseif step == 65 then
+						__pico_sfx[_sfx].speed = byte
+					elseif step == 66 then
+						__pico_sfx[_sfx].loop_start = byte
+					elseif step == 67 then
+						__pico_sfx[_sfx].loop_end = byte
+					end
+				elseif inbyte < 0x8000 then
 					-- code, possibly compressed
 					if inbyte == 0x4305 then
 						codelen = bit.lshift(lastbyte,8) + byte
 					elseif inbyte >= 0x4308 then
 						code = code .. string.char(byte)
 					end
-					lastbyte = byte
+				elseif inbyte == 0x8000 then
+					version = byte
 				end
+				lastbyte = byte
 				inbyte = inbyte + 1
 			end
 		end
@@ -756,18 +793,6 @@ function load_p8(filename)
 		local sfx_end = data:find('__music__') - 1
 		local sfxdata = data:sub(sfx_start,sfx_end)
 
-		__pico_sfx = {}
-		for i=0,63 do
-			__pico_sfx[i] = {
-				speed=16,
-				loop_start=0,
-				loop_end=0
-			}
-			for j=0,31 do
-				__pico_sfx[i][j] = {0,0,0,0}
-			end
-		end
-
 		local _sfx = 0
 		local step = 0
 
@@ -804,7 +829,6 @@ function load_p8(filename)
 		local musicdata = data:sub(music_start,music_end)
 
 		local _music = 0
-		__pico_music = {}
 
 		local next_line = 1
 		while next_line do

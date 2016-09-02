@@ -1400,7 +1400,7 @@ end
 function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
-	local basehigh = 0x7fff
+	local basehigh = 0x8000
 	memcpy(base, delta, basehigh-delta)
 end
 
@@ -2083,7 +2083,7 @@ function btnp(i,p)
 		p = p or 0
 		if __keymap[p][i] then
 			local v = __pico_keypressed[p][i]
-			if v and (v == 0 or v == 12 or (v > 12 and v % 4 == 0)) then
+			if v and (v == 0 or (v >= 12 and v % 4 == 0)) then
 				return true
 			end
 		end
@@ -2166,32 +2166,33 @@ end
 
 function memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
-	if source_addr >= 0x6000 and dest_addr >= 0x6000 then
-		if source_addr + len >= 0x8000 then
-			return
+	if len <= 0 then
+		return
+	end
+	if source_addr < 0x6000 or dest_addr < 0x6000 then
+		return
+	end
+	if source_addr + len > 0x8000 or dest_addr + len > 0x8000 then
+		return
+	end
+	local img = __screen:newImageData()
+	for i=0,len-1 do
+		local x = flr(source_addr-0x6000+i)%64*2
+		local y = flr((source_addr-0x6000+i)/64)
+		--TODO: why are colors broken?
+		local c = ceil(img:getPixel(x,y)/16)
+		local d = ceil(img:getPixel(x+1,y)/16)
+		if c ~= 0 then
+			c = c - 1
 		end
-		if dest_addr + len >= 0x8000 then
-			return
+		if d ~= 0 then
+			d = d - 1
 		end
-		local img = __screen:newImageData()
-		for i=0,len-1 do
-			local x = flr(source_addr-0x6000+i)%64*2
-			local y = flr((source_addr-0x6000+i)/64)
-			--TODO: why are colors broken?
-			local c = ceil(img:getPixel(x,y)/16)
-			local d = ceil(img:getPixel(x+1,y)/16)
-			if c ~= 0 then
-				c = c - 1
-			end
-			if d ~= 0 then
-				d = d - 1
-			end
 
-			local dx = flr(dest_addr-0x6000+i)%64*2
-			local dy = flr((dest_addr-0x6000+i)/64)
-			pset(dx,dy,c)
-			pset(dx+1,dy,d)
-		end
+		local dx = flr(dest_addr-0x6000+i)%64*2
+		local dy = flr((dest_addr-0x6000+i)/64)
+		pset(dx,dy,c)
+		pset(dx+1,dy,d)
 	end
 end
 
@@ -2221,8 +2222,7 @@ function min(a,b)
 		warning('min a or b are nil returning 0')
 		return 0
 	end
-	if a < b then return a end
-	return b
+	return a < b and a or b
 end
 
 function max(a,b)
@@ -2230,31 +2230,38 @@ function max(a,b)
 		warning('max a or b are nil returning 0')
 		return 0
 	end
-	if a > b then return a end
-	return b
+	return a > b and a or b
 end
 
 function mid(x,y,z)
-	x = x or 0
-	y = y or 0
-	z = z or 0
-	return x > y and x or y > z and z or y
+	x, y, z = x or 0, y or 0, z or 0
+	if x > y then x, y = y, x end
+	return max(x, min(y, z))
 end
 
-assert(mid(1,5,6) == 5)
-assert(mid(3,2,6) == 3)
-assert(mid(3,9,6) == 6)
+assert(min(1, 2) == 1)
+assert(min(2, 1) == 1)
 
-function __pico_angle(a)
-	-- FIXME: why does this work?
-	return (((a - math.pi) / (math.pi*2)) + 0.25) % 1.0
-end
+assert(max(1, 2) == 2)
+assert(max(2, 1) == 2)
+
+assert(mid(1, 2, 3) == 2)
+assert(mid(1, 3, 2) == 2)
+assert(mid(2, 1, 3) == 2)
+assert(mid(2, 3, 1) == 2)
+assert(mid(3, 1, 2) == 2)
+assert(mid(3, 2, 1) == 2)
 
 flr = math.floor
 ceil = math.ceil
 function cos(x) return math.cos((x or 0)*(math.pi*2)) end
 function sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
-function atan2(y,x) return __pico_angle(math.atan2(y,x)) end
+function atan2(x,y) return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0 end
+
+assert(atan2(1, 0) == 0)
+assert(atan2(0,-1) == 0.25)
+assert(atan2(-1,0) == 0.5)
+assert(atan2(0, 1) == 0.75)
 
 sqrt = math.sqrt
 abs = math.abs

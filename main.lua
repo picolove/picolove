@@ -128,12 +128,7 @@ local host_time = 0
 
 local retro_mode = false
 
-local __pico_audio_channels = {
-	[0]={},
-	[1]={},
-	[2]={},
-	[3]={}
-}
+local __pico_audio_channels = {}
 
 local __pico_sfx = {}
 local __audio_channels
@@ -165,6 +160,10 @@ end
 local paused = false
 local focus = true
 
+function note_to_hz(note)
+	return 440*math.pow(2,(note-33)/12)
+end
+
 function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == 'Android' then
@@ -174,83 +173,52 @@ function love.load(argv)
 	end
 
 	osc = {}
-	osc[0] = function()
-		-- tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5) * 0.5
-		end
+	-- tri
+	osc[0] = function(x)
+		return (abs((x%2)-1)-0.5) * 0.5
 	end
-	osc[1] = function()
-		-- uneven tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			local t = x%1
-			return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
-		end
+	-- uneven tri
+	osc[1] = function(x)
+		local t = x%1
+		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
 	end
-	osc[2] = function()
-		-- saw
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%1-0.5) * 0.333
-		end
+	-- saw
+	osc[2] = function(x)
+		return (x%1-0.5) * 0.333
 	end
-	osc[3] = function()
-		-- sqr
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%2 < 0.5 and 1 or -1) * 0.25
-		end
+	-- sqr
+	osc[3] = function(x)
+		return (x%2 < 0.5 and 1 or -1) * 0.25
 	end
+	-- pulse
 	osc[4] = function(x)
-		-- pulse
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (x%2 < 0.25 and 1 or -1) * 0.25
-		end
+		return (x%2 < 0.25 and 1 or -1) * 0.25
 	end
+	-- tri/2
 	osc[5] = function(x)
-		-- tri/2
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
+	end
+	-- noise
+	osc[6]=function()
+		local lastx=0
+		local sample=0
+		local lsample=0
+		local tscale=note_to_hz(63)/__sample_rate
+		return function(x)
+			local scale=(x-lastx)/tscale
+			lsample=sample
+			sample=(lsample+scale*(math.random()*2-1))/(1+scale)
+			lastx=x
+			return math.min(math.max((lsample+sample)*4/3*(1.75-scale), -1), 1)*0.7
 		end
 	end
-	osc[6] = function(x)
-		-- noise FIXME: (zep said this is brown noise)
-		local x = 0
-		local last_samples = {0}
-		return function(freq)
-			local y = last_samples[#last_samples] + (love.math.random()*2-1)/10
-			y = lowpass(last_samples[#last_samples],y,freq)
-			table.insert(last_samples,y)
-			table.remove(last_samples,1)
-			return mid(-1,y * 1.666,1)
-			--return y * 0.666
-		end
-	end
+	-- detuned tri
 	osc[7] = function(x)
-		-- detuned tri
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
-		end
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
 	end
-	osc['saw_lfo'] = function()
-		-- saw from 0 to 1, used for arppregiator
-		local x = 0
-		return function(freq)
-			x = x + freq/__sample_rate
-			return x%1
-		end
+	-- saw from 0 to 1, used for arppregiator
+	osc['saw_lfo'] = function(x)
+		return x%1
 	end
 
 	__audio_channels = {
@@ -262,6 +230,13 @@ function love.load(argv)
 
 	for i=0,3 do
 		__audio_channels[i]:play()
+	end
+
+	for i=0,3 do
+		__pico_audio_channels[i]={
+			oscpos=0,
+			noise=osc[6]()
+		}
 	end
 
 	love.graphics.clear()
@@ -994,8 +969,12 @@ function note_to_string(note)
 	return string.format('%s%d',note_map[note],octave)
 end
 
-function note_to_hz(note)
-	return 440*math.pow(2,(note-33)/12)
+local function oldosc(osc)
+	local x=0
+	return function(freq)
+		x=x+freq/__sample_rate
+		return osc(x)
+	end
 end
 
 function update_audio(time)
@@ -1058,11 +1037,15 @@ function update_audio(time)
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
 					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
-					ch.osc = osc[ch.instr]()
+					if ch.instr ~= 6 then
+						ch.osc = osc[ch.instr]
+					else
+						ch.osc = ch.noise
+					end
 					if ch.fx == 2 then
-						ch.lfo = osc[0]()
+						ch.lfo = oldosc(osc[0])
 					elseif ch.fx >= 6 then
-						ch.lfo = osc['saw_lfo']()
+						ch.lfo = oldosc(osc['saw_lfo'])
 					end
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
@@ -1104,14 +1087,8 @@ function update_audio(time)
 						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
-					ch.sample = ch.osc(ch.freq) * vol/7
-					if ch.offset%1 < 0.1 then
-						-- ramp up to avoid pops
-						ch.sample = lerp(0,ch.sample,ch.offset%0.1*10)
-					elseif ch.offset%1 > 0.9 then
-						-- ramp down to avoid pops
-						ch.sample = lerp(ch.sample,0,(ch.offset+0.8)%0.1*10)
-					end
+					ch.sample = ch.osc(ch.oscpos) * vol/7
+					ch.oscpos = ch.oscpos + ch.freq/__sample_rate
 					ch.buffer:setSample(ch.bufferpos,ch.sample)
 				else
 					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))

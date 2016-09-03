@@ -175,31 +175,32 @@ function love.load(argv)
 	osc = {}
 	-- tri
 	osc[0] = function(x)
-		return (abs((x%2)-1)-0.5) * 0.5
+		return (abs((x%1)*2-1)*2-1) * 0.7
 	end
 	-- uneven tri
 	osc[1] = function(x)
 		local t = x%1
-		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.5
+		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.7
 	end
 	-- saw
 	osc[2] = function(x)
-		return (x%1-0.5) * 0.333
+		return (x%1-0.5) * 0.9
 	end
 	-- sqr
 	osc[3] = function(x)
-		return (x%2 < 0.5 and 1 or -1) * 0.25
+		return (x%1 < 0.5 and 1 or -1) * 1/3
 	end
 	-- pulse
 	osc[4] = function(x)
-		return (x%2 < 0.25 and 1 or -1) * 0.25
+		return (x%1 < 0.3125 and 1 or -1) * 1/3
 	end
 	-- tri/2
 	osc[5] = function(x)
-		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2) * 0.333
+		x=x*4
+		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2-0.1) * 0.7
 	end
 	-- noise
-	osc[6]=function()
+	osc[6] = function()
 		local lastx=0
 		local sample=0
 		local lsample=0
@@ -214,7 +215,8 @@ function love.load(argv)
 	end
 	-- detuned tri
 	osc[7] = function(x)
-		return (abs((x%2)-1)-0.5 + (abs(((x*0.97)%2)-1)-0.5)/2) * 0.333
+		x=x*2
+		return (abs((x%2)-1)-0.5 + (abs(((x*127/128)%2)-1)-0.5)/2) - 1/4
 	end
 	-- saw from 0 to 1, used for arppregiator
 	osc['saw_lfo'] = function(x)

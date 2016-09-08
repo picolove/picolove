@@ -167,7 +167,7 @@ end
 function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == 'Android' then
-		love.resize(love.window.getDimensions())
+		love.resize(love.graphics.getDimensions())
 	else
 		love.window.setMode(__pico_resolution[1]*scale+xpadding*scale*2,__pico_resolution[2]*scale+ypadding*scale*2)
 	end
@@ -297,7 +297,7 @@ extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	vec4 texcolor = Texel(texture, texture_coords);
-	if(texcolor.a == 0) {
+	if(texcolor.a == 0.0) {
 		return vec4(0.0,0.0,0.0,0.0);
 	}
 	int index = int(color.r*16.0);

@@ -4,69 +4,6 @@ local __pico_fps=30
 
 local frametime = 1/__pico_fps
 
-local __compression_map = {
-	'INVALID',
-	' ',
-	'0',
-	'1',
-	'2',
-	'3',
-	'4',
-	'5',
-	'6',
-	'7',
-	'8',
-	'9',
-	'a',
-	'b',
-	'c',
-	'd',
-	'e',
-	'f',
-	'g',
-	'h',
-	'i',
-	'j',
-	'k',
-	'l',
-	'm',
-	'n',
-	'o',
-	'p',
-	'q',
-	'r',
-	's',
-	't',
-	'u',
-	'v',
-	'w',
-	'x',
-	'y',
-	'z',
-	'!',
-	'#',
-	'%',
-	'(',
-	')',
-	'{',
-	'}',
-	'[',
-	']',
-	'<',
-	'>',
-	'+',
-	'=',
-	'/',
-	'*',
-	':',
-	';',
-	'.',
-	',',
-	'~',
-	'_',
-	'"',
-}
-
 local cart = nil
 local cartname = nil
 local love_args = nil
@@ -424,6 +361,11 @@ function new_sandbox()
 	}
 end
 
+local __compression_map = {}
+for entry in ('\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_'):gmatch('.') do
+	table.insert(__compression_map,entry)
+end
+
 function load_p8(filename)
 	log('Loading',filename)
 
@@ -477,6 +419,7 @@ function load_p8(filename)
 		local version = nil
 		local codelen = nil
 		local code = ''
+		local compressed = false
 		local sprite = 0
 		for y=0,204 do
 			for x=0,159 do
@@ -551,11 +494,10 @@ function load_p8(filename)
 					end
 				elseif inbyte < 0x8000 then
 					-- code, possibly compressed
-					if inbyte == 0x4305 then
-						codelen = bit.lshift(lastbyte,8) + byte
-					elseif inbyte >= 0x4308 then
-						code = code .. string.char(byte)
+					if inbyte == 0x4300 then
+						compressed = (byte == 58)
 					end
+					code = code .. string.char(byte)
 				elseif inbyte == 0x8000 then
 					version = byte
 				end
@@ -566,14 +508,19 @@ function load_p8(filename)
 
 		-- decompress code
 		log('version',version)
-		log('codelen',codelen)
-		if version == 0 then
-			lua = code
-		elseif version == 1 or version == 5 then
+		if version>8 then
+			error(string.format('unknown file version %d',version))
+		end
+
+		if not compressed then
+			lua = code:match("(.-)%f[%z]")
+		else
 			-- decompress code
 			local mode = 0
 			local copy = nil
-			local i = 0
+			local i = 8
+			local codelen = bit.lshift(code:byte(5,5),8) + code:byte(6,6)
+			log('codelen',codelen)
 			while #lua < codelen do
 				i = i + 1
 				local byte = string.byte(code,i,i)
@@ -595,10 +542,7 @@ function load_p8(filename)
 					elseif byte == 0x00 then
 						-- output next byte
 						mode = 1
-					elseif byte == 0x01 then
-						-- output newline
-						lua = lua .. '\n'
-					elseif byte >= 0x02 and byte <= 0x3b then
+					elseif byte >= 0x01 and byte <= 0x3b then
 						-- output this byte from map
 						lua = lua .. __compression_map[byte]
 					elseif byte >= 0x3c then
@@ -608,8 +552,6 @@ function load_p8(filename)
 					end
 				end
 			end
-		else
-			error(string.format('unknown file version %d',version))
 		end
 
 	else

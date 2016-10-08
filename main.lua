@@ -34,8 +34,6 @@ local __pico_pal_transparent = {
 
 __pico_resolution = {128,128}
 
-local lineMesh = love.graphics.newMesh(128,'points')
-
 local __pico_palette = {
 	{0,0,0,255},
 	{29,43,83,255},
@@ -1438,16 +1436,16 @@ function circ(ox,oy,r,col)
 		table.insert(points,{ox+x,oy-y})
 		table.insert(points,{ox+y,oy-x})
 		y = y + 1
-		if decisionOver2 <= 0 then
+		if decisionOver2 < 0 then
 			decisionOver2 = decisionOver2 + 2 * y + 1
 		else
 			x = x - 1
 			decisionOver2 = decisionOver2 + 2 * (y-x) + 1
 		end
 	end
-	lineMesh:setVertices(points)
-	lineMesh:setDrawRange(1,#points)
-	love.graphics.draw(lineMesh)
+	if #points > 0 then
+		love.graphics.points(points)
+	end
 end
 
 function _plot4points(points,cx,cy,x,y)
@@ -1471,30 +1469,26 @@ function circfill(cx,cy,r,col)
 	r = flr(r)
 	local x = r
 	local y = 0
-	local err = -r
+	local err = 1 - r
 
 	local points = {}
 
 	while y <= x do
-		local lasty = y
-		err = err + y
-		y = y + 1
-		err = err + y
-		_plot4points(points,cx,cy,x,lasty)
-		if err > 0 then
-			if x ~= lasty then
-				_plot4points(points,cx,cy,lasty,x)
+		_plot4points(points,cx,cy,x,y)
+		if err < 0 then
+			err = err + 2 * y + 3
+		else
+			if x ~= y then
+				_plot4points(points,cx,cy,y,x)
 			end
-			err = err - x
 			x = x - 1
-			err = err - x
+			err = err + 2 * (y - x) + 3
 		end
+		y = y + 1
 	end
-
-	lineMesh:setVertices(points)
-	lineMesh:setDrawRange(1,#points)
-	love.graphics.draw(lineMesh)
-
+	if #points > 0 then
+		love.graphics.points(points)
+	end
 end
 
 function help()
@@ -1593,9 +1587,7 @@ function line(x0,y0,x1,y1,col)
 			end
 		end
 	end
-	lineMesh:setVertices(points)
-	lineMesh:setDrawRange(1,#points)
-	love.graphics.draw(lineMesh)
+	love.graphics.points(points)
 end
 
 function _call(code)

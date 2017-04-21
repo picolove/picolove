@@ -252,13 +252,10 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 }]])
 	__display_shader:send('palette',unpack(__display_palette))
 
-	pal()
-
 	-- load the cart
 	clip()
 	camera()
 	pal()
-	palt()
 	color(6)
 
 	_load(argv[2] or 'nocart.p8')
@@ -1825,6 +1822,9 @@ function pal(c0,c1,p)
 		__text_shader:send('palette',unpack(__draw_palette))
 		__display_shader:send('palette',unpack(__display_palette))
 		__palette_modified = false
+		-- According to PICO-8 manual:
+		-- pal() to reset to system defaults (including transparency values)
+		palt()
 	elseif p == 1 and c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16

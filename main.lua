@@ -2,7 +2,7 @@ require 'strict'
 
 local __pico_fps=30
 
-local frametime = 1/__pico_fps
+local frametime = 1 / __pico_fps
 
 local cart = nil
 local cartname = nil
@@ -29,28 +29,27 @@ local loaded_code = nil
 
 local __audio_buffer_size = 1024
 
-local __pico_pal_transparent = {
-}
+local __pico_pal_transparent = {}
 
-__pico_resolution = {128,128}
+__pico_resolution = {128, 128}
 
 local __pico_palette = {
-	{0,0,0,255},
-	{29,43,83,255},
-	{126,37,83,255},
-	{0,135,81,255},
-	{171,82,54,255},
-	{95,87,79,255},
-	{194,195,199,255},
-	{255,241,232,255},
-	{255,0,77,255},
-	{255,163,0,255},
-	{255,240,36,255},
-	{0,231,86,255},
-	{41,173,255,255},
-	{131,118,156,255},
-	{255,119,168,255},
-	{255,204,170,255}
+	{  0,   0,   0, 255},
+	{ 29,  43,  83, 255},
+	{126,  37,  83, 255},
+	{  0, 135,  81, 255},
+	{171,  82,  54, 255},
+	{ 95,  87,  79, 255},
+	{194, 195, 199, 255},
+	{255, 241, 232, 255},
+	{255,   0,  77, 255},
+	{255, 163,   0, 255},
+	{255, 240,  36, 255},
+	{  0, 231,  86, 255},
+	{ 41, 173, 255, 255},
+	{131, 118, 156, 255},
+	{255, 119, 168, 255},
+	{255, 204, 170, 255}
 }
 
 local video_frames = nil
@@ -78,25 +77,25 @@ local __pico_current_music = nil
 local currentDirectory = '/'
 local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
-function get_bits(v,s,e)
-	local mask = shl(shl(1,s)-1,e)
-	return shr(band(mask,v))
+function get_bits(v, s, e)
+	local mask = shl(shl(1, s) - 1, e)
+	return shr(band(mask, v))
 end
 
 local QueueableSource = require 'QueueableSource'
 
-function lowpass(y0,y1, cutoff)
-	local RC = 1.0/(cutoff*2*3.14)
-	local dt = 1.0/__sample_rate
-	local alpha = dt/(RC+dt)
-	return y0 + (alpha*(y1 - y0))
+function lowpass(y0, y1, cutoff)
+	local RC = 1.0 / (cutoff * 2 * 3.14)
+	local dt = 1.0 / __sample_rate
+	local alpha = dt / (RC + dt)
+	return y0 + (alpha * (y1 - y0))
 end
 
 local paused = false
 local focus = true
 
 function note_to_hz(note)
-	return 440*math.pow(2,(note-33)/12)
+	return 440 * math.pow(2, (note - 33) / 12)
 end
 
 function love.load(argv)

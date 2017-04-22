@@ -519,7 +519,7 @@ function load_p8(filename)
 		end
 
 		if not compressed then
-			lua = code:match("(.-)%f[%z]")
+			lua = code:match('(.-)%f[%z]')
 		else
 			-- decompress code
 			local mode = 0
@@ -794,7 +794,7 @@ function load_p8(filename)
 		local ce = b:find('--', nil, true)
 		if not (nl or th or an or o) then
 			if ce then
-				local c, t = b:match("(.-)(%s-%-%-.*)")
+				local c, t = b:match('(.-)(%s-%-%-.*)')
 				return 'if ' .. a:sub(2, -2) .. ' then ' .. c .. ' end' .. t .. '\n'
 			else
 				return 'if ' .. a:sub(2, -2) .. ' then ' .. b .. ' end\n'

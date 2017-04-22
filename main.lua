@@ -208,50 +208,53 @@ function love.load(argv)
 	end
 
 
-	__draw_shader = love.graphics.newShader([[
-extern float palette[16];
+	__draw_shader = love.graphics.newShader(
+		'extern float palette[16];' ..
 
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(color.r*16.0);
-	return vec4(vec3(palette[index]/16.0),1.0);
-}]])
-	__draw_shader:send('palette',unpack(__draw_palette))
+		'vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {' ..
+		'	int index = int(color.r * 16.0);' ..
+		'	return vec4(vec3(palette[index] / 16.0), 1.0);' ..
+		'}'
+	)
+	__draw_shader:send('palette', unpack(__draw_palette))
 
-	__sprite_shader = love.graphics.newShader([[
-extern float palette[16];
-extern float transparent[16];
+	__sprite_shader = love.graphics.newShader(
+		'extern float palette[16];' ..
+		'extern float transparent[16];' ..
 
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(floor(Texel(texture, texture_coords).r*16.0));
-	float alpha = transparent[index];
-	return vec4(vec3(palette[index]/16.0),alpha);
-}]])
-	__sprite_shader:send('palette',unpack(__draw_palette))
-	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+		'vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {' ..
+		'	int index = int(floor(Texel(texture, texture_coords).r * 16.0));' ..
+		'	float alpha = transparent[index];' ..
+		'	return vec4(vec3(palette[index] / 16.0), alpha);' ..
+		'}'
+	)
+	__sprite_shader:send('palette', unpack(__draw_palette))
+	__sprite_shader:send('transparent', unpack(__pico_pal_transparent))
 
-	__text_shader = love.graphics.newShader([[
-extern float palette[16];
+	__text_shader = love.graphics.newShader(
+		'extern float palette[16];' ..
 
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	vec4 texcolor = Texel(texture, texture_coords);
-	if(texcolor.a == 0.0) {
-		return vec4(0.0,0.0,0.0,0.0);
-	}
-	int index = int(color.r*16.0);
-	// lookup the colour in the palette by index
-	return vec4(vec3(palette[index]/16.0),1.0);
-}]])
-	__text_shader:send('palette',unpack(__draw_palette))
+		'vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {' ..
+		'	vec4 texcolor = Texel(texture, texture_coords);' ..
+		'	if (texcolor.a == 0.0) {' ..
+		'		return vec4(0.0,0.0,0.0,0.0);' ..
+		'	}' ..
+		'	int index = int(color.r * 16.0);' ..
+			-- lookup the colour in the palette by index
+		'	return vec4(vec3(palette[index] / 16.0), 1.0);' ..
+		'}'
+	)
+	__text_shader:send('palette', unpack(__draw_palette))
 
-	__display_shader = love.graphics.newShader([[
+	__display_shader = love.graphics.newShader(
+		'extern vec4 palette[16];' ..
 
-extern vec4 palette[16];
-
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*15.0);
-	// lookup the colour in the palette by index
-	return palette[index]/256.0;
-}]])
+		'vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {' ..
+		'	int index = int(Texel(texture, texture_coords).r * 15.0);' ..
+			-- lookup the colour in the palette by index
+		'	return palette[index] / 256.0;' ..
+		'}'
+	)
 	__display_shader:send('palette', unpack(__display_palette))
 
 	-- load the cart

@@ -240,7 +240,7 @@ function love.load(argv)
 		'		return vec4(0.0,0.0,0.0,0.0);' ..
 		'	}' ..
 		'	int index = int(color.r * 16.0);' ..
-			-- lookup the colour in the palette by index
+			-- lookup the color in the palette by index
 		'	return vec4(vec3(palette[index] / 16.0), 1.0);' ..
 		'}'
 	)
@@ -251,7 +251,7 @@ function love.load(argv)
 
 		'vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {' ..
 		'	int index = int(Texel(texture, texture_coords).r * 15.0);' ..
-			-- lookup the colour in the palette by index
+			-- lookup the color in the palette by index
 		'	return palette[index] / 256.0;' ..
 		'}'
 	)
@@ -1946,7 +1946,7 @@ end
 function sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 -- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
 -- and draw in rectangle (dx, dy, dw, dh)
--- Colour 0 drawn as transparent by default (see palt())
+-- Color 0 drawn as transparent by default (see palt())
 -- dw, dh defaults to sw, sh
 -- flip_x=true to flip horizontally
 -- flip_y=true to flip vertically

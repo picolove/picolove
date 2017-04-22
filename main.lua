@@ -855,7 +855,7 @@ end
 function love.run()
   if love.math then
     love.math.setRandomSeed(os.time())
-    for i = 1, 3 do
+    for _ = 1, 3 do
       love.math.random()
     end
   end
@@ -1719,7 +1719,7 @@ function ls()
   end
   local count = 0
   love.keyboard.setTextInput(false)
-  for i, item in ipairs(output) do
+  for _, item in ipairs(output) do
     color(item.color)
     for j = 1, #item.name, 32 do
       print(item.name:sub(j, j + 32))
@@ -2007,7 +2007,7 @@ function foreach(a,f)
     warning('foreach got a nil value')
     return
   end
-  for i, v in ipairs(a) do
+  for _, v in ipairs(a) do
     f(v)
   end
 end

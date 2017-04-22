@@ -2,12 +2,12 @@ pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
 function _init()
-	t=0
+	t = 0
 	linebuffer = ''
 	line = 0
 	cls()
-	spr(32,0,3,6,1)
-	spr(38,45,0)
+	spr(32, 0, 3, 6, 1)
+	spr(38, 45, 0)
 	print('')
 	print('')
 
@@ -20,27 +20,27 @@ function _init()
 end
 
 function _update()
-	t+=1
+	t += 1
 end
 
 function _keydown(key)
 	if key == 'backspace' then
 		--delete carret
-		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
-		linebuffer = linebuffer:sub(1,#linebuffer-1)
+		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
+		linebuffer = linebuffer:sub(1, #linebuffer - 1)
 	elseif key == 'return' or key == 'kpenter' then
 		--delete text and carret
-		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 		--render command
-		print('> '..linebuffer, nil, nil, 7)
+		print('> ' .. linebuffer, nil, nil, 7)
 		if linebuffer == 'dir' or linebuffer == 'ls'
-			or (#linebuffer > 4 and linebuffer:sub(1,4) == 'dir ')
-			or (#linebuffer > 3 and linebuffer:sub(1,3) == 'ls ') then
+			or (#linebuffer > 4 and linebuffer:sub(1, 4) == 'dir ')
+			or (#linebuffer > 3 and linebuffer:sub(1, 3) == 'ls ') then
 			ls()
-		elseif linebuffer:sub(1,5) == 'load ' then
-			load(linebuffer:sub(6,#linebuffer))
+		elseif linebuffer:sub(1, 5) == 'load ' then
+			load(linebuffer:sub(6, #linebuffer))
 		elseif linebuffer == 'cls' then
-			line=-1
+			line =- 1
 			cls()
 		elseif linebuffer == 'help' then
 			help()
@@ -50,9 +50,9 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == 'run' then
 			run()
-		elseif linebuffer == 'cd' or linebuffer:sub(1,3) == 'cd ' then
+		elseif linebuffer == 'cd' or linebuffer:sub(1, 3) == 'cd ' then
 			cd(linebuffer:sub(4))
-		elseif linebuffer:sub(1,6) == 'mkdir ' and #linebuffer>6 then
+		elseif linebuffer:sub(1, 6) == 'mkdir ' and #linebuffer > 6 then
 			mkdir(linebuffer:sub(7))
 		elseif #linebuffer == 0 then
 			--do nothing
@@ -60,7 +60,7 @@ function _keydown(key)
 			--TODO
 		elseif linebuffer == 'reboot' then
 			reboot()
-		elseif linebuffer:sub(1,5) == 'save ' then
+		elseif linebuffer:sub(1, 5) == 'save ' then
 			--TODO
 		else
 			_call(linebuffer)
@@ -80,12 +80,12 @@ function _draw()
 		cursor(0, 120)
 	end
 	-- delete text and carret
-	rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 	-- render text
-	print('> '..linebuffer,0,_getcursory(),7)
+	print('> ' .. linebuffer, 0, _getcursory(), 7)
 	-- render carret
 	if t % 16 < 8 then
-		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,8)
+		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 8)
 	end
 end
 

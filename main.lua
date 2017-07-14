@@ -99,6 +99,10 @@ function note_to_hz(note)
 	return 440*math.pow(2,(note-33)/12)
 end
 
+function shdr_unpack(tbl)
+	return unpack(tbl, 1, 17) -- change to 16 once love2d shader bug is fixed
+end
+
 function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == 'Android' then
@@ -213,7 +217,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__draw_shader:send('palette',unpack(__draw_palette))
+	__draw_shader:send('palette',shdr_unpack(__draw_palette))
 
 	__sprite_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -224,8 +228,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
-	__sprite_shader:send('palette',unpack(__draw_palette))
-	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	__sprite_shader:send('palette',shdr_unpack(__draw_palette))
+	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
 
 	__text_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -239,7 +243,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__text_shader:send('palette',unpack(__draw_palette))
+	__text_shader:send('palette',shdr_unpack(__draw_palette))
 
 	__display_shader = love.graphics.newShader([[
 
@@ -250,7 +254,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return palette[index]/256.0;
 }]])
-	__display_shader:send('palette',unpack(__display_palette))
+	__display_shader:send('palette',shdr_unpack(__display_palette))
 
 	-- load the cart
 	clip()
@@ -1050,7 +1054,7 @@ end
 
 function flip_screen()
 	love.graphics.setShader(__display_shader)
-	__display_shader:send('palette',unpack(__display_palette))
+	__display_shader:send('palette',shdr_unpack(__display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
@@ -1817,10 +1821,10 @@ function pal(c0,c1,p)
 			__draw_palette[i] = i
 			__display_palette[i] = __pico_palette[i]
 		end
-		__draw_shader:send('palette',unpack(__draw_palette))
-		__sprite_shader:send('palette',unpack(__draw_palette))
-		__text_shader:send('palette',unpack(__draw_palette))
-		__display_shader:send('palette',unpack(__display_palette))
+		__draw_shader:send('palette',shdr_unpack(__draw_palette))
+		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
+		__text_shader:send('palette',shdr_unpack(__draw_palette))
+		__display_shader:send('palette',shdr_unpack(__display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
@@ -1831,7 +1835,7 @@ function pal(c0,c1,p)
 		c1 = c1+1
 		c0 = c0+1
 		__display_palette[c0] = __pico_palette[c1]
-		__display_shader:send('palette',unpack(__display_palette))
+		__display_shader:send('palette',shdr_unpack(__display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
 		c0 = flr(c0)%16
@@ -1839,9 +1843,9 @@ function pal(c0,c1,p)
 		c1 = c1+1
 		c0 = c0+1
 		__draw_palette[c0] = c1
-		__draw_shader:send('palette',unpack(__draw_palette))
-		__sprite_shader:send('palette',unpack(__draw_palette))
-		__text_shader:send('palette',unpack(__draw_palette))
+		__draw_shader:send('palette',shdr_unpack(__draw_palette))
+		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
+		__text_shader:send('palette',shdr_unpack(__draw_palette))
 		__palette_modified = true
 	end
 end
@@ -1859,13 +1863,13 @@ function palt(c,t)
 			__pico_pal_transparent[c+1] = 0
 		end
 	end
-	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
 end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
 	n = flr(n)
 	w = w or 1
 	h = h or 1
@@ -1909,7 +1913,7 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
 	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(dx)+(dw*(flip_x and 1 or 0)),
 		flr(dy)+(dh*(flip_y and 1 or 0)),

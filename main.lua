@@ -191,7 +191,6 @@ function love.load(argv)
 
 	love.mouse.setVisible(false)
 	love.keyboard.setKeyRepeat(true)
-	love.window.setTitle('picolove')
 	love.graphics.setLineStyle('rough')
 	love.graphics.setPointSize(1)
 	love.graphics.setLineWidth(1)

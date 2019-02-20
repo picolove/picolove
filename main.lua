@@ -666,7 +666,7 @@ function load_p8(filename)
 					sprite = sprite + 1
 				end
 			end
-			next_line = gfxdata:find('\n',end_of_line)+1
+			next_line = gffdata:find('\n',end_of_line)+1
 		end
 
 		assert(sprite == 256,'wrong number of spriteflags:'..sprite)

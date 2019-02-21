@@ -1,11 +1,11 @@
 PICOLOVE
 --------
 
-Implementation of PICO-8 API for LOVE
+Implementation of PICO-8's API for LÖVE
 
 On github at: https://github.com/picolove/picolove
 
-Requires Love 0.10.2
+Requires LÖVE 0.10.2
 
 What it is:
 
@@ -15,7 +15,7 @@ What is PICO-8:
 
  * See http://www.lexaloffle.com/pico-8.php
 
-What is Love:
+What is LÖVE:
 
  * See https://love2d.org/
 
@@ -28,7 +28,7 @@ Why:
  * Extendable
  * No arbitrary cpu or memory limitations
  * No arbitrary code size limitations
- * Betting debugging tools available
+ * Better debugging tools available
  * Open source
 
 What it isn't:
@@ -47,7 +47,7 @@ Differences:
 
  * Uses floating point numbers not fixed point
  * sqrt doesn't freeze
- * Uses luajit not lua 5.2
+ * Uses LuaJIT not lua 5.2
 
 Extra features:
 

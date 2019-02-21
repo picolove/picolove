@@ -8,7 +8,11 @@ local cart = nil
 local cartname = nil
 local love_args = nil
 local __screen
-local __pico_clip
+
+local pico8 = {
+	clip = nil
+}
+
 local __pico_color
 local __pico_map
 local __pico_quads
@@ -1244,16 +1248,16 @@ end
 function clip(x,y,w,h)
 	if type(x) == 'number' then
 		love.graphics.setScissor(x,y,w,h)
-		__pico_clip = {x,y,w,h}
+		pico8.clip = {x,y,w,h}
 	else
 		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
-		__pico_clip = nil
+		pico8.clip = nil
 	end
 end
 
 function restore_clip()
-	if __pico_clip then
-		love.graphics.setScissor(unpack(__pico_clip))
+	if pico8.clip then
+		love.graphics.setScissor(unpack(pico8.clip))
 	else
 		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 	end

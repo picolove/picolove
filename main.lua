@@ -21,9 +21,6 @@ local __sprite_shader
 local __text_shader
 local __display_palette
 local __display_shader
-local scale = 4
-local xpadding = 8.5
-local ypadding = 3.5
 local __accum = 0
 local loaded_code = nil
 
@@ -33,8 +30,6 @@ local __audio_buffer_size = 1024
 
 local __pico_pal_transparent = {
 }
-
-__pico_resolution = {128,128}
 
 local __pico_palette = {
 	{0,0,0,255},
@@ -109,8 +104,6 @@ function love.load(argv)
 	love_args = argv
 	if love.system.getOS() == 'Android' then
 		love.resize(love.graphics.getDimensions())
-	else
-		love.window.setMode(__pico_resolution[1]*scale+xpadding*scale*2,__pico_resolution[2]*scale+ypadding*scale*2)
 	end
 
 	osc = {}

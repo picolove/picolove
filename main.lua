@@ -9,6 +9,25 @@ local __screen
 local pico8 = {
 	clip = nil,
 	fps = 30
+	palette = {
+		{0,0,0,255},
+		{29,43,83,255},
+		{126,37,83,255},
+		{0,135,81,255},
+		{171,82,54,255},
+		{95,87,79,255},
+		{194,195,199,255},
+		{255,241,232,255},
+		{255,0,77,255},
+		{255,163,0,255},
+		{255,240,36,255},
+		{0,231,86,255},
+		{41,173,255,255},
+		{131,118,156,255},
+		{255,119,168,255},
+		{255,204,170,255}
+	}
+}
 }
 
 
@@ -34,25 +53,6 @@ local eol_chars = '\n'
 local __audio_buffer_size = 1024
 
 local __pico_pal_transparent = {
-}
-
-local __pico_palette = {
-	{0,0,0,255},
-	{29,43,83,255},
-	{126,37,83,255},
-	{0,135,81,255},
-	{171,82,54,255},
-	{95,87,79,255},
-	{194,195,199,255},
-	{255,241,232,255},
-	{255,0,77,255},
-	{255,163,0,255},
-	{255,240,36,255},
-	{0,231,86,255},
-	{41,173,255,255},
-	{131,118,156,255},
-	{255,119,168,255},
-	{255,204,170,255}
 }
 
 local video_frames = nil
@@ -205,7 +205,7 @@ function love.load(argv)
 	for i=1,16 do
 		__draw_palette[i] = i
 		__pico_pal_transparent[i] = i == 1 and 0 or 1
-		__display_palette[i] = __pico_palette[i]
+		__display_palette[i] = pico8.palette[i]
 	end
 
 
@@ -1825,7 +1825,7 @@ function pal(c0,c1,p)
 		if __palette_modified == false then return end
 		for i=1,16 do
 			__draw_palette[i] = i
-			__display_palette[i] = __pico_palette[i]
+			__display_palette[i] = pico8.palette[i]
 		end
 		__draw_shader:send('palette',shdr_unpack(__draw_palette))
 		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
@@ -1840,7 +1840,7 @@ function pal(c0,c1,p)
 		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
-		__display_palette[c0] = __pico_palette[c1]
+		__display_palette[c0] = pico8.palette[c1]
 		__display_shader:send('palette',shdr_unpack(__display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then

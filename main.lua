@@ -1,8 +1,5 @@
 require 'strict'
 
-local __pico_fps=30
-
-local frametime = 1/__pico_fps
 
 local cart = nil
 local cartname = nil
@@ -10,8 +7,12 @@ local love_args = nil
 local __screen
 
 local pico8 = {
-	clip = nil
+	clip = nil,
+	fps = 30
 }
+
+
+local frametime = 1/ pico8.fps
 
 local __pico_color
 local __pico_map
@@ -2247,11 +2248,11 @@ love.graphics.point = function(x,y)
 end
 
 function setfps(fps)
-	__pico_fps = flr(fps)
-	if __pico_fps <= 0 then
-		__pico_fps = 30
+	pico8.fps = flr(fps)
+	if pico8.fps <= 0 then
+		pico8.fps = 30
 	end
-	frametime = 1/__pico_fps
+	frametime = 1 / pico8.fps
 end
 
 function lerp(a,b,t)

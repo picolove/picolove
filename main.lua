@@ -8,7 +8,7 @@ local __screen
 
 local pico8 = {
 	clip = nil,
-	fps = 30
+	fps = 30,
 	palette = {
 		{0,0,0,255},
 		{29,43,83,255},
@@ -26,8 +26,8 @@ local pico8 = {
 		{131,118,156,255},
 		{255,119,168,255},
 		{255,204,170,255}
-	}
-}
+	},
+	spriteflags = {}
 }
 
 
@@ -38,7 +38,6 @@ local __pico_map
 local __pico_quads
 local __pico_spritesheet_data
 local __pico_spritesheet
-local __pico_spriteflags
 local __draw_palette
 local __draw_shader
 local __sprite_shader
@@ -60,9 +59,7 @@ local video_frames = nil
 local __pico_camera_x = 0
 local __pico_camera_y = 0
 local osc
-
 local host_time = 0
-
 local retro_mode = false
 
 local __pico_audio_channels = {}
@@ -377,7 +374,7 @@ function load_p8(filename)
 		end
 	end
 	__pico_spritesheet_data = love.image.newImageData(128,128)
-	__pico_spriteflags = {}
+	pico8.spriteflags = {}
 
 	__pico_sfx = {}
 	for i=0,63 do
@@ -469,7 +466,7 @@ function load_p8(filename)
 						mapY = mapY + 1
 					end
 				elseif inbyte < 0x3100 then
-					__pico_spriteflags[sprite] = byte
+					pico8.spriteflags[sprite] = byte
 					sprite = sprite + 1
 				elseif inbyte < 0x3200 then
 					-- music
@@ -662,14 +659,14 @@ function load_p8(filename)
 				for i=1,#line do
 					local v = line:sub(i)
 					v = tonumber(v,16)
-					__pico_spriteflags[sprite] = v
+					pico8.spriteflags[sprite] = v
 					sprite = sprite + 1
 				end
 			else
 				for i=1,#line,2 do
 					local v = line:sub(i,i+1)
 					v = tonumber(v,16)
-					__pico_spriteflags[sprite] = v
+					pico8.spriteflags[sprite] = v
 					sprite = sprite + 1
 				end
 			end
@@ -1300,13 +1297,13 @@ function fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
-		if not __pico_spriteflags[flr(n)] then
+		if not pico8.spriteflags[flr(n)] then
 			warning(string.format('fget(%d,%d)',n,f))
 			return 0
 		end
-		return band(__pico_spriteflags[flr(n)],shl(1,flr(f))) ~= 0
+		return band(pico8.spriteflags[flr(n)],shl(1,flr(f))) ~= 0
 	end
-	return __pico_spriteflags[flr(n)]
+	return pico8.spriteflags[flr(n)]
 end
 
 assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
@@ -1327,13 +1324,13 @@ function fset(n,f,v)
 	if f then
 		-- set specific bit to v (true or false)
 		if f then
-			__pico_spriteflags[n] = bor(__pico_spriteflags[n],shl(1,f))
+			pico8.spriteflags[n] = bor(pico8.spriteflags[n],shl(1,f))
 		else
-			__pico_spriteflags[n] = band(bnot(__pico_spriteflags[n],shl(1,f)))
+			pico8.spriteflags[n] = band(bnot(pico8.spriteflags[n],shl(1,f)))
 		end
 	else
 		-- set bitfield to v (number)
-		__pico_spriteflags[n] = v
+		pico8.spriteflags[n] = v
 	end
 end
 
@@ -2083,7 +2080,7 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
 						else
-							if band(__pico_spriteflags[v],bitmask) ~= 0 then
+							if band(pico8.spriteflags[v],bitmask) ~= 0 then
 								love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
 							else
 							end

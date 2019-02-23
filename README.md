@@ -42,6 +42,7 @@ What it isn't:
 Not Yet Implemented:
 
  * Memory modification/reading
+ * PICO-8 cartridge versions > 8
 
 Differences:
 

@@ -30,6 +30,7 @@ local pico8 = {
 	spriteflags = {},
 	audio_channels = {},
 	sfx = {},
+	music = {},
 	camera_x = 0,
 	camera_y = 0,
 	pal_transparent = {},
@@ -66,8 +67,6 @@ local __audio_channels
 local __sample_rate = 22050
 local channels = 1
 local bits = 16
-
-local __pico_music = {}
 
 local __pico_current_music = nil
 
@@ -384,9 +383,9 @@ function load_p8(filename)
 			pico8.sfx[i][j] = {0,0,0,0}
 		end
 	end
-	__pico_music = {}
+	pico8.music = {}
 	for i=0,63 do
-		__pico_music[i] = {
+		pico8.music[i] = {
 			loop = 0,
 			[0] = 1,
 			[1] = 2,
@@ -468,8 +467,8 @@ function load_p8(filename)
 				elseif inbyte < 0x3200 then
 					-- music
 					local _music = math.floor((inbyte-0x3100)/4)
-					__pico_music[_music][inbyte%4] = bit.band(byte,0x7F)
-					__pico_music[_music].loop = bit.bor(bit.rshift(bit.band(byte,0x80),7-inbyte%4),__pico_music[_music].loop)
+					pico8.music[_music][inbyte%4] = bit.band(byte,0x7F)
+					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte,0x80),7-inbyte%4),pico8.music[_music].loop)
 				elseif inbyte < 0x4300 then
 					-- sfx
 					local _sfx = math.floor((inbyte-0x3200)/68)
@@ -755,7 +754,7 @@ function load_p8(filename)
 			end_of_line = end_of_line - 1
 			local line = musicdata:sub(next_line,end_of_line)
 
-			__pico_music[_music] = {
+			pico8.music[_music] = {
 				loop = tonumber(line:sub(1,2),16),
 				[0] = tonumber(line:sub(4,5),16),
 				[1] = tonumber(line:sub(6,7),16),
@@ -929,17 +928,17 @@ function update_audio(time)
 			__pico_current_music.offset = __pico_current_music.offset + 7350/(61*__pico_current_music.speed*__sample_rate)
 			if __pico_current_music.offset >= 32 then
 				local next_track = __pico_current_music.music
-				if __pico_music[next_track].loop == 2 then
+				if pico8.music[next_track].loop == 2 then
 					-- go back until we find the loop start
 					while true do
-						if __pico_music[next_track].loop == 1 or next_track == 0 then
+						if pico8.music[next_track].loop == 1 or next_track == 0 then
 							break
 						end
 						next_track = next_track - 1
 					end
-				elseif __pico_music[__pico_current_music.music].loop == 4 then
+				elseif pico8.music[__pico_current_music.music].loop == 4 then
 					next_track = nil
-				elseif __pico_music[__pico_current_music.music].loop <= 1 then
+				elseif pico8.music[__pico_current_music.music].loop <= 1 then
 					next_track = next_track + 1
 				end
 				if next_track then
@@ -947,7 +946,7 @@ function update_audio(time)
 				end
 			end
 		end
-		local music = __pico_current_music and __pico_music[__pico_current_music.music] or nil
+		local music = __pico_current_music and pico8.music[__pico_current_music.music] or nil
 
 		for channel=0,3 do
 			local ch = pico8.audio_channels[channel]
@@ -1163,7 +1162,7 @@ end
 function music(n,fade_len,channel_mask)
 	if n == -1 then
 		for i=0,3 do
-			if __pico_current_music and __pico_music[__pico_current_music.music][i] < 64 then
+			if __pico_current_music and pico8.music[__pico_current_music.music][i] < 64 then
 				pico8.audio_channels[i].sfx = nil
 				pico8.audio_channels[i].offset = 0
 				pico8.audio_channels[i].last_step = -1
@@ -1172,7 +1171,7 @@ function music(n,fade_len,channel_mask)
 		__pico_current_music = nil
 		return
 	end
-	local m = __pico_music[n]
+	local m = pico8.music[n]
 	if not m then
 		warning(string.format('music %d does not exist',n))
 		return
@@ -1191,8 +1190,8 @@ function music(n,fade_len,channel_mask)
 	pico8.audio_channels[slowest_channel].loop = false
 	__pico_current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
 	for i=0,3 do
-		if __pico_music[n][i] < 64 then
-			pico8.audio_channels[i].sfx = __pico_music[n][i]
+		if pico8.music[n][i] < 64 then
+			pico8.audio_channels[i].sfx = pico8.music[n][i]
 			pico8.audio_channels[i].offset = 0
 			pico8.audio_channels[i].last_step = -1
 		end

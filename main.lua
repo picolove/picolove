@@ -29,6 +29,7 @@ local pico8 = {
 	},
 	spriteflags = {},
 	audio_channels = {},
+	sfx = {},
 	pal_transparent = {},
 }
 
@@ -375,15 +376,15 @@ function load_p8(filename)
 	__pico_spritesheet_data = love.image.newImageData(128,128)
 	pico8.spriteflags = {}
 
-	__pico_sfx = {}
+	pico8.sfx = {}
 	for i=0,63 do
-		__pico_sfx[i] = {
+		pico8.sfx[i] = {
 			speed=16,
 			loop_start=0,
 			loop_end=0
 		}
 		for j=0,31 do
-			__pico_sfx[i][j] = {0,0,0,0}
+			pico8.sfx[i][j] = {0,0,0,0}
 		end
 	end
 	__pico_music = {}
@@ -478,13 +479,13 @@ function load_p8(filename)
 					local step = (inbyte-0x3200)%68
 					if step < 64 and inbyte%2 == 1 then
 						local note = bit.lshift(byte,8)+lastbyte
-						__pico_sfx[_sfx][(step-1)/2] = {bit.band(note,0x3f),bit.rshift(bit.band(note,0x1c0),6),bit.rshift(bit.band(note, 0xe00),9),bit.rshift(bit.band(note,0x7000),12)}
+						pico8.sfx[_sfx][(step-1)/2] = {bit.band(note,0x3f),bit.rshift(bit.band(note,0x1c0),6),bit.rshift(bit.band(note, 0xe00),9),bit.rshift(bit.band(note,0x7000),12)}
 					elseif step == 65 then
-						__pico_sfx[_sfx].speed = byte
+						pico8.sfx[_sfx].speed = byte
 					elseif step == 66 then
-						__pico_sfx[_sfx].loop_start = byte
+						pico8.sfx[_sfx].loop_start = byte
 					elseif step == 67 then
-						__pico_sfx[_sfx].loop_end = byte
+						pico8.sfx[_sfx].loop_end = byte
 					end
 				elseif inbyte < 0x8000 then
 					-- code, possibly compressed
@@ -723,9 +724,9 @@ function load_p8(filename)
 			end_of_line = end_of_line - 1
 			local line = sfxdata:sub(next_line,end_of_line)
 			local editor_mode = tonumber(line:sub(1,2),16)
-			__pico_sfx[_sfx].speed = tonumber(line:sub(3,4),16)
-			__pico_sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
-			__pico_sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
+			pico8.sfx[_sfx].speed = tonumber(line:sub(3,4),16)
+			pico8.sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
+			pico8.sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
 			for i=9,#line,5 do
 				local v = line:sub(i,i+4)
 				assert(#v == 5)
@@ -733,7 +734,7 @@ function load_p8(filename)
 				local instr = tonumber(line:sub(i+2,i+2),16)
 				local vol   = tonumber(line:sub(i+3,i+3),16)
 				local fx    = tonumber(line:sub(i+4,i+4),16)
-				__pico_sfx[_sfx][step] = {note,instr,vol,fx}
+				pico8.sfx[_sfx][step] = {note,instr,vol,fx}
 				step = step + 1
 			end
 			_sfx = _sfx + 1
@@ -962,8 +963,8 @@ function update_audio(time)
 				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
 				ch.bufferpos = 0
 			end
-			if ch.sfx and __pico_sfx[ch.sfx] then
-				local sfx = __pico_sfx[ch.sfx]
+			if ch.sfx and pico8.sfx[ch.sfx] then
+				local sfx = pico8.sfx[ch.sfx]
 				ch.offset = ch.offset + 7350/(61*sfx.speed*__sample_rate)
 				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
@@ -976,8 +977,8 @@ function update_audio(time)
 					pico8.audio_channels[channel].sfx = nil
 				end
 			end
-			if ch.sfx and __pico_sfx[ch.sfx] then
-				local sfx = __pico_sfx[ch.sfx]
+			if ch.sfx and pico8.sfx[ch.sfx] then
+				local sfx = pico8.sfx[ch.sfx]
 				-- when we pass a new step
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
@@ -1183,7 +1184,7 @@ function music(n,fade_len,channel_mask)
 	local slowest_channel = nil
 	for i=0,3 do
 		if m[i] < 64 then
-			local sfx = __pico_sfx[m[i]]
+			local sfx = pico8.sfx[m[i]]
 			if slowest_speed == nil or slowest_speed > sfx.speed then
 				slowest_speed = sfx.speed
 				slowest_channel = i

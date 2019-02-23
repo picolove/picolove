@@ -31,6 +31,7 @@ local pico8 = {
 	audio_channels = {},
 	sfx = {},
 	music = {},
+	current_music = nil,
 	camera_x = 0,
 	camera_y = 0,
 	pal_transparent = {},
@@ -67,8 +68,6 @@ local __audio_channels
 local __sample_rate = 22050
 local channels = 1
 local bits = 16
-
-local __pico_current_music = nil
 
 local currentDirectory = '/'
 local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
@@ -924,10 +923,10 @@ function update_audio(time)
 	local samples = flr(time*__sample_rate)
 
 	for i=0,samples-1 do
-		if __pico_current_music then
-			__pico_current_music.offset = __pico_current_music.offset + 7350/(61*__pico_current_music.speed*__sample_rate)
-			if __pico_current_music.offset >= 32 then
-				local next_track = __pico_current_music.music
+		if pico8.current_music then
+			pico8.current_music.offset = pico8.current_music.offset + 7350/(61*pico8.current_music.speed*__sample_rate)
+			if pico8.current_music.offset >= 32 then
+				local next_track = pico8.current_music.music
 				if pico8.music[next_track].loop == 2 then
 					-- go back until we find the loop start
 					while true do
@@ -936,9 +935,9 @@ function update_audio(time)
 						end
 						next_track = next_track - 1
 					end
-				elseif pico8.music[__pico_current_music.music].loop == 4 then
+				elseif pico8.music[pico8.current_music.music].loop == 4 then
 					next_track = nil
-				elseif pico8.music[__pico_current_music.music].loop <= 1 then
+				elseif pico8.music[pico8.current_music.music].loop <= 1 then
 					next_track = next_track + 1
 				end
 				if next_track then
@@ -946,7 +945,7 @@ function update_audio(time)
 				end
 			end
 		end
-		local music = __pico_current_music and pico8.music[__pico_current_music.music] or nil
+		local music = pico8.current_music and pico8.music[pico8.current_music.music] or nil
 
 		for channel=0,3 do
 			local ch = pico8.audio_channels[channel]
@@ -1162,13 +1161,13 @@ end
 function music(n,fade_len,channel_mask)
 	if n == -1 then
 		for i=0,3 do
-			if __pico_current_music and pico8.music[__pico_current_music.music][i] < 64 then
+			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then
 				pico8.audio_channels[i].sfx = nil
 				pico8.audio_channels[i].offset = 0
 				pico8.audio_channels[i].last_step = -1
 			end
 		end
-		__pico_current_music = nil
+		pico8.current_music = nil
 		return
 	end
 	local m = pico8.music[n]
@@ -1188,7 +1187,7 @@ function music(n,fade_len,channel_mask)
 		end
 	end
 	pico8.audio_channels[slowest_channel].loop = false
-	__pico_current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
+	pico8.current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
 	for i=0,3 do
 		if pico8.music[n][i] < 64 then
 			pico8.audio_channels[i].sfx = pico8.music[n][i]

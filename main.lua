@@ -28,6 +28,7 @@ local pico8 = {
 		{255,204,170,255}
 	},
 	spriteflags = {},
+	audio_channels = {},
 	pal_transparent = {},
 }
 
@@ -61,7 +62,6 @@ local osc
 local host_time = 0
 local retro_mode = false
 
-local __pico_audio_channels = {}
 
 local __pico_sfx = {}
 local __audio_channels
@@ -170,7 +170,7 @@ function love.load(argv)
 	end
 
 	for i=0,3 do
-		__pico_audio_channels[i]={
+		pico8.audio_channels[i]={
 			oscpos=0,
 			noise=osc[6]()
 		}
@@ -952,7 +952,7 @@ function update_audio(time)
 		local music = __pico_current_music and __pico_music[__pico_current_music.music] or nil
 
 		for channel=0,3 do
-			local ch = __pico_audio_channels[channel]
+			local ch = pico8.audio_channels[channel]
 			local tick = 0
 			local tickrate = 60*16
 			local note,instr,vol,fx
@@ -970,10 +970,10 @@ function update_audio(time)
 						ch.last_step = -1
 						ch.offset = sfx.loop_start
 					else
-						__pico_audio_channels[channel].sfx = nil
+						pico8.audio_channels[channel].sfx = nil
 					end
 				elseif ch.offset >= 32 then
-					__pico_audio_channels[channel].sfx = nil
+					pico8.audio_channels[channel].sfx = nil
 				end
 			end
 			if ch.sfx and __pico_sfx[ch.sfx] then
@@ -1166,9 +1166,9 @@ function music(n,fade_len,channel_mask)
 	if n == -1 then
 		for i=0,3 do
 			if __pico_current_music and __pico_music[__pico_current_music.music][i] < 64 then
-				__pico_audio_channels[i].sfx = nil
-				__pico_audio_channels[i].offset = 0
-				__pico_audio_channels[i].last_step = -1
+				pico8.audio_channels[i].sfx = nil
+				pico8.audio_channels[i].offset = 0
+				pico8.audio_channels[i].last_step = -1
 			end
 		end
 		__pico_current_music = nil
@@ -1190,13 +1190,13 @@ function music(n,fade_len,channel_mask)
 			end
 		end
 	end
-	__pico_audio_channels[slowest_channel].loop = false
+	pico8.audio_channels[slowest_channel].loop = false
 	__pico_current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
 	for i=0,3 do
 		if __pico_music[n][i] < 64 then
-			__pico_audio_channels[i].sfx = __pico_music[n][i]
-			__pico_audio_channels[i].offset = 0
-			__pico_audio_channels[i].last_step = -1
+			pico8.audio_channels[i].sfx = __pico_music[n][i]
+			pico8.audio_channels[i].offset = 0
+			pico8.audio_channels[i].last_step = -1
 		end
 	end
 end
@@ -1220,22 +1220,22 @@ function sfx(n,channel,offset)
 	-- n = -2 to stop looping on channel
 	channel = channel or -1
 	if n == -1 and channel >= 0 then
-		__pico_audio_channels[channel].sfx = nil
+		pico8.audio_channels[channel].sfx = nil
 		return
 	elseif n == -2 and channel >= 0 then
-		__pico_audio_channels[channel].loop = false
+		pico8.audio_channels[channel].loop = false
 	end
 	offset = offset or 0
 	if channel == -1 then
 		-- find a free channel
 		for i=0,3 do
-			if __pico_audio_channels[i].sfx == nil then
+			if pico8.audio_channels[i].sfx == nil then
 				channel = i
 			end
 		end
 	end
 	if channel == -1 then return end
-	local ch = __pico_audio_channels[channel]
+	local ch = pico8.audio_channels[channel]
 	ch.sfx=n
 	ch.offset=offset
 	ch.last_step=offset-1

@@ -32,6 +32,7 @@ local pico8 = {
 	sfx = {},
 	music = {},
 	current_music = nil,
+	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
 	pal_transparent = {},
@@ -1350,11 +1351,11 @@ function print(str,x,y,col)
 	if col then color(col) end
 	local canscroll = y==nil
 	if y==nil then
-		y = __pico_cursor[2]
-		__pico_cursor[2] = __pico_cursor[2] + 6
+		y = pico8.cursor[2]
+		pico8.cursor[2] = pico8.cursor[2] + 6
 	end
 	if x==nil then
-		x = __pico_cursor[1]
+		x = pico8.cursor[1]
 	end
 	if canscroll and y > 121 then
 		local c = col or __pico_color
@@ -1368,18 +1369,16 @@ function print(str,x,y,col)
 	love.graphics.print(str,flr(x),flr(y))
 end
 
-__pico_cursor = {0,0}
-
 function cursor(x,y)
-	__pico_cursor = {x,y}
+	pico8.cursor = {x,y}
 end
 
 function _getcursorx()
-	return __pico_cursor[1]
+	return pico8.cursor[1]
 end
 
 function _getcursory()
-	return __pico_cursor[2]
+	return pico8.cursor[2]
 end
 
 function color(c)
@@ -1391,7 +1390,7 @@ end
 
 function cls()
 	love.graphics.clear(0,0,0,255)
-	__pico_cursor = {0,0}
+	pico8.cursor = {0,0}
 end
 
 pico8.camera_x = 0

@@ -30,6 +30,8 @@ local pico8 = {
 	spriteflags = {},
 	audio_channels = {},
 	sfx = {},
+	camera_x = 0,
+	camera_y = 0,
 	pal_transparent = {},
 }
 
@@ -1399,23 +1401,23 @@ function cls()
 	__pico_cursor = {0,0}
 end
 
-__pico_camera_x = 0
-__pico_camera_y = 0
+pico8.camera_x = 0
+pico8.camera_y = 0
 
 function camera(x,y)
 	if type(x) == 'number' then
-		__pico_camera_x = flr(x)
-		__pico_camera_y = flr(y)
+		pico8.camera_x = flr(x)
+		pico8.camera_y = flr(y)
 	else
-		__pico_camera_x = 0
-		__pico_camera_y = 0
+		pico8.camera_x = 0
+		pico8.camera_y = 0
 	end
 	restore_camera()
 end
 
 function restore_camera()
 	love.graphics.origin()
-	love.graphics.translate(-__pico_camera_x,-__pico_camera_y)
+	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
 function circ(ox,oy,r,col)

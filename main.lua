@@ -27,7 +27,8 @@ local pico8 = {
 		{255,119,168,255},
 		{255,204,170,255}
 	},
-	spriteflags = {}
+	spriteflags = {},
+	pal_transparent = {},
 }
 
 
@@ -51,8 +52,6 @@ local eol_chars = '\n'
 
 local __audio_buffer_size = 1024
 
-local __pico_pal_transparent = {
-}
 
 local video_frames = nil
 
@@ -198,10 +197,10 @@ function love.load(argv)
 
 	__draw_palette = {}
 	__display_palette = {}
-	__pico_pal_transparent = {}
+	pico8.pal_transparent = {}
 	for i=1,16 do
 		__draw_palette[i] = i
-		__pico_pal_transparent[i] = i == 1 and 0 or 1
+		pico8.pal_transparent[i] = i == 1 and 0 or 1
 		__display_palette[i] = pico8.palette[i]
 	end
 
@@ -225,7 +224,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
 	__sprite_shader:send('palette',shdr_unpack(__draw_palette))
-	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 
 	__text_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -1856,23 +1855,23 @@ end
 function palt(c,t)
 	if type(c) ~= 'number' then
 		for i=1,16 do
-			__pico_pal_transparent[i] = i == 1 and 0 or 1
+			pico8.pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
 		c = flr(c)%16
 		if t == false then
-			__pico_pal_transparent[c+1] = 1
+			pico8.pal_transparent[c+1] = 1
 		elseif t == true then
-			__pico_pal_transparent[c+1] = 0
+			pico8.pal_transparent[c+1] = 0
 		end
 	end
-	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 end
 
 function spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 	n = flr(n)
 	w = w or 1
 	h = h or 1
@@ -1916,7 +1915,7 @@ function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
 	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',shdr_unpack(__pico_pal_transparent))
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(__pico_spritesheet,q,
 		flr(dx)+(dw*(flip_x and 1 or 0)),
 		flr(dy)+(dh*(flip_y and 1 or 0)),

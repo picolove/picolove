@@ -9,7 +9,7 @@ Requires LÖVE 0.10.2
 
 What it is:
 
- * An implementation of PICO-8's api in love
+ * An implementation of PICO-8's API in LÖVE
 
 What is PICO-8:
 

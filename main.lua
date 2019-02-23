@@ -58,15 +58,10 @@ local __audio_buffer_size = 1024
 
 
 local video_frames = nil
-
-local __pico_camera_x = 0
-local __pico_camera_y = 0
 local osc
 local host_time = 0
 local retro_mode = false
 
-
-local __pico_sfx = {}
 local __audio_channels
 local __sample_rate = 22050
 local channels = 1

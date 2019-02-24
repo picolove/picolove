@@ -27,6 +27,7 @@ local pico8 = {
 		{255,119,168,255},
 		{255,204,170,255}
 	},
+	color = nil,
 	spriteflags = {},
 	audio_channels = {},
 	sfx = {},
@@ -49,7 +50,6 @@ shr = bit.rshift
 
 local frametime = 1/ pico8.fps
 
-local __pico_color
 local __pico_map
 local __pico_quads
 local __pico_spritesheet_data
@@ -1366,7 +1366,7 @@ function print(str,x,y,col)
 		x = pico8.cursor[1]
 	end
 	if canscroll and y > 121 then
-		local c = col or __pico_color
+		local c = col or pico8.color
 		scroll(6)
 		y = 120
 		rectfill(0,y,127,y+6,0)
@@ -1392,7 +1392,7 @@ end
 function color(c)
 	c = c and flr(c) or 0
 	assert(c >= 0 and c <= 16,string.format('c is %s',c))
-	__pico_color = c
+	pico8.color = c
 	love.graphics.setColor(c*16,0,0,255)
 end
 
@@ -1421,7 +1421,7 @@ function restore_camera()
 end
 
 function circ(ox,oy,r,col)
-	col = col or __pico_color
+	col = col or pico8.color
 	color(col)
 	ox = flr(ox)
 	oy = flr(oy)
@@ -1468,7 +1468,7 @@ function _horizontal_line(points,x0,y,x1)
 end
 
 function circfill(cx,cy,r,col)
-	col = col or __pico_color
+	col = col or pico8.color
 	color(col)
 	cx = flr(cx)
 	cy = flr(cy)
@@ -1520,7 +1520,7 @@ function help()
 end
 
 function line(x0,y0,x1,y1,col)
-	col = col or __pico_color
+	col = col or pico8.color
 	color(col)
 
 	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
@@ -1754,13 +1754,13 @@ function mkdir(name)
 end
 
 function rect(x0,y0,x1,y1,col)
-	col = col or __pico_color
+	col = col or pico8.color
 	color(col)
 	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function rectfill(x0,y0,x1,y1,col)
-	col = col or __pico_color
+	col = col or pico8.color
 	color(col)
 	local w = (x1-x0)+1
 	local h = (y1-y0)+1

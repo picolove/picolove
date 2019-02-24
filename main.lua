@@ -38,6 +38,14 @@ local pico8 = {
 	pal_transparent = {},
 }
 
+local bit = require('bit')
+
+band = bit.band
+bor = bit.bor
+bxor = bit.bxor
+bnot = bit.bnot
+shl = bit.lshift
+shr = bit.rshift
 
 local frametime = 1/ pico8.fps
 
@@ -2214,15 +2222,6 @@ function sgn(x)
 		return 1
 	end
 end
-
-local bit = require('bit')
-
-band = bit.band
-bor = bit.bor
-bxor = bit.bxor
-bnot = bit.bnot
-shl = bit.lshift
-shr = bit.rshift
 
 sub = string.sub
 

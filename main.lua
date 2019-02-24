@@ -29,6 +29,7 @@ local pico8 = {
 	},
 	color = nil,
 	spriteflags = {},
+	map = {},
 	audio_channels = {},
 	sfx = {},
 	music = {},
@@ -50,7 +51,6 @@ shr = bit.rshift
 
 local frametime = 1/ pico8.fps
 
-local __pico_map
 local __pico_quads
 local __pico_spritesheet_data
 local __pico_spritesheet
@@ -369,12 +369,12 @@ function load_p8(filename)
 	log('Loading',filename)
 
 	local lua = ''
-	__pico_map = {}
+	pico8.map = {}
 	__pico_quads = {}
 	for y=0,63 do
-		__pico_map[y] = {}
+		pico8.map[y] = {}
 		for x=0,127 do
-			__pico_map[y][x] = 0
+			pico8.map[y][x] = 0
 		end
 	end
 	__pico_spritesheet_data = love.image.newImageData(128,128)
@@ -434,7 +434,7 @@ function load_p8(filename)
 				local hi = bit.rshift(byte,4)
 				if inbyte < 0x2000 then
 					if outY >= 64 then
-						__pico_map[mapY][mapX] = byte
+						pico8.map[mapY][mapX] = byte
 						mapX = mapX + 1
 						if mapX == 128 then
 							mapX = 0
@@ -463,7 +463,7 @@ function load_p8(filename)
 						end
 					end
 				elseif inbyte < 0x3000 then
-					__pico_map[mapY][mapX] = byte
+					pico8.map[mapY][mapX] = byte
 					mapX = mapX + 1
 					if mapX == 128 then
 						mapX = 0
@@ -622,7 +622,7 @@ function load_p8(filename)
 					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
 					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
 					local v = bor(shl(hi,4),lo)
-					__pico_map[ty][tx] = v
+					pico8.map[ty][tx] = v
 					shared = shared + 1
 					tx = tx + 1
 					if tx == 128 then
@@ -701,7 +701,7 @@ function load_p8(filename)
 				v = tonumber(v,16)
 				if col == 0 then
 				end
-				__pico_map[row][col] = v
+				pico8.map[row][col] = v
 				col = col + 1
 				tiles = tiles + 1
 				if col == 128 then
@@ -2053,12 +2053,12 @@ end
 function mget(x,y)
 	if x == nil or y == nil then return 0 end
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
-	return __pico_map[flr(y)][flr(x)]
+	return pico8.map[flr(y)][flr(x)]
 end
 
 function mset(x,y,v)
 	if x >= 0 and x < 128 and y >= 0 and y < 64 then
-		__pico_map[flr(y)][flr(x)] = v
+		pico8.map[flr(y)][flr(x)] = v
 	end
 end
 
@@ -2077,7 +2077,7 @@ function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do
 				if cel_x+x < 128 and cel_x+x >= 0 then
-					local v = __pico_map[flr(cel_y+y)][flr(cel_x+x)]
+					local v = pico8.map[flr(cel_y+y)][flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)

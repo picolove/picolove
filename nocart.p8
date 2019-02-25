@@ -37,6 +37,13 @@ function _keydown(key)
 		if (cursorx < 0) then
 			cursorx = 0
 		end
+	elseif key == 'delete' then
+		--delete carret
+		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+
+		local startbuffer = linebuffer:sub(1,cursorx)
+		local endbuffer = linebuffer:sub(cursorx+2)
+		linebuffer = startbuffer .. endbuffer
 	elseif key == 'home' then
 		cursorx = 0
 	elseif key == 'end' then

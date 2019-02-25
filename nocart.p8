@@ -37,6 +37,16 @@ function _keydown(key)
 		if (cursorx < 0) then
 			cursorx = 0
 		end
+	elseif key == 'left' then
+		cursorx-=1
+		if (cursorx < 0) then
+			cursorx = 0
+		end
+	elseif key == 'right' then
+		cursorx+=1
+		if (cursorx > #linebuffer) then
+			cursorx = #linebuffer
+		end
 	elseif key == 'return' or key == 'kpenter' then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)

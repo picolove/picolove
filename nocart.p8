@@ -5,6 +5,7 @@ function _init()
 	t=0
 	linebuffer = ''
 	line = 0
+	cursorx = 0
 	cls()
 	spr(32,0,3,6,1)
 	spr(38,45,0)
@@ -27,7 +28,15 @@ function _keydown(key)
 	if key == 'backspace' then
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
-		linebuffer = linebuffer:sub(1,#linebuffer-1)
+
+		local startbuffer = linebuffer:sub(1,cursorx-1)
+		local endbuffer = linebuffer:sub(cursorx+1)
+		linebuffer = startbuffer .. endbuffer
+
+		cursorx-=1
+		if (cursorx < 0) then
+			cursorx = 0
+		end
 	elseif key == 'return' or key == 'kpenter' then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
@@ -66,11 +75,18 @@ function _keydown(key)
 			_call(linebuffer)
 		end
 		linebuffer = ''
+		cursorx = 0
 	end
 end
 
 function _textinput(text)
-	linebuffer = linebuffer .. text
+	local startbuffer = linebuffer:sub(1,cursorx)
+	local endbuffer = linebuffer:sub(cursorx+1,#linebuffer)
+	linebuffer = startbuffer .. text .. endbuffer
+
+	if #text then
+		cursorx += #text
+	end
 end
 
 function _draw()
@@ -85,7 +101,7 @@ function _draw()
 	print('> '..linebuffer,0,_getcursory(),7)
 	-- render carret
 	if t % 16 < 8 then
-		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,8)
+		rectfill((cursorx+2)*4,_getcursory(),(cursorx+2)*4+3,_getcursory()+4,8)
 	end
 end
 

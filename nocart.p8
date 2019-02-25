@@ -37,6 +37,10 @@ function _keydown(key)
 		if (cursorx < 0) then
 			cursorx = 0
 		end
+	elseif key == 'home' then
+		cursorx = 0
+	elseif key == 'end' then
+		cursorx = #linebuffer
 	elseif key == 'left' then
 		cursorx-=1
 		if (cursorx < 0) then

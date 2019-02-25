@@ -49,7 +49,7 @@ bnot = bit.bnot
 shl = bit.lshift
 shr = bit.rshift
 
-local frametime = 1/ pico8.fps
+local frametime = 1 / pico8.fps
 
 local __pico_quads
 local __pico_spritesheet_data
@@ -72,6 +72,8 @@ local video_frames = nil
 local osc
 local host_time = 0
 local retro_mode = false
+local paused = false
+local focus = true
 
 local __audio_channels
 local __sample_rate = 22050
@@ -94,9 +96,6 @@ function lowpass(y0,y1, cutoff)
 	local alpha = dt/(RC+dt)
 	return y0 + (alpha*(y1 - y0))
 end
-
-local paused = false
-local focus = true
 
 function note_to_hz(note)
 	return 440*math.pow(2,(note-33)/12)

@@ -4,11 +4,11 @@ require 'strict'
 local cart = nil
 local cartname = nil
 local love_args = nil
-local __screen
 
 local pico8 = {
 	clip = nil,
 	fps = 30,
+	screen = nil,
 	palette = {
 		{0,0,0,255},
 		{29,43,83,255},
@@ -182,8 +182,8 @@ function love.load(argv)
 
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
-	__screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
-	__screen:setFilter('linear','nearest')
+	pico8.screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
+	pico8.screen:setFilter('linear','nearest')
 
 	local font = love.graphics.newImageFont('font.png', fontchars, 1)
 	love.graphics.setFont(font)
@@ -196,7 +196,7 @@ function love.load(argv)
 	love.graphics.setLineWidth(1)
 
 	love.graphics.origin()
-	love.graphics.setCanvas(__screen)
+	love.graphics.setCanvas(pico8.screen)
 	restore_clip()
 
 	pico8.draw_palette = {}
@@ -1072,9 +1072,9 @@ function flip_screen()
 
 	local screen_w,screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
-		love.graphics.draw(__screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
+		love.graphics.draw(pico8.screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
 	else
-		love.graphics.draw(__screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
+		love.graphics.draw(pico8.screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
 	end
 
 	love.graphics.present()
@@ -1082,18 +1082,18 @@ function flip_screen()
 	if video_frames then
 		local tmp = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
 		love.graphics.setCanvas(tmp)
-		love.graphics.draw(__screen,0,0)
+		love.graphics.draw(pico8.screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
 	end
 	-- get ready for next time
 	love.graphics.setShader(__draw_shader)
-	love.graphics.setCanvas(__screen)
+	love.graphics.setCanvas(pico8.screen)
 	restore_clip()
 	restore_camera()
 end
 
 function love.draw()
-	love.graphics.setCanvas(__screen)
+	love.graphics.setCanvas(pico8.screen)
 	restore_clip()
 	restore_camera()
 
@@ -1266,7 +1266,7 @@ end
 
 function pget(x,y)
 	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
-		local __screen_img = __screen:newImageData()
+		local __screen_img = pico8.screen:newImageData()
 		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
@@ -1643,7 +1643,7 @@ function _load(_cartname)
 	end
 
 	love.graphics.setShader(__draw_shader)
-	love.graphics.setCanvas(__screen)
+	love.graphics.setCanvas(pico8.screen)
 	love.graphics.origin()
 	camera()
 	restore_clip()
@@ -1775,7 +1775,7 @@ function rectfill(x0,y0,x1,y1,col)
 end
 
 function run()
-	love.graphics.setCanvas(__screen)
+	love.graphics.setCanvas(pico8.screen)
 	love.graphics.setShader(__draw_shader)
 	restore_clip()
 	love.graphics.origin()
@@ -1792,7 +1792,7 @@ function run()
 		local result
 		setfenv(f,cart)
 		love.graphics.setShader(__draw_shader)
-		love.graphics.setCanvas(__screen)
+		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
 		restore_clip()
 		ok,result = pcall(f)
@@ -2119,7 +2119,7 @@ function memcpy(dest_addr,source_addr,len)
 	if source_addr + len > 0x8000 or dest_addr + len > 0x8000 then
 		return
 	end
-	local img = __screen:newImageData()
+	local img = pico8.screen:newImageData()
 	for i=0,len-1 do
 		local x = flr(source_addr-0x6000+i)%64*2
 		local y = flr((source_addr-0x6000+i)/64)

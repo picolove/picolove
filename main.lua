@@ -37,6 +37,7 @@ local pico8 = {
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
+	display_palette = {},
 	pal_transparent = {},
 }
 
@@ -58,7 +59,6 @@ local __draw_palette
 local __draw_shader
 local __sprite_shader
 local __text_shader
-local __display_palette
 local __display_shader
 local __accum = 0
 local loaded_code = nil
@@ -200,12 +200,12 @@ function love.load(argv)
 	restore_clip()
 
 	__draw_palette = {}
-	__display_palette = {}
+	pico8.display_palette = {}
 	pico8.pal_transparent = {}
 	for i=1,16 do
 		__draw_palette[i] = i
 		pico8.pal_transparent[i] = i == 1 and 0 or 1
-		__display_palette[i] = pico8.palette[i]
+		pico8.display_palette[i] = pico8.palette[i]
 	end
 
 
@@ -253,7 +253,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return palette[index]/256.0;
 }]])
-	__display_shader:send('palette',shdr_unpack(__display_palette))
+	__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 
 	-- load the cart
 	clip()
@@ -1060,7 +1060,7 @@ end
 
 function flip_screen()
 	love.graphics.setShader(__display_shader)
-	__display_shader:send('palette',shdr_unpack(__display_palette))
+	__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 
@@ -1823,12 +1823,12 @@ function pal(c0,c1,p)
 		if __palette_modified == false then return end
 		for i=1,16 do
 			__draw_palette[i] = i
-			__display_palette[i] = pico8.palette[i]
+			pico8.display_palette[i] = pico8.palette[i]
 		end
 		__draw_shader:send('palette',shdr_unpack(__draw_palette))
 		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
 		__text_shader:send('palette',shdr_unpack(__draw_palette))
-		__display_shader:send('palette',shdr_unpack(__display_palette))
+		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
@@ -1838,8 +1838,8 @@ function pal(c0,c1,p)
 		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
-		__display_palette[c0] = pico8.palette[c1]
-		__display_shader:send('palette',shdr_unpack(__display_palette))
+		pico8.display_palette[c0] = pico8.palette[c1]
+		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
 		c0 = flr(c0)%16

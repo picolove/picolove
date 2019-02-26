@@ -37,6 +37,7 @@ local pico8 = {
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
+	draw_palette = {},
 	display_palette = {},
 	pal_transparent = {},
 }
@@ -55,7 +56,6 @@ local frametime = 1 / pico8.fps
 local __pico_quads
 local __pico_spritesheet_data
 local __pico_spritesheet
-local __draw_palette
 local __draw_shader
 local __sprite_shader
 local __text_shader
@@ -199,11 +199,11 @@ function love.load(argv)
 	love.graphics.setCanvas(__screen)
 	restore_clip()
 
-	__draw_palette = {}
+	pico8.draw_palette = {}
 	pico8.display_palette = {}
 	pico8.pal_transparent = {}
 	for i=1,16 do
-		__draw_palette[i] = i
+		pico8.draw_palette[i] = i
 		pico8.pal_transparent[i] = i == 1 and 0 or 1
 		pico8.display_palette[i] = pico8.palette[i]
 	end
@@ -216,7 +216,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__draw_shader:send('palette',shdr_unpack(__draw_palette))
+	__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 
 	__sprite_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -227,7 +227,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
-	__sprite_shader:send('palette',shdr_unpack(__draw_palette))
+	__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 
 	__text_shader = love.graphics.newShader([[
@@ -242,7 +242,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__text_shader:send('palette',shdr_unpack(__draw_palette))
+	__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 
 	__display_shader = love.graphics.newShader([[
 
@@ -1822,12 +1822,12 @@ function pal(c0,c1,p)
 	if type(c0) ~= 'number' then
 		if __palette_modified == false then return end
 		for i=1,16 do
-			__draw_palette[i] = i
+			pico8.draw_palette[i] = i
 			pico8.display_palette[i] = pico8.palette[i]
 		end
-		__draw_shader:send('palette',shdr_unpack(__draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
-		__text_shader:send('palette',shdr_unpack(__draw_palette))
+		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
@@ -1846,10 +1846,10 @@ function pal(c0,c1,p)
 		c1 = flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
-		__draw_palette[c0] = c1
-		__draw_shader:send('palette',shdr_unpack(__draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(__draw_palette))
-		__text_shader:send('palette',shdr_unpack(__draw_palette))
+		pico8.draw_palette[c0] = c1
+		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
 	end
 end

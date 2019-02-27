@@ -302,10 +302,10 @@ function new_sandbox()
 		circ=circ,
 		circfill=circfill,
 		help=help,
-		dir=ls,
+		dir=api.ls,
 		line=line,
 		load=_load,
-		ls=ls,
+		ls=api.ls,
 		mkdir=mkdir,
 		rect=rect,
 		rectfill=rectfill,
@@ -1654,7 +1654,7 @@ function _load(_cartname)
 	end
 end
 
-function ls()
+function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
 	print('directory: '..currentDirectory, nil, nil, 12)
 	local output = {}

@@ -257,7 +257,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 
 	-- load the cart
-	clip()
+	api.clip()
 	camera()
 	pal()
 	color(6)
@@ -283,7 +283,7 @@ function new_sandbox()
 		_getcursorx=_getcursorx,
 		_getcursory=_getcursory,
 		-- pico8 api functions go here
-		clip=clip,
+		clip=api.clip,
 		pget=pget,
 		pset=pset,
 		sget=sget,
@@ -1247,7 +1247,7 @@ function sfx(n,channel,offset)
 	ch.loop=true
 end
 
-function clip(x,y,w,h)
+function api.clip(x,y,w,h)
 	if type(x) == 'number' then
 		love.graphics.setScissor(x,y,w,h)
 		pico8.clip = {x,y,w,h}

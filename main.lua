@@ -258,7 +258,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	-- load the cart
 	api.clip()
-	camera()
+	api.camera()
 	pal()
 	color(6)
 
@@ -297,8 +297,8 @@ function new_sandbox()
 		cd=cd,
 		cursor=cursor,
 		color=color,
-		cls=cls,
-		camera=camera,
+		cls=api.cls,
+		camera=api.camera,
 		circ=circ,
 		circfill=circfill,
 		help=help,
@@ -1396,7 +1396,7 @@ function color(c)
 	love.graphics.setColor(c*16,0,0,255)
 end
 
-function cls()
+function api.cls()
 	love.graphics.clear(0,0,0,255)
 	pico8.cursor = {0,0}
 end
@@ -1404,7 +1404,7 @@ end
 pico8.camera_x = 0
 pico8.camera_y = 0
 
-function camera(x,y)
+function api.camera(x,y)
 	if type(x) == 'number' then
 		pico8.camera_x = flr(x)
 		pico8.camera_y = flr(y)
@@ -1646,7 +1646,7 @@ function _load(_cartname)
 	love.graphics.setShader(__draw_shader)
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.origin()
-	camera()
+	api.camera()
 	restore_clip()
 	cartname = _cartname
 	if load_p8(currentDirectory.._cartname) then

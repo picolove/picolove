@@ -290,7 +290,7 @@ function new_sandbox()
 		sset=sset,
 		fget=fget,
 		fset=fset,
-		flip=flip,
+		flip=api.flip,
 		folder=folder,
 		print=print,
 		printh=log,
@@ -1338,7 +1338,7 @@ function fset(n,f,v)
 	end
 end
 
-function flip()
+function api.flip()
 	flip_screen()
 	love.timer.sleep(frametime)
 end

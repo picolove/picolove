@@ -291,7 +291,7 @@ function new_sandbox()
 		fget=fget,
 		fset=fset,
 		flip=api.flip,
-		folder=folder,
+		folder=api.folder,
 		print=print,
 		printh=log,
 		cd=cd,
@@ -1343,7 +1343,7 @@ function api.flip()
 	love.timer.sleep(frametime)
 end
 
-function folder()
+function api.folder()
 	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
 end
 

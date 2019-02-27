@@ -306,7 +306,7 @@ function new_sandbox()
 		line=line,
 		load=_load,
 		ls=api.ls,
-		mkdir=mkdir,
+		mkdir=api.mkdir,
 		rect=rect,
 		rectfill=rectfill,
 		run=run,
@@ -1744,7 +1744,7 @@ function api.cd(name)
 	end
 end
 
-function mkdir(name)
+function api.mkdir(name)
 	if name == nil then
 		color(6)
 		print('mkdir [name]')

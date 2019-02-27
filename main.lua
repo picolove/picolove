@@ -84,6 +84,10 @@ local bits = 16
 local currentDirectory = '/'
 local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
+function shdr_unpack(tbl)
+	return unpack(tbl, 1, 17) -- change to 16 once love2d shader bug is fixed
+end
+
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
 	return shr(band(mask,v))
@@ -100,10 +104,6 @@ end
 
 function note_to_hz(note)
 	return 440*math.pow(2,(note-33)/12)
-end
-
-function shdr_unpack(tbl)
-	return unpack(tbl, 1, 17) -- change to 16 once love2d shader bug is fixed
 end
 
 function love.load(argv)

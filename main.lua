@@ -294,7 +294,7 @@ function new_sandbox()
 		folder=api.folder,
 		print=print,
 		printh=log,
-		cd=cd,
+		cd=api.cd,
 		cursor=cursor,
 		color=color,
 		cls=api.cls,
@@ -1699,7 +1699,7 @@ function api.ls()
 	love.keyboard.setTextInput(true)
 end
 
-function cd(name)
+function api.cd(name)
 	local output = ''
 	local newDirectory = currentDirectory..name..'/'
 

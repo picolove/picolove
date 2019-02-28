@@ -29,14 +29,16 @@ function _keydown(key)
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 
-		local startbuffer = linebuffer:sub(1,cursorx-1)
-		local endbuffer = linebuffer:sub(cursorx+1)
-		linebuffer = startbuffer .. endbuffer
-
 		cursorx-=1
+		local delchars = 1
 		if (cursorx < 0) then
 			cursorx = 0
+			delchars = 0
 		end
+
+		local startbuffer = linebuffer:sub(1,cursorx)
+		local endbuffer = linebuffer:sub(cursorx+1+delchars)
+		linebuffer = startbuffer .. endbuffer
 	elseif key == 'delete' then
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)

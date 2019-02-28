@@ -284,7 +284,7 @@ function new_sandbox()
 		_getcursory=_getcursory,
 		-- pico8 api functions go here
 		clip=api.clip,
-		pget=pget,
+		pget=api.pget,
 		pset=api.pset,
 		sget=api.sget,
 		sset=sset,
@@ -1265,7 +1265,7 @@ function restore_clip()
 	end
 end
 
-function pget(x,y)
+function api.pget(x,y)
 	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
 		local __screen_img = pico8.screen:newImageData()
 		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
@@ -2146,8 +2146,8 @@ function peek(addr, val)
 	if addr >= 0x6000 and addr < 0x8000 then
 		local dx = flr(addr-0x6000)%64
 		local dy = flr((addr-0x6000)/64)
-		local low = pget(dx, dy)
-		local high = bit.lshift(pget(dx + 1, dy))
+		local low = api.pget(dx, dy)
+		local high = bit.lshift(api.pget(dx + 1, dy))
 		return bit.band(low, high)
 	end
 end

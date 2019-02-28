@@ -260,7 +260,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.clip()
 	api.camera()
 	pal()
-	color(6)
+	api.color(6)
 
 	_load(argv[2] or 'nocart.p8')
 	run()
@@ -296,7 +296,7 @@ function new_sandbox()
 		printh=log,
 		cd=api.cd,
 		cursor=cursor,
-		color=color,
+		color=api.color,
 		cls=api.cls,
 		camera=api.camera,
 		circ=circ,
@@ -1278,7 +1278,7 @@ end
 
 function api.pset(x,y,c)
 	if not c then return end
-	color(c)
+	api.color(c)
 	love.graphics.point(flr(x),flr(y),c*16,0,0,255)
 end
 
@@ -1356,7 +1356,7 @@ end
 
 log = print
 function print(str,x,y,col)
-	if col then color(col) end
+	if col then api.color(col) end
 	local canscroll = y==nil
 	if y==nil then
 		y = pico8.cursor[2]
@@ -1370,7 +1370,7 @@ function print(str,x,y,col)
 		scroll(6)
 		y = 120
 		rectfill(0,y,127,y+6,0)
-		color(c)
+		api.color(c)
 		cursor(0, y+6)
 	end
 	love.graphics.setShader(__text_shader)
@@ -1389,7 +1389,7 @@ function _getcursory()
 	return pico8.cursor[2]
 end
 
-function color(c)
+function api.color(c)
 	c = c and flr(c) or 0
 	assert(c >= 0 and c <= 16,string.format('c is %s',c))
 	pico8.color = c
@@ -1422,7 +1422,7 @@ end
 
 function circ(ox,oy,r,col)
 	col = col or pico8.color
-	color(col)
+	api.color(col)
 	ox = flr(ox)
 	oy = flr(oy)
 	r = flr(r)
@@ -1469,7 +1469,7 @@ end
 
 function circfill(cx,cy,r,col)
 	col = col or pico8.color
-	color(col)
+	api.color(col)
 	cx = flr(cx)
 	cy = flr(cy)
 	r = flr(r)
@@ -1499,10 +1499,10 @@ end
 
 function help()
 	print('')
-	color(12)
+	api.color(12)
 	print('commands')
 	print('')
-	color(6)
+	api.color(6)
 	print('load <filename>  save <filename>')
 	print('run              resume')
 	print('shutdown         reboot')
@@ -1513,7 +1513,7 @@ function help()
 	print('alt+enter to toggle fullscreen')
 	print('alt+f4 or command+q to fastquit')
 	print('')
-	color(12)
+	api.color(12)
 	print('see readme.md for more info')
 	print('or visit: github.com/picolove')
 	print('')
@@ -1521,7 +1521,7 @@ end
 
 function line(x0,y0,x1,y1,col)
 	col = col or pico8.color
-	color(col)
+	api.color(col)
 
 	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
 		warning('line has NaN value')
@@ -1674,7 +1674,7 @@ function api.ls()
 	local count = 0
 	love.keyboard.setTextInput(false)
 	for i, item in ipairs(output) do
-		color(item.color)
+		api.color(item.color)
 		for j=1,#item.name,32 do
 			print(item.name:sub(j,j+32))
 			flip_screen()
@@ -1685,7 +1685,7 @@ function api.ls()
 				local y = _getcursory() - 6
 				cursor(0, y)
 				rectfill(0, y, 127, y+6, 0)
-				color(item.color)
+				api.color(item.color)
 				while true do
 					local e = love.event.wait()
 					if e == 'keypressed' then
@@ -1734,19 +1734,19 @@ function api.cd(name)
 	end
 
 	if not failed then
-		color(12)
+		api.color(12)
 		for i=1,#output,32 do
 			print(output:sub(i,i+32))
 		end
 	else
-		color(7)
+		api.color(7)
 		print(output)
 	end
 end
 
 function api.mkdir(name)
 	if name == nil then
-		color(6)
+		api.color(6)
 		print('mkdir [name]')
 	else
 		love.filesystem.createDirectory(currentDirectory..name)
@@ -1755,13 +1755,13 @@ end
 
 function rect(x0,y0,x1,y1,col)
 	col = col or pico8.color
-	color(col)
+	api.color(col)
 	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function rectfill(x0,y0,x1,y1,col)
 	col = col or pico8.color
-	color(col)
+	api.color(col)
 	local w = (x1-x0)+1
 	local h = (y1-y0)+1
 	if w < 0 then

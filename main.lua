@@ -285,7 +285,7 @@ function new_sandbox()
 		-- pico8 api functions go here
 		clip=api.clip,
 		pget=pget,
-		pset=pset,
+		pset=api.pset,
 		sget=sget,
 		sset=sset,
 		fget=fget,
@@ -1276,7 +1276,7 @@ function pget(x,y)
 	end
 end
 
-function pset(x,y,c)
+function api.pset(x,y,c)
 	if not c then return end
 	color(c)
 	love.graphics.point(flr(x),flr(y),c*16,0,0,255)
@@ -2103,8 +2103,8 @@ function memset(dest_addr,val,len)
 			local dy = flr((dest_addr-0x6000+i)/64)
 			local low = val
 			local high = bit.lshift(val,4)
-			pset(dx,dy,high)
-			pset(dx+1,dy,low)
+			api.pset(dx,dy,high)
+			api.pset(dx+1,dy,low)
 		end
 	end
 end
@@ -2136,8 +2136,8 @@ function memcpy(dest_addr,source_addr,len)
 
 		local dx = flr(dest_addr-0x6000+i)%64*2
 		local dy = flr((dest_addr-0x6000+i)/64)
-		pset(dx,dy,c)
-		pset(dx+1,dy,d)
+		api.pset(dx,dy,c)
+		api.pset(dx+1,dy,d)
 	end
 end
 
@@ -2157,8 +2157,8 @@ function poke(addr, val)
 	if addr >= 0x6000 and addr < 0x8000 then
 		local dx = flr(addr-0x6000)%64*2
 		local dy = flr((addr-0x6000)/64)
-		pset(dx, dy, bit.band(val, 15))
-		pset(dx + 1, dy, bit.rshift(val, 4))
+		api.pset(dx, dy, bit.band(val, 15))
+		api.pset(dx + 1, dy, bit.rshift(val, 4))
 	end
 end
 

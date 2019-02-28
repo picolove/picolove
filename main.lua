@@ -286,7 +286,7 @@ function new_sandbox()
 		clip=api.clip,
 		pget=pget,
 		pset=api.pset,
-		sget=sget,
+		sget=api.sget,
 		sset=sset,
 		fget=fget,
 		fset=fset,
@@ -1282,7 +1282,7 @@ function api.pset(x,y,c)
 	love.graphics.point(flr(x),flr(y),c*16,0,0,255)
 end
 
-function sget(x,y)
+function api.sget(x,y)
 	-- return the color from the spritesheet
 	x = flr(x)
 	y = flr(y)

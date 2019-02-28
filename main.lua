@@ -295,7 +295,7 @@ function new_sandbox()
 		print=print,
 		printh=log,
 		cd=api.cd,
-		cursor=cursor,
+		cursor=api.cursor,
 		color=api.color,
 		cls=api.cls,
 		camera=api.camera,
@@ -1371,13 +1371,13 @@ function print(str,x,y,col)
 		y = 120
 		rectfill(0,y,127,y+6,0)
 		api.color(c)
-		cursor(0, y+6)
+		api.cursor(0, y+6)
 	end
 	love.graphics.setShader(__text_shader)
 	love.graphics.print(str,flr(x),flr(y))
 end
 
-function cursor(x,y)
+function api.cursor(x,y)
 	pico8.cursor = {x,y}
 end
 
@@ -1683,7 +1683,7 @@ function api.ls()
 				print('--more--', nil, nil, 12)
 				flip_screen()
 				local y = _getcursory() - 6
-				cursor(0, y)
+				api.cursor(0, y)
 				rectfill(0, y, 127, y+6, 0)
 				api.color(item.color)
 				while true do

@@ -300,7 +300,7 @@ function new_sandbox()
 		cls=api.cls,
 		camera=api.camera,
 		circ=api.circ,
-		circfill=circfill,
+		circfill=api.circfill,
 		help=help,
 		dir=api.ls,
 		line=line,
@@ -1467,7 +1467,7 @@ function _horizontal_line(points,x0,y,x1)
 	end
 end
 
-function circfill(cx,cy,r,col)
+function api.circfill(cx,cy,r,col)
 	col = col or pico8.color
 	api.color(col)
 	cx = flr(cx)

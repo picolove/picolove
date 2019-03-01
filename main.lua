@@ -326,7 +326,7 @@ function new_sandbox()
 		sfx=sfx,
 		music=music,
 		mget=api.mget,
-		mset=mset,
+		mset=api.mset,
 		map=api.map,
 		memcpy=memcpy,
 		memset=memset,
@@ -2056,7 +2056,7 @@ function api.mget(x,y)
 	return pico8.map[flr(y)][flr(x)]
 end
 
-function mset(x,y,v)
+function api.mset(x,y,v)
 	if x >= 0 and x < 128 and y >= 0 and y < 64 then
 		pico8.map[flr(y)][flr(x)] = v
 	end

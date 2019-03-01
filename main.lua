@@ -308,7 +308,7 @@ function new_sandbox()
 		ls=api.ls,
 		mkdir=api.mkdir,
 		rect=api.rect,
-		rectfill=rectfill,
+		rectfill=api.rectfill,
 		run=run,
 		reload=reload,
 		reboot=reboot,
@@ -1369,7 +1369,7 @@ function print(str,x,y,col)
 		local c = col or pico8.color
 		scroll(6)
 		y = 120
-		rectfill(0,y,127,y+6,0)
+		api.rectfill(0,y,127,y+6,0)
 		api.color(c)
 		api.cursor(0, y+6)
 	end
@@ -1684,7 +1684,7 @@ function api.ls()
 				flip_screen()
 				local y = _getcursory() - 6
 				api.cursor(0, y)
-				rectfill(0, y, 127, y+6, 0)
+				api.rectfill(0, y, 127, y+6, 0)
 				api.color(item.color)
 				while true do
 					local e = love.event.wait()
@@ -1759,7 +1759,7 @@ function api.rect(x0,y0,x1,y1,col)
 	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
-function rectfill(x0,y0,x1,y1,col)
+function api.rectfill(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)
 	local w = (x1-x0)+1

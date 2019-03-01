@@ -313,7 +313,7 @@ function new_sandbox()
 		reload=reload,
 		reboot=reboot,
 		pal=api.pal,
-		palt=palt,
+		palt=api.palt,
 		spr=api.spr,
 		sspr=api.sspr,
 		add=add,
@@ -1833,7 +1833,7 @@ function api.pal(c0,c1,p)
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
-		palt()
+		api.palt()
 	elseif p == 1 and c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16
@@ -1855,7 +1855,7 @@ function api.pal(c0,c1,p)
 	end
 end
 
-function palt(c,t)
+function api.palt(c,t)
 	if type(c) ~= 'number' then
 		for i=1,16 do
 			pico8.pal_transparent[i] = i == 1 and 0 or 1

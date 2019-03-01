@@ -259,7 +259,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	-- load the cart
 	api.clip()
 	api.camera()
-	pal()
+	api.pal()
 	api.color(6)
 
 	_load(argv[2] or 'nocart.p8')
@@ -312,7 +312,7 @@ function new_sandbox()
 		run=run,
 		reload=reload,
 		reboot=reboot,
-		pal=pal,
+		pal=api.pal,
 		palt=palt,
 		spr=api.spr,
 		sspr=api.sspr,
@@ -1819,7 +1819,7 @@ end
 
 local __palette_modified = true
 
-function pal(c0,c1,p)
+function api.pal(c0,c1,p)
 	if type(c0) ~= 'number' then
 		if __palette_modified == false then return end
 		for i=1,16 do

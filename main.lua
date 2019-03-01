@@ -307,7 +307,7 @@ function new_sandbox()
 		load=_load,
 		ls=api.ls,
 		mkdir=api.mkdir,
-		rect=rect,
+		rect=api.rect,
 		rectfill=rectfill,
 		run=run,
 		reload=reload,
@@ -1753,7 +1753,7 @@ function api.mkdir(name)
 	end
 end
 
-function rect(x0,y0,x1,y1,col)
+function api.rect(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)
 	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))

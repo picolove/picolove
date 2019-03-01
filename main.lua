@@ -2002,7 +2002,7 @@ __keymap = {
 function btn(i,p)
 	if type(i) == 'number' then
 		p = p or 0
-		if __keymap[p][i] then
+		if __keymap[p] and __keymap[p][i] then
 			return __pico_keypressed[p][i] ~= nil
 		end
 		return false

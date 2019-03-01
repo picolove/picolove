@@ -303,7 +303,7 @@ function new_sandbox()
 		circfill=api.circfill,
 		help=help,
 		dir=api.ls,
-		line=line,
+		line=api.line,
 		load=_load,
 		ls=api.ls,
 		mkdir=api.mkdir,
@@ -1519,7 +1519,7 @@ function help()
 	print('')
 end
 
-function line(x0,y0,x1,y1,col)
+function api.line(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)
 

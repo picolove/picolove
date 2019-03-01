@@ -315,7 +315,7 @@ function new_sandbox()
 		pal=pal,
 		palt=palt,
 		spr=api.spr,
-		sspr=sspr,
+		sspr=api.sspr,
 		add=add,
 		del=del,
 		foreach=foreach,
@@ -1906,7 +1906,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__draw_shader)
 end
 
-function sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
+function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 -- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
 -- and draw in rectangle (dx, dy, dw, dh)
 -- Colour 0 drawn as transparent by default (see palt())

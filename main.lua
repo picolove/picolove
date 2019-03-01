@@ -299,7 +299,7 @@ function new_sandbox()
 		color=api.color,
 		cls=api.cls,
 		camera=api.camera,
-		circ=circ,
+		circ=api.circ,
 		circfill=circfill,
 		help=help,
 		dir=api.ls,
@@ -1420,7 +1420,7 @@ function restore_camera()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
-function circ(ox,oy,r,col)
+function api.circ(ox,oy,r,col)
 	col = col or pico8.color
 	api.color(col)
 	ox = flr(ox)

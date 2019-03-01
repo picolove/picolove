@@ -314,7 +314,7 @@ function new_sandbox()
 		reboot=reboot,
 		pal=pal,
 		palt=palt,
-		spr=spr,
+		spr=api.spr,
 		sspr=sspr,
 		add=add,
 		del=del,
@@ -1871,7 +1871,7 @@ function palt(c,t)
 	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 end
 
-function spr(n,x,y,w,h,flip_x,flip_y)
+function api.spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))

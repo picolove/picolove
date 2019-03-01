@@ -327,7 +327,7 @@ function new_sandbox()
 		music=music,
 		mget=mget,
 		mset=mset,
-		map=map,
+		map=api.map,
 		memcpy=memcpy,
 		memset=memset,
 		peek=peek,
@@ -356,7 +356,7 @@ function new_sandbox()
 		stat=stat,
 		time=function() return host_time end,
 		-- deprecated pico-8 function aliases
-		mapdraw=map
+		mapdraw=api.map
 	}
 end
 
@@ -2062,7 +2062,7 @@ function mset(x,y,v)
 	end
 end
 
-function map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
+function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_x = cel_x or 0
 	cel_y = cel_y or 0
 	love.graphics.setShader(__sprite_shader)

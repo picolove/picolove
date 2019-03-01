@@ -325,7 +325,7 @@ function new_sandbox()
 		btnp=btnp,
 		sfx=sfx,
 		music=music,
-		mget=mget,
+		mget=api.mget,
 		mset=mset,
 		map=api.map,
 		memcpy=memcpy,
@@ -2050,7 +2050,7 @@ function btnp(i,p)
 	end
 end
 
-function mget(x,y)
+function api.mget(x,y)
 	if x == nil or y == nil then return 0 end
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
 	return pico8.map[flr(y)][flr(x)]

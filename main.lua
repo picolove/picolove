@@ -46,7 +46,7 @@ local pico8 = {
 local bit = require('bit')
 
 api.band = bit.band
-bor = bit.bor
+api.bor = bit.bor
 bxor = bit.bxor
 bnot = bit.bnot
 shl = bit.lshift
@@ -345,7 +345,7 @@ function new_sandbox()
 		srand=srand,
 		sgn=sgn,
 		band=api.band,
-		bor=bor,
+		bor=api.bor,
 		bxor=bxor,
 		bnot=bnot,
 		shl=shl,
@@ -621,7 +621,7 @@ function load_p8(filename)
 					-- get the two pixel values and merge them
 					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
 					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
-					local v = bor(shl(hi,4),lo)
+					local v = api.bor(shl(hi,4),lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
 					tx = tx + 1
@@ -1328,7 +1328,7 @@ function api.fset(n,f,v)
 	if f then
 		-- set specific bit to v (true or false)
 		if f then
-			pico8.spriteflags[n] = bor(pico8.spriteflags[n],shl(1,f))
+			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],shl(1,f))
 		else
 			pico8.spriteflags[n] = api.band(bnot(pico8.spriteflags[n],shl(1,f)))
 		end

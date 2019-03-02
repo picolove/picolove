@@ -331,7 +331,7 @@ function new_sandbox()
 		memcpy=memcpy,
 		memset=memset,
 		peek=api.peek,
-		poke=poke,
+		poke=api.poke,
 		max=max,
 		min=min,
 		mid=mid,
@@ -2156,7 +2156,7 @@ function api.peek(addr, val)
 	end
 end
 
-function poke(addr, val)
+function api.poke(addr, val)
 	-- TODO: implement for non screen space
 	if addr >= 0x6000 and addr < 0x8000 then
 		local dx = flr(addr-0x6000)%64*2

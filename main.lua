@@ -328,7 +328,7 @@ function new_sandbox()
 		mget=api.mget,
 		mset=api.mset,
 		map=api.map,
-		memcpy=memcpy,
+		memcpy=api.memcpy,
 		memset=memset,
 		peek=api.peek,
 		poke=api.poke,
@@ -1351,7 +1351,7 @@ function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
 	local basehigh = 0x8000
-	memcpy(base, delta, basehigh-delta)
+	api.memcpy(base, delta, basehigh-delta)
 end
 
 log = print
@@ -2113,7 +2113,7 @@ function memset(dest_addr,val,len)
 	end
 end
 
-function memcpy(dest_addr,source_addr,len)
+function api.memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
 	if len <= 0 then
 		return

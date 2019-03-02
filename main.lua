@@ -332,7 +332,7 @@ function new_sandbox()
 		memset=api.memset,
 		peek=api.peek,
 		poke=api.poke,
-		max=max,
+		max=api.max,
 		min=api.min,
 		mid=mid,
 		flr=flr,
@@ -2174,7 +2174,7 @@ function api.min(a,b)
 	return a < b and a or b
 end
 
-function max(a,b)
+function api.max(a,b)
 	if a == nil or b == nil then
 		warning('max a or b are nil returning 0')
 		return 0
@@ -2185,14 +2185,14 @@ end
 function mid(x,y,z)
 	x, y, z = x or 0, y or 0, z or 0
 	if x > y then x, y = y, x end
-	return max(x, api.min(y, z))
+	return api.max(x, api.min(y, z))
 end
 
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)
 
-assert(max(1, 2) == 2)
-assert(max(2, 1) == 2)
+assert(api.max(1, 2) == 2)
+assert(api.max(2, 1) == 2)
 
 assert(mid(1, 2, 3) == 2)
 assert(mid(1, 3, 2) == 2)

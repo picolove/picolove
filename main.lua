@@ -334,7 +334,7 @@ function new_sandbox()
 		poke=api.poke,
 		max=api.max,
 		min=api.min,
-		mid=mid,
+		mid=api.mid,
 		flr=flr,
 		cos=cos,
 		sin=sin,
@@ -2182,7 +2182,7 @@ function api.max(a,b)
 	return a > b and a or b
 end
 
-function mid(x,y,z)
+function api.mid(x,y,z)
 	x, y, z = x or 0, y or 0, z or 0
 	if x > y then x, y = y, x end
 	return api.max(x, api.min(y, z))
@@ -2194,12 +2194,12 @@ assert(api.min(2, 1) == 1)
 assert(api.max(1, 2) == 2)
 assert(api.max(2, 1) == 2)
 
-assert(mid(1, 2, 3) == 2)
-assert(mid(1, 3, 2) == 2)
-assert(mid(2, 1, 3) == 2)
-assert(mid(2, 3, 1) == 2)
-assert(mid(3, 1, 2) == 2)
-assert(mid(3, 2, 1) == 2)
+assert(api.mid(1, 2, 3) == 2)
+assert(api.mid(1, 3, 2) == 2)
+assert(api.mid(2, 1, 3) == 2)
+assert(api.mid(2, 3, 1) == 2)
+assert(api.mid(3, 1, 2) == 2)
+assert(api.mid(3, 2, 1) == 2)
 
 flr = math.floor
 ceil = math.ceil

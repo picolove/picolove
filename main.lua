@@ -289,7 +289,7 @@ function new_sandbox()
 		sget=api.sget,
 		sset=api.sset,
 		fget=api.fget,
-		fset=fset,
+		fset=api.fset,
 		flip=api.flip,
 		folder=api.folder,
 		print=print,
@@ -1318,7 +1318,7 @@ assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
 assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
 assert(bit.band(0x05,bit.lshift(1,3)) == 0)
 
-function fset(n,f,v)
+function api.fset(n,f,v)
 	-- fset n [f] v
 	-- f is the flag index 0..7
 	-- v is boolean

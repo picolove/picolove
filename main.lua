@@ -2040,14 +2040,14 @@ function btnp(i,p)
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
-		for i=0,5 do
+		for i=0,7 do
 			if __pico_keypressed[0][i] then
 				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
-		for i=6,13 do
+		for i=0,7 do
 			if __pico_keypressed[1][i] then
-				bitfield = bitfield + bit.lshift(1,i)
+				bitfield = bitfield + bit.lshift(1,i+8)
 			end
 		end
 		return bitfield

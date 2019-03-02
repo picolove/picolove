@@ -310,7 +310,7 @@ function new_sandbox()
 		rect=api.rect,
 		rectfill=api.rectfill,
 		run=run,
-		reload=reload,
+		reload=api.reload,
 		reboot=reboot,
 		pal=api.pal,
 		palt=api.palt,
@@ -1109,7 +1109,7 @@ end
 
 function love.keypressed(key)
 	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
-		reload()
+		api.reload()
 		run()
 	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		love.event.quit()
@@ -1812,7 +1812,7 @@ function reboot()
 	run()
 end
 
-function reload(dest_addr,source_addr,len)
+function api.reload(dest_addr,source_addr,len)
 	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
 	_load(cartname)
 end

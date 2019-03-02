@@ -45,7 +45,7 @@ local pico8 = {
 
 local bit = require('bit')
 
-band = bit.band
+api.band = bit.band
 bor = bit.bor
 bxor = bit.bxor
 bnot = bit.bnot
@@ -90,7 +90,7 @@ end
 
 function get_bits(v,s,e)
 	local mask = shl(shl(1,s)-1,e)
-	return shr(band(mask,v))
+	return shr(api.band(mask,v))
 end
 
 local QueueableSource = require 'QueueableSource'
@@ -344,7 +344,7 @@ function new_sandbox()
 		rnd=rnd,
 		srand=srand,
 		sgn=sgn,
-		band=band,
+		band=api.band,
 		bor=bor,
 		bxor=bxor,
 		bnot=bnot,
@@ -1305,7 +1305,7 @@ function api.fget(n,f)
 			warning(string.format('fget(%d,%d)',n,f))
 			return 0
 		end
-		return band(pico8.spriteflags[flr(n)],shl(1,flr(f))) ~= 0
+		return api.band(pico8.spriteflags[flr(n)],shl(1,flr(f))) ~= 0
 	end
 	return pico8.spriteflags[flr(n)]
 end
@@ -1330,7 +1330,7 @@ function api.fset(n,f,v)
 		if f then
 			pico8.spriteflags[n] = bor(pico8.spriteflags[n],shl(1,f))
 		else
-			pico8.spriteflags[n] = band(bnot(pico8.spriteflags[n],shl(1,f)))
+			pico8.spriteflags[n] = api.band(bnot(pico8.spriteflags[n],shl(1,f)))
 		end
 	else
 		-- set bitfield to v (number)
@@ -2086,7 +2086,7 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
 						else
-							if band(pico8.spriteflags[v],bitmask) ~= 0 then
+							if api.band(pico8.spriteflags[v],bitmask) ~= 0 then
 								love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
 							else
 							end

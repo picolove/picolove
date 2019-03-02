@@ -323,7 +323,7 @@ function new_sandbox()
 		all=all,
 		btn=btn,
 		btnp=btnp,
-		sfx=sfx,
+		sfx=api.sfx,
 		music=api.music,
 		mget=api.mget,
 		mset=api.mset,
@@ -1220,7 +1220,7 @@ function love.textinput(text)
 	end
 end
 
-function sfx(n,channel,offset)
+function api.sfx(n,channel,offset)
 	-- n = -1 stop sound on channel
 	-- n = -2 to stop looping on channel
 	channel = channel or -1

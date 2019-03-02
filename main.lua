@@ -288,7 +288,7 @@ function new_sandbox()
 		pset=api.pset,
 		sget=api.sget,
 		sset=api.sset,
-		fget=fget,
+		fget=api.fget,
 		fset=fset,
 		flip=api.flip,
 		folder=api.folder,
@@ -1297,7 +1297,7 @@ function api.sset(x,y,c)
 	__pico_spritesheet:refresh()
 end
 
-function fget(n,f)
+function api.fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean

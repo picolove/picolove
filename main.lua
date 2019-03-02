@@ -329,7 +329,7 @@ function new_sandbox()
 		mset=api.mset,
 		map=api.map,
 		memcpy=api.memcpy,
-		memset=memset,
+		memset=api.memset,
 		peek=api.peek,
 		poke=api.poke,
 		max=max,
@@ -2099,7 +2099,7 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	love.graphics.setShader(__draw_shader)
 end
 
-function memset(dest_addr,val,len)
+function api.memset(dest_addr,val,len)
 	-- only for range 0x6000+0x8000
 	if dest_addr >= 0x6000 then
 		for i=0,len-1 do

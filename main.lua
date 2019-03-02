@@ -49,7 +49,7 @@ api.band = bit.band
 api.bor = bit.bor
 api.bxor = bit.bxor
 api.bnot = bit.bnot
-shl = bit.lshift
+api.shl = bit.lshift
 shr = bit.rshift
 
 local frametime = 1 / pico8.fps
@@ -89,7 +89,7 @@ function shdr_unpack(tbl)
 end
 
 function get_bits(v,s,e)
-	local mask = shl(shl(1,s)-1,e)
+	local mask = api.shl(api.shl(1,s)-1,e)
 	return shr(api.band(mask,v))
 end
 
@@ -348,7 +348,7 @@ function new_sandbox()
 		bor=api.bor,
 		bxor=api.bxor,
 		bnot=api.bnot,
-		shl=shl,
+		shl=api.shl,
 		shr=shr,
 		exit=shutdown,
 		shutdown=shutdown,
@@ -621,7 +621,7 @@ function load_p8(filename)
 					-- get the two pixel values and merge them
 					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
 					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
-					local v = api.bor(shl(hi,4),lo)
+					local v = api.bor(api.shl(hi,4),lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
 					tx = tx + 1
@@ -1305,7 +1305,7 @@ function api.fget(n,f)
 			warning(string.format('fget(%d,%d)',n,f))
 			return 0
 		end
-		return api.band(pico8.spriteflags[flr(n)],shl(1,flr(f))) ~= 0
+		return api.band(pico8.spriteflags[flr(n)],api.shl(1,flr(f))) ~= 0
 	end
 	return pico8.spriteflags[flr(n)]
 end
@@ -1328,9 +1328,9 @@ function api.fset(n,f,v)
 	if f then
 		-- set specific bit to v (true or false)
 		if f then
-			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],shl(1,f))
+			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],api.shl(1,f))
 		else
-			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],shl(1,f)))
+			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],api.shl(1,f)))
 		end
 	else
 		-- set bitfield to v (number)

@@ -287,7 +287,7 @@ function new_sandbox()
 		pget=api.pget,
 		pset=api.pset,
 		sget=api.sget,
-		sset=sset,
+		sset=api.sset,
 		fget=fget,
 		fset=fset,
 		flip=api.flip,
@@ -1290,7 +1290,7 @@ function api.sget(x,y)
 	return flr(r/16)
 end
 
-function sset(x,y,c)
+function api.sset(x,y,c)
 	x = flr(x)
 	y = flr(y)
 	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)

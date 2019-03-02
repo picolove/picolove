@@ -337,7 +337,7 @@ function new_sandbox()
 		mid=api.mid,
 		flr=flr,
 		cos=api.cos,
-		sin=sin,
+		sin=api.sin,
 		atan2=atan2,
 		sqrt=sqrt,
 		abs=abs,
@@ -2204,7 +2204,7 @@ assert(api.mid(3, 2, 1) == 2)
 flr = math.floor
 ceil = math.ceil
 function api.cos(x) return math.cos((x or 0)*(math.pi*2)) end
-function sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
+function api.sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
 function atan2(x,y) return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0 end
 
 assert(atan2(1, 0) == 0)

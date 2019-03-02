@@ -324,7 +324,7 @@ function new_sandbox()
 		btn=btn,
 		btnp=btnp,
 		sfx=sfx,
-		music=music,
+		music=api.music,
 		mget=api.mget,
 		mset=api.mset,
 		map=api.map,
@@ -950,7 +950,7 @@ function update_audio(time)
 					next_track = next_track + 1
 				end
 				if next_track then
-					music(next_track)
+					api.music(next_track)
 				end
 			end
 		end
@@ -1167,7 +1167,7 @@ function love.keyreleased(key)
 	end
 end
 
-function music(n,fade_len,channel_mask)
+function api.music(n,fade_len,channel_mask)
 	if n == -1 then
 		for i=0,3 do
 			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then

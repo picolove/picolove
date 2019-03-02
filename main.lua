@@ -48,7 +48,7 @@ local bit = require('bit')
 api.band = bit.band
 api.bor = bit.bor
 api.bxor = bit.bxor
-bnot = bit.bnot
+api.bnot = bit.bnot
 shl = bit.lshift
 shr = bit.rshift
 
@@ -347,7 +347,7 @@ function new_sandbox()
 		band=api.band,
 		bor=api.bor,
 		bxor=api.bxor,
-		bnot=bnot,
+		bnot=api.bnot,
 		shl=shl,
 		shr=shr,
 		exit=shutdown,
@@ -1330,7 +1330,7 @@ function api.fset(n,f,v)
 		if f then
 			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],shl(1,f))
 		else
-			pico8.spriteflags[n] = api.band(bnot(pico8.spriteflags[n],shl(1,f)))
+			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],shl(1,f)))
 		end
 	else
 		-- set bitfield to v (number)

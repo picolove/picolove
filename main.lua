@@ -47,7 +47,7 @@ local bit = require('bit')
 
 api.band = bit.band
 api.bor = bit.bor
-bxor = bit.bxor
+api.bxor = bit.bxor
 bnot = bit.bnot
 shl = bit.lshift
 shr = bit.rshift
@@ -346,7 +346,7 @@ function new_sandbox()
 		sgn=sgn,
 		band=api.band,
 		bor=api.bor,
-		bxor=bxor,
+		bxor=api.bxor,
 		bnot=bnot,
 		shl=shl,
 		shr=shr,

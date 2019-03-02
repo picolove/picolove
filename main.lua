@@ -333,7 +333,7 @@ function new_sandbox()
 		peek=api.peek,
 		poke=api.poke,
 		max=max,
-		min=min,
+		min=api.min,
 		mid=mid,
 		flr=flr,
 		cos=cos,
@@ -2166,7 +2166,7 @@ function api.poke(addr, val)
 	end
 end
 
-function min(a,b)
+function api.min(a,b)
 	if a == nil or b == nil then
 		warning('min a or b are nil returning 0')
 		return 0
@@ -2185,11 +2185,11 @@ end
 function mid(x,y,z)
 	x, y, z = x or 0, y or 0, z or 0
 	if x > y then x, y = y, x end
-	return max(x, min(y, z))
+	return max(x, api.min(y, z))
 end
 
-assert(min(1, 2) == 1)
-assert(min(2, 1) == 1)
+assert(api.min(1, 2) == 1)
+assert(api.min(2, 1) == 1)
 
 assert(max(1, 2) == 2)
 assert(max(2, 1) == 2)

@@ -50,7 +50,7 @@ api.bor = bit.bor
 api.bxor = bit.bxor
 api.bnot = bit.bnot
 api.shl = bit.lshift
-shr = bit.rshift
+api.shr = bit.rshift
 
 local frametime = 1 / pico8.fps
 
@@ -90,7 +90,7 @@ end
 
 function get_bits(v,s,e)
 	local mask = api.shl(api.shl(1,s)-1,e)
-	return shr(api.band(mask,v))
+	return api.shr(api.band(mask,v))
 end
 
 local QueueableSource = require 'QueueableSource'
@@ -349,7 +349,7 @@ function new_sandbox()
 		bxor=api.bxor,
 		bnot=api.bnot,
 		shl=api.shl,
-		shr=shr,
+		shr=api.shr,
 		exit=shutdown,
 		shutdown=shutdown,
 		sub=sub,

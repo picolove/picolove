@@ -350,8 +350,8 @@ function new_sandbox()
 		bnot=api.bnot,
 		shl=api.shl,
 		shr=api.shr,
-		exit=shutdown,
-		shutdown=shutdown,
+		exit=api.shutdown,
+		shutdown=api.shutdown,
 		sub=api.sub,
 		stat=api.stat,
 		time=function() return host_time end,
@@ -2229,7 +2229,7 @@ end
 
 api.sub = string.sub
 
-function shutdown()
+function api.shutdown()
 	love.event.quit()
 end
 

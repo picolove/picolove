@@ -339,7 +339,7 @@ function new_sandbox()
 		cos=api.cos,
 		sin=api.sin,
 		atan2=api.atan2,
-		sqrt=sqrt,
+		sqrt=api.sqrt,
 		abs=abs,
 		rnd=rnd,
 		srand=srand,
@@ -2212,7 +2212,7 @@ assert(api.atan2(0,-1) == 0.25)
 assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
-sqrt = math.sqrt
+api.sqrt = math.sqrt
 abs = math.abs
 function rnd(x) return love.math.random()*(x or 1) end
 function srand(seed)

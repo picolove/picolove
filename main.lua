@@ -341,7 +341,7 @@ function new_sandbox()
 		atan2=api.atan2,
 		sqrt=api.sqrt,
 		abs=abs,
-		rnd=rnd,
+		rnd=api.rnd,
 		srand=srand,
 		sgn=sgn,
 		band=api.band,
@@ -2214,7 +2214,7 @@ assert(api.atan2(0, 1) == 0.75)
 
 api.sqrt = math.sqrt
 abs = math.abs
-function rnd(x) return love.math.random()*(x or 1) end
+function api.rnd(x) return love.math.random()*(x or 1) end
 function srand(seed)
 	if seed == 0 then seed = 1 end
 	return love.math.setRandomSeed(api.flr(seed*32768))

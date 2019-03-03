@@ -263,7 +263,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.color(6)
 
 	_load(argv[2] or 'nocart.p8')
-	run()
+	api.run()
 end
 
 function new_sandbox()
@@ -309,7 +309,7 @@ function new_sandbox()
 		mkdir=api.mkdir,
 		rect=api.rect,
 		rectfill=api.rectfill,
-		run=run,
+		run=api.run,
 		reload=api.reload,
 		reboot=api.reboot,
 		pal=api.pal,
@@ -1110,7 +1110,7 @@ end
 function love.keypressed(key)
 	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		api.reload()
-		run()
+		api.run()
 	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		love.event.quit()
 	elseif key == 'pause' then
@@ -1775,7 +1775,7 @@ function api.rectfill(x0,y0,x1,y1,col)
 	love.graphics.rectangle('fill',flr(x0),flr(y0),w,h)
 end
 
-function run()
+function api.run()
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.setShader(__draw_shader)
 	restore_clip()
@@ -1809,7 +1809,7 @@ end
 
 function api.reboot()
 	_load('nocart.p8')
-	run()
+	api.run()
 end
 
 function api.reload(dest_addr,source_addr,len)

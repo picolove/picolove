@@ -320,7 +320,7 @@ function new_sandbox()
 		del=del,
 		foreach=foreach,
 		count=count,
-		all=all,
+		all=api.all,
 		btn=btn,
 		btnp=btnp,
 		sfx=api.sfx,
@@ -1966,7 +1966,7 @@ function count(a)
 	return #a
 end
 
-function all(a)
+function api.all(a)
 	local i = 0
 	local n = table.getn(a)
 	return function()

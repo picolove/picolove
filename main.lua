@@ -353,7 +353,7 @@ function new_sandbox()
 		exit=shutdown,
 		shutdown=shutdown,
 		sub=api.sub,
-		stat=stat,
+		stat=api.stat,
 		time=function() return host_time end,
 		-- deprecated pico-8 function aliases
 		mapdraw=api.map
@@ -2233,7 +2233,7 @@ function shutdown()
 	love.event.quit()
 end
 
-function stat(x)
+function api.stat(x)
 	return 0
 end
 

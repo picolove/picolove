@@ -343,7 +343,7 @@ function new_sandbox()
 		abs=abs,
 		rnd=api.rnd,
 		srand=api.srand,
-		sgn=sgn,
+		sgn=api.sgn,
 		band=api.band,
 		bor=api.bor,
 		bxor=api.bxor,
@@ -2219,7 +2219,7 @@ function api.srand(seed)
 	if seed == 0 then seed = 1 end
 	return love.math.setRandomSeed(api.flr(seed*32768))
 end
-function sgn(x)
+function api.sgn(x)
 	if x < 0 then
 		return -1
 	else

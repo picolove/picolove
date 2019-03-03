@@ -317,7 +317,7 @@ function new_sandbox()
 		spr=api.spr,
 		sspr=api.sspr,
 		add=api.add,
-		del=del,
+		del=api.del,
 		foreach=api.foreach,
 		count=api.count,
 		all=api.all,
@@ -1936,7 +1936,7 @@ function api.add(a,v)
 	table.insert(a,v)
 end
 
-function del(a,dv)
+function api.del(a,dv)
 	if a == nil then
 		warning('del from nil')
 		return

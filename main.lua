@@ -292,7 +292,7 @@ function new_sandbox()
 		fset=api.fset,
 		flip=api.flip,
 		folder=api.folder,
-		print=print,
+		print=api.print,
 		printh=log,
 		cd=api.cd,
 		cursor=api.cursor,
@@ -1355,7 +1355,7 @@ function scroll(pixels)
 end
 
 log = print
-function print(str,x,y,col)
+function api.print(str,x,y,col)
 	if col then api.color(col) end
 	local canscroll = y==nil
 	if y==nil then
@@ -1498,25 +1498,25 @@ function api.circfill(cx,cy,r,col)
 end
 
 function help()
-	print('')
+	api.print('')
 	api.color(12)
-	print('commands')
-	print('')
+	api.print('commands')
+	api.print('')
 	api.color(6)
-	print('load <filename>  save <filename>')
-	print('run              resume')
-	print('shutdown         reboot')
-	print('install_demos    dir')
-	print('cd <dirname>     mkdir <dirname>')
-	print('cd ..   go up a directory')
-	print('')
-	print('alt+enter to toggle fullscreen')
-	print('alt+f4 or command+q to fastquit')
-	print('')
+	api.print('load <filename>  save <filename>')
+	api.print('run              resume')
+	api.print('shutdown         reboot')
+	api.print('install_demos    dir')
+	api.print('cd <dirname>     mkdir <dirname>')
+	api.print('cd ..   go up a directory')
+	api.print('')
+	api.print('alt+enter to toggle fullscreen')
+	api.print('alt+f4 or command+q to fastquit')
+	api.print('')
 	api.color(12)
-	print('see readme.md for more info')
-	print('or visit: github.com/picolove')
-	print('')
+	api.print('see readme.md for more info')
+	api.print('or visit: github.com/picolove')
+	api.print('')
 end
 
 function api.line(x0,y0,x1,y1,col)
@@ -1599,16 +1599,16 @@ end
 function _call(code)
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then
-		print('syntax error', nil, nil, 14)
-		print(sub(e,20), nil, nil, 6)
+		api.print('syntax error', nil, nil, 14)
+		api.print(sub(e,20), nil, nil, 6)
 		return false
 	else
 		local result
 		setfenv(f,cart)
 		ok,e = pcall(f)
 		if not ok then
-			print('runtime error', nil, nil, 14)
-			print(sub(e,20), nil, nil, 6)
+			api.print('runtime error', nil, nil, 14)
+			api.print(sub(e,20), nil, nil, 6)
 		end
 	end
 	return true
@@ -1639,7 +1639,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
-		print('could not load', nil, nil, 6)
+		api.print('could not load', nil, nil, 6)
 		return
 	end
 
@@ -1650,13 +1650,13 @@ function _load(_cartname)
 	restore_clip()
 	cartname = _cartname
 	if load_p8(currentDirectory.._cartname) then
-		print('loaded '.._cartname, nil, nil, 6)
+		api.print('loaded '.._cartname, nil, nil, 6)
 	end
 end
 
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-	print('directory: '..currentDirectory, nil, nil, 12)
+	api.print('directory: '..currentDirectory, nil, nil, 12)
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
@@ -1676,11 +1676,11 @@ function api.ls()
 	for i, item in ipairs(output) do
 		api.color(item.color)
 		for j=1,#item.name,32 do
-			print(item.name:sub(j,j+32))
+			api.print(item.name:sub(j,j+32))
 			flip_screen()
 			count = count + 1
 			if count == 20 then
-				print('--more--', nil, nil, 12)
+				api.print('--more--', nil, nil, 12)
 				flip_screen()
 				local y = _getcursory() - 6
 				api.cursor(0, y)
@@ -1736,18 +1736,18 @@ function api.cd(name)
 	if not failed then
 		api.color(12)
 		for i=1,#output,32 do
-			print(output:sub(i,i+32))
+			api.print(output:sub(i,i+32))
 		end
 	else
 		api.color(7)
-		print(output)
+		api.print(output)
 	end
 end
 
 function api.mkdir(name)
 	if name == nil then
 		api.color(6)
-		print('mkdir [name]')
+		api.print('mkdir [name]')
 	else
 		love.filesystem.createDirectory(currentDirectory..name)
 	end

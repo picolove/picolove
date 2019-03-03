@@ -322,7 +322,7 @@ function new_sandbox()
 		count=api.count,
 		all=api.all,
 		btn=api.btn,
-		btnp=btnp,
+		btnp=api.btnp,
 		sfx=api.sfx,
 		music=api.music,
 		mget=api.mget,
@@ -2027,7 +2027,7 @@ function api.btn(i,p)
 	end
 end
 
-function btnp(i,p)
+function api.btnp(i,p)
 	if type(i) == 'number' then
 		p = p or 0
 		if __keymap[p] and __keymap[p][i] then

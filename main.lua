@@ -318,7 +318,7 @@ function new_sandbox()
 		sspr=api.sspr,
 		add=add,
 		del=del,
-		foreach=foreach,
+		foreach=api.foreach,
 		count=count,
 		all=api.all,
 		btn=btn,
@@ -1952,7 +1952,7 @@ function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
 
-function foreach(a,f)
+function api.foreach(a,f)
 	if not a then
 		warning('foreach got a nil value')
 		return

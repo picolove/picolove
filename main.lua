@@ -319,7 +319,7 @@ function new_sandbox()
 		add=add,
 		del=del,
 		foreach=api.foreach,
-		count=count,
+		count=api.count,
 		all=api.all,
 		btn=btn,
 		btnp=btnp,
@@ -1962,7 +1962,7 @@ function api.foreach(a,f)
 	end
 end
 
-function count(a)
+function api.count(a)
 	return #a
 end
 

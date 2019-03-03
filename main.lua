@@ -311,7 +311,7 @@ function new_sandbox()
 		rectfill=api.rectfill,
 		run=run,
 		reload=api.reload,
-		reboot=reboot,
+		reboot=api.reboot,
 		pal=api.pal,
 		palt=api.palt,
 		spr=api.spr,
@@ -1807,7 +1807,7 @@ function run()
 	if cart._init then cart._init() end
 end
 
-function reboot()
+function api.reboot()
 	_load('nocart.p8')
 	run()
 end

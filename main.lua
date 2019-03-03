@@ -321,7 +321,7 @@ function new_sandbox()
 		foreach=api.foreach,
 		count=api.count,
 		all=api.all,
-		btn=btn,
+		btn=api.btn,
 		btnp=btnp,
 		sfx=api.sfx,
 		music=api.music,
@@ -2003,7 +2003,7 @@ __keymap = {
 	}
 }
 
-function btn(i,p)
+function api.btn(i,p)
 	if type(i) == 'number' then
 		p = p or 0
 		if __keymap[p] and __keymap[p][i] then

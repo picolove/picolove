@@ -352,7 +352,7 @@ function new_sandbox()
 		shr=api.shr,
 		exit=shutdown,
 		shutdown=shutdown,
-		sub=sub,
+		sub=api.sub,
 		stat=stat,
 		time=function() return host_time end,
 		-- deprecated pico-8 function aliases
@@ -1600,7 +1600,7 @@ function _call(code)
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then
 		api.print('syntax error', nil, nil, 14)
-		api.print(sub(e,20), nil, nil, 6)
+		api.print(api.sub(e,20), nil, nil, 6)
 		return false
 	else
 		local result
@@ -1608,7 +1608,7 @@ function _call(code)
 		ok,e = pcall(f)
 		if not ok then
 			api.print('runtime error', nil, nil, 14)
-			api.print(sub(e,20), nil, nil, 6)
+			api.print(api.sub(e,20), nil, nil, 6)
 		end
 	end
 	return true
@@ -2227,7 +2227,7 @@ function api.sgn(x)
 	end
 end
 
-sub = string.sub
+api.sub = string.sub
 
 function shutdown()
 	love.event.quit()

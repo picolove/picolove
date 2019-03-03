@@ -335,7 +335,7 @@ function new_sandbox()
 		max=api.max,
 		min=api.min,
 		mid=api.mid,
-		flr=flr,
+		flr=api.flr,
 		cos=api.cos,
 		sin=api.sin,
 		atan2=api.atan2,
@@ -619,8 +619,8 @@ function load_p8(filename)
 			for sy=64,127 do
 				for sx=0,127,2 do
 					-- get the two pixel values and merge them
-					local lo = flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
-					local hi = flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+					local lo = api.flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
+					local hi = api.flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
 					local v = api.bor(api.shl(hi,4),lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
@@ -914,8 +914,8 @@ note_map = {
 }
 
 function note_to_string(note)
-	local octave = flr(note/12)
-	local note = flr(note%12)
+	local octave = api.flr(note/12)
+	local note = api.flr(note%12)
 	return string.format('%s%d',note_map[note],octave)
 end
 
@@ -929,7 +929,7 @@ end
 
 function update_audio(time)
 	-- check what sfx should be playing
-	local samples = flr(time*__sample_rate)
+	local samples = api.flr(time*__sample_rate)
 
 	for i=0,samples-1 do
 		if pico8.current_music then
@@ -984,9 +984,9 @@ function update_audio(time)
 			if ch.sfx and pico8.sfx[ch.sfx] then
 				local sfx = pico8.sfx[ch.sfx]
 				-- when we pass a new step
-				if flr(ch.offset) > ch.last_step then
+				if api.flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
-					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
+					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[api.flr(ch.offset)])
 					if ch.instr ~= 6 then
 						ch.osc = osc[ch.instr]
 					else
@@ -1000,7 +1000,7 @@ function update_audio(time)
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
 					end
-					ch.last_step = flr(ch.offset)
+					ch.last_step = api.flr(ch.offset)
 				end
 				if ch.vol and ch.vol > 0 then
 					local vol = ch.vol
@@ -1024,17 +1024,17 @@ function update_audio(time)
 						vol = lerp(ch.vol,0,ch.offset%1)
 					elseif ch.fx == 6 then
 						-- fast appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(8)*4)
+						local off = bit.band(api.flr(ch.offset),0xfc)
+						local lfo = api.flr(ch.lfo(8)*4)
 						off = off + lfo
-						local note = sfx[flr(off)][1]
+						local note = sfx[api.flr(off)][1]
 						ch.freq = note_to_hz(note)
 					elseif ch.fx == 7 then
 						-- slow appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(4)*4)
+						local off = bit.band(api.flr(ch.offset),0xfc)
+						local lfo = api.flr(ch.lfo(4)*4)
 						off = off + lfo
-						local note = sfx[flr(off)][1]
+						local note = sfx[api.flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
 					ch.sample = ch.osc(ch.oscpos) * vol/7
@@ -1268,8 +1268,8 @@ end
 function api.pget(x,y)
 	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
 		local __screen_img = pico8.screen:newImageData()
-		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
-		return flr(r/17.0)
+		local r,g,b,a = __screen_img:getPixel(api.flr(x),api.flr(y))
+		return api.flr(r/17.0)
 	else
 		warning(string.format('pget out of screen %d,%d',x,y))
 		return 0
@@ -1279,20 +1279,20 @@ end
 function api.pset(x,y,c)
 	if not c then return end
 	api.color(c)
-	love.graphics.point(flr(x),flr(y),c*16,0,0,255)
+	love.graphics.point(api.flr(x),api.flr(y),c*16,0,0,255)
 end
 
 function api.sget(x,y)
 	-- return the color from the spritesheet
-	x = flr(x)
-	y = flr(y)
+	x = api.flr(x)
+	y = api.flr(y)
 	local r,g,b,a = __pico_spritesheet_data:getPixel(x,y)
-	return flr(r/16)
+	return api.flr(r/16)
 end
 
 function api.sset(x,y,c)
-	x = flr(x)
-	y = flr(y)
+	x = api.flr(x)
+	y = api.flr(y)
 	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
 	__pico_spritesheet:refresh()
 end
@@ -1301,13 +1301,13 @@ function api.fget(n,f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
-		if not pico8.spriteflags[flr(n)] then
+		if not pico8.spriteflags[api.flr(n)] then
 			warning(string.format('fget(%d,%d)',n,f))
 			return 0
 		end
-		return api.band(pico8.spriteflags[flr(n)],api.shl(1,flr(f))) ~= 0
+		return api.band(pico8.spriteflags[api.flr(n)],api.shl(1,api.flr(f))) ~= 0
 	end
-	return pico8.spriteflags[flr(n)]
+	return pico8.spriteflags[api.flr(n)]
 end
 
 assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
@@ -1374,7 +1374,7 @@ function print(str,x,y,col)
 		api.cursor(0, y+6)
 	end
 	love.graphics.setShader(__text_shader)
-	love.graphics.print(str,flr(x),flr(y))
+	love.graphics.print(str,api.flr(x),api.flr(y))
 end
 
 function api.cursor(x,y)
@@ -1390,7 +1390,7 @@ function _getcursory()
 end
 
 function api.color(c)
-	c = c and flr(c) or 0
+	c = c and api.flr(c) or 0
 	assert(c >= 0 and c <= 16,string.format('c is %s',c))
 	pico8.color = c
 	love.graphics.setColor(c*16,0,0,255)
@@ -1406,8 +1406,8 @@ pico8.camera_y = 0
 
 function api.camera(x,y)
 	if type(x) == 'number' then
-		pico8.camera_x = flr(x)
-		pico8.camera_y = flr(y)
+		pico8.camera_x = api.flr(x)
+		pico8.camera_y = api.flr(y)
 	else
 		pico8.camera_x = 0
 		pico8.camera_y = 0
@@ -1423,9 +1423,9 @@ end
 function api.circ(ox,oy,r,col)
 	col = col or pico8.color
 	api.color(col)
-	ox = flr(ox)
-	oy = flr(oy)
-	r = flr(r)
+	ox = api.flr(ox)
+	oy = api.flr(oy)
+	r = api.flr(r)
 	local points = {}
 	local x = r
 	local y = 0
@@ -1470,9 +1470,9 @@ end
 function api.circfill(cx,cy,r,col)
 	col = col or pico8.color
 	api.color(col)
-	cx = flr(cx)
-	cy = flr(cy)
-	r = flr(r)
+	cx = api.flr(cx)
+	cy = api.flr(cy)
+	r = api.flr(r)
 	local x = r
 	local y = 0
 	local err = 1 - r
@@ -1528,10 +1528,10 @@ function api.line(x0,y0,x1,y1,col)
 		return
 	end
 
-	x0 = flr(x0)
-	y0 = flr(y0)
-	x1 = flr(x1)
-	y1 = flr(y1)
+	x0 = api.flr(x0)
+	y0 = api.flr(y0)
+	x1 = api.flr(x1)
+	y1 = api.flr(y1)
 
 
 	local dx = x1 - x0
@@ -1578,7 +1578,7 @@ function api.line(x0,y0,x1,y1,col)
 				end
 				x0 = x0 + stepx
 				fraction = fraction + dy
-				table.insert(points,{flr(x0),flr(y0)})
+				table.insert(points,{api.flr(x0),api.flr(y0)})
 			end
 		else
 			local fraction = dx - bit.rshift(dy, 1)
@@ -1589,7 +1589,7 @@ function api.line(x0,y0,x1,y1,col)
 				end
 				y0 = y0 + stepy
 				fraction = fraction + dx
-				table.insert(points,{flr(x0),flr(y0)})
+				table.insert(points,{api.flr(x0),api.flr(y0)})
 			end
 		end
 	end
@@ -1756,7 +1756,7 @@ end
 function api.rect(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)
-	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
+	love.graphics.rectangle('line',api.flr(x0)+1,api.flr(y0)+1,api.flr(x1-x0),api.flr(y1-y0))
 end
 
 function api.rectfill(x0,y0,x1,y1,col)
@@ -1772,7 +1772,7 @@ function api.rectfill(x0,y0,x1,y1,col)
 		h = -h
 		y0 = y0-h
 	end
-	love.graphics.rectangle('fill',flr(x0),flr(y0),w,h)
+	love.graphics.rectangle('fill',api.flr(x0),api.flr(y0),w,h)
 end
 
 function api.run()
@@ -1835,16 +1835,16 @@ function api.pal(c0,c1,p)
 		-- pal() to reset to system defaults (including transparency values)
 		api.palt()
 	elseif p == 1 and c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = api.flr(c0)%16
+		c1 = api.flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		pico8.display_palette[c0] = pico8.palette[c1]
 		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = api.flr(c0)%16
+		c1 = api.flr(c1)%16
 		c1 = c1+1
 		c0 = c0+1
 		pico8.draw_palette[c0] = c1
@@ -1861,7 +1861,7 @@ function api.palt(c,t)
 			pico8.pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
-		c = flr(c)%16
+		c = api.flr(c)%16
 		if t == false then
 			pico8.pal_transparent[c+1] = 1
 		elseif t == true then
@@ -1872,10 +1872,10 @@ function api.palt(c,t)
 end
 
 function api.spr(n,x,y,w,h,flip_x,flip_y)
-	n = flr(n)
+	n = api.flr(n)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
-	n = flr(n)
+	n = api.flr(n)
 	w = w or 1
 	h = h or 1
 	local q
@@ -1890,7 +1890,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 		if __pico_quads[id] then
 			q = __pico_quads[id]
 		else
-			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
+			q = love.graphics.newQuad(api.flr(n%16)*8,api.flr(n/16)*8,8*w,8*h,128,128)
 			__pico_quads[id] = q
 		end
 	end
@@ -1898,8 +1898,8 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 		log('missing quad',n)
 	end
 	love.graphics.draw(__pico_spritesheet,q,
-		flr(x)+(w*8*(flip_x and 1 or 0)),
-		flr(y)+(h*8*(flip_y and 1 or 0)),
+		api.flr(x)+(w*8*(flip_x and 1 or 0)),
+		api.flr(y)+(h*8*(flip_y and 1 or 0)),
 		0,
 		flip_x and -1 or 1,
 		flip_y and -1 or 1)
@@ -1920,8 +1920,8 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	love.graphics.setShader(__sprite_shader)
 	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(__pico_spritesheet,q,
-		flr(dx)+(dw*(flip_x and 1 or 0)),
-		flr(dy)+(dh*(flip_y and 1 or 0)),
+		api.flr(dx)+(dw*(flip_x and 1 or 0)),
+		api.flr(dy)+(dh*(flip_y and 1 or 0)),
 		0,
 		flip_x and -1 or 1 * (dw/sw),
 		flip_y and -1 or 1 * (dh/sh))
@@ -2057,12 +2057,12 @@ end
 function api.mget(x,y)
 	if x == nil or y == nil then return 0 end
 	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
-	return pico8.map[flr(y)][flr(x)]
+	return pico8.map[api.flr(y)][api.flr(x)]
 end
 
 function api.mset(x,y,v)
 	if x >= 0 and x < 128 and y >= 0 and y < 64 then
-		pico8.map[flr(y)][flr(x)] = v
+		pico8.map[api.flr(y)][api.flr(x)] = v
 	end
 end
 
@@ -2071,17 +2071,17 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_y = cel_y or 0
 	love.graphics.setShader(__sprite_shader)
 	love.graphics.setColor(255,255,255,255)
-	cel_x = flr(cel_x)
-	cel_y = flr(cel_y)
-	sx = flr(sx)
-	sy = flr(sy)
-	cel_w = flr(cel_w)
-	cel_h = flr(cel_h)
+	cel_x = api.flr(cel_x)
+	cel_y = api.flr(cel_y)
+	sx = api.flr(sx)
+	sy = api.flr(sy)
+	cel_w = api.flr(cel_w)
+	cel_h = api.flr(cel_h)
 	for y=0,cel_h-1 do
 		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do
 				if cel_x+x < 128 and cel_x+x >= 0 then
-					local v = pico8.map[flr(cel_y+y)][flr(cel_x+x)]
+					local v = pico8.map[api.flr(cel_y+y)][api.flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
@@ -2103,8 +2103,8 @@ function api.memset(dest_addr,val,len)
 	-- only for range 0x6000+0x8000
 	if dest_addr >= 0x6000 then
 		for i=0,len-1 do
-			local dx = flr(dest_addr-0x6000+i)%64*2
-			local dy = flr((dest_addr-0x6000+i)/64)
+			local dx = api.flr(dest_addr-0x6000+i)%64*2
+			local dy = api.flr((dest_addr-0x6000+i)/64)
 			local low = val
 			local high = bit.lshift(val,4)
 			api.pset(dx,dy,high)
@@ -2126,8 +2126,8 @@ function api.memcpy(dest_addr,source_addr,len)
 	end
 	local img = pico8.screen:newImageData()
 	for i=0,len-1 do
-		local x = flr(source_addr-0x6000+i)%64*2
-		local y = flr((source_addr-0x6000+i)/64)
+		local x = api.flr(source_addr-0x6000+i)%64*2
+		local y = api.flr((source_addr-0x6000+i)/64)
 		--TODO: why are colors broken?
 		local c = ceil(img:getPixel(x,y)/16)
 		local d = ceil(img:getPixel(x+1,y)/16)
@@ -2138,8 +2138,8 @@ function api.memcpy(dest_addr,source_addr,len)
 			d = d - 1
 		end
 
-		local dx = flr(dest_addr-0x6000+i)%64*2
-		local dy = flr((dest_addr-0x6000+i)/64)
+		local dx = api.flr(dest_addr-0x6000+i)%64*2
+		local dy = api.flr((dest_addr-0x6000+i)/64)
 		api.pset(dx,dy,c)
 		api.pset(dx+1,dy,d)
 	end
@@ -2148,8 +2148,8 @@ end
 function api.peek(addr, val)
 	-- TODO: implement for non screen space
 	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64
-		local dy = flr((addr-0x6000)/64)
+		local dx = api.flr(addr-0x6000)%64
+		local dy = api.flr((addr-0x6000)/64)
 		local low = api.pget(dx, dy)
 		local high = bit.lshift(api.pget(dx + 1, dy))
 		return bit.band(low, high)
@@ -2159,8 +2159,8 @@ end
 function api.poke(addr, val)
 	-- TODO: implement for non screen space
 	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64*2
-		local dy = flr((addr-0x6000)/64)
+		local dx = api.flr(addr-0x6000)%64*2
+		local dy = api.flr((addr-0x6000)/64)
 		api.pset(dx, dy, bit.band(val, 15))
 		api.pset(dx + 1, dy, bit.rshift(val, 4))
 	end
@@ -2201,7 +2201,7 @@ assert(api.mid(2, 3, 1) == 2)
 assert(api.mid(3, 1, 2) == 2)
 assert(api.mid(3, 2, 1) == 2)
 
-flr = math.floor
+api.flr = math.floor
 ceil = math.ceil
 function api.cos(x) return math.cos((x or 0)*(math.pi*2)) end
 function api.sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
@@ -2217,7 +2217,7 @@ abs = math.abs
 function rnd(x) return love.math.random()*(x or 1) end
 function srand(seed)
 	if seed == 0 then seed = 1 end
-	return love.math.setRandomSeed(flr(seed*32768))
+	return love.math.setRandomSeed(api.flr(seed*32768))
 end
 function sgn(x)
 	if x < 0 then
@@ -2242,7 +2242,7 @@ love.graphics.point = function(x,y)
 end
 
 function setfps(fps)
-	pico8.fps = flr(fps)
+	pico8.fps = api.flr(fps)
 	if pico8.fps <= 0 then
 		pico8.fps = 30
 	end

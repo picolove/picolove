@@ -316,7 +316,7 @@ function new_sandbox()
 		palt=api.palt,
 		spr=api.spr,
 		sspr=api.sspr,
-		add=add,
+		add=api.add,
 		del=del,
 		foreach=api.foreach,
 		count=api.count,
@@ -1928,7 +1928,7 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	love.graphics.setShader(__draw_shader)
 end
 
-function add(a,v)
+function api.add(a,v)
 	if a == nil then
 		warning('add to nil')
 		return

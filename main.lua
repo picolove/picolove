@@ -115,7 +115,7 @@ function love.load(argv)
 	osc = {}
 	-- tri
 	osc[0] = function(x)
-		return (abs((x%1)*2-1)*2-1) * 0.7
+		return (api.abs((x%1)*2-1)*2-1) * 0.7
 	end
 	-- uneven tri
 	osc[1] = function(x)
@@ -137,7 +137,7 @@ function love.load(argv)
 	-- tri/2
 	osc[5] = function(x)
 		x=x*4
-		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2-0.1) * 0.7
+		return (api.abs((x%2)-1)-0.5 + (api.abs(((x*0.5)%2)-1)-0.5)/2-0.1) * 0.7
 	end
 	-- noise
 	osc[6] = function()
@@ -156,7 +156,7 @@ function love.load(argv)
 	-- detuned tri
 	osc[7] = function(x)
 		x=x*2
-		return (abs((x%2)-1)-0.5 + (abs(((x*127/128)%2)-1)-0.5)/2) - 1/4
+		return (api.abs((x%2)-1)-0.5 + (api.abs(((x*127/128)%2)-1)-0.5)/2) - 1/4
 	end
 	-- saw from 0 to 1, used for arppregiator
 	osc['saw_lfo'] = function(x)
@@ -340,7 +340,7 @@ function new_sandbox()
 		sin=api.sin,
 		atan2=api.atan2,
 		sqrt=api.sqrt,
-		abs=abs,
+		abs=api.abs,
 		rnd=api.rnd,
 		srand=api.srand,
 		sgn=api.sgn,
@@ -2213,7 +2213,7 @@ assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
 api.sqrt = math.sqrt
-abs = math.abs
+api.abs = math.abs
 function api.rnd(x) return love.math.random()*(x or 1) end
 function api.srand(seed)
 	if seed == 0 then seed = 1 end

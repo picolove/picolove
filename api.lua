@@ -24,6 +24,8 @@ function api.folder()
 	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
 end
 
+-- TODO: move interactive implementatn into nocart
+-- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
 	api.print('directory: '..currentDirectory, nil, nil, 12)

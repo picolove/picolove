@@ -52,7 +52,7 @@ api.bnot = bit.bnot
 api.shl = bit.lshift
 api.shr = bit.rshift
 
-local frametime = 1 / pico8.fps
+frametime = 1 / pico8.fps
 
 local __pico_quads
 local __pico_spritesheet_data
@@ -1338,10 +1338,6 @@ function api.fset(n,f,v)
 	end
 end
 
-function api.flip()
-	flip_screen()
-	love.timer.sleep(frametime)
-end
 
 function api.folder()
 	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())

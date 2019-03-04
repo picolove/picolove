@@ -73,4 +73,49 @@ end
 
 api.dir = api.ls
 
+function api.cd(name)
+	local output = ''
+	local newDirectory = currentDirectory..name..'/'
+
+	-- filter /TEXT/../ -> /
+	local count = 1
+	while count > 0 do
+		newDirectory, count = newDirectory:gsub('/[^/]*/%.%./','/')
+	end
+
+	-- filter /TEXT/..$ -> /
+	count = 1
+	while count > 0 do
+		newDirectory, count = newDirectory:gsub('/[^/]*/%.%.$','/')
+	end
+
+	local failed = newDirectory:find('%.%.') ~= nil
+
+	if #name == 0 then
+		output = 'directory: '..currentDirectory
+	elseif failed then
+		if newDirectory == '/../' then
+			output = 'cd: failed'
+		else
+			output = 'directory not found'
+		end
+	elseif love.filesystem.exists(newDirectory) then
+		currentDirectory = newDirectory
+		output = currentDirectory
+	else
+		failed = true
+		output = 'directory not found'
+	end
+
+	if not failed then
+		api.color(12)
+		for i=1,#output,32 do
+			api.print(output:sub(i,i+32))
+		end
+	else
+		api.color(7)
+		api.print(output)
+	end
+end
+
 return api

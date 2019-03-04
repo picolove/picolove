@@ -20,4 +20,8 @@ function api.cls()
 	pico8.cursor = {0,0}
 end
 
+function api.folder()
+	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
+end
+
 return api

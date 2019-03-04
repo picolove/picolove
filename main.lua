@@ -1328,11 +1328,6 @@ function api.fset(n,f,v)
 	end
 end
 
-
-function api.folder()
-	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
-end
-
 function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40

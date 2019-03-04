@@ -1382,11 +1382,6 @@ function api.color(c)
 	love.graphics.setColor(c*16,0,0,255)
 end
 
-function api.cls()
-	love.graphics.clear(0,0,0,255)
-	pico8.cursor = {0,0}
-end
-
 pico8.camera_x = 0
 pico8.camera_y = 0
 

@@ -15,4 +15,9 @@ function api.clip(x,y,w,h)
 	end
 end
 
+function api.cls()
+	love.graphics.clear(0,0,0,255)
+	pico8.cursor = {0,0}
+end
+
 return api

@@ -302,7 +302,7 @@ function new_sandbox()
 		circ=api.circ,
 		circfill=api.circfill,
 		help=help,
-		dir=api.ls,
+		dir=api.dir,
 		line=api.line,
 		load=_load,
 		ls=api.ls,

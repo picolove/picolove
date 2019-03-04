@@ -71,4 +71,6 @@ function api.ls()
 	love.keyboard.setTextInput(true)
 end
 
+api.dir = api.ls
+
 return api

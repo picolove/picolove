@@ -6,7 +6,7 @@ local cart = nil
 local cartname = nil
 local love_args = nil
 
-local pico8 = {
+pico8 = {
 	clip = nil,
 	fps = 30,
 	screen = nil,
@@ -1245,16 +1245,6 @@ function api.sfx(n,channel,offset)
 	ch.offset=offset
 	ch.last_step=offset-1
 	ch.loop=true
-end
-
-function api.clip(x,y,w,h)
-	if type(x) == 'number' then
-		love.graphics.setScissor(x,y,w,h)
-		pico8.clip = {x,y,w,h}
-	else
-		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
-		pico8.clip = nil
-	end
 end
 
 function restore_clip()

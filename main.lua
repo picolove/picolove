@@ -1354,40 +1354,6 @@ function restore_camera()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
-function api.circ(ox,oy,r,col)
-	col = col or pico8.color
-	api.color(col)
-	ox = api.flr(ox)
-	oy = api.flr(oy)
-	r = api.flr(r)
-	local points = {}
-	local x = r
-	local y = 0
-	local decisionOver2 = 1 - x
-
-	while y <= x do
-		table.insert(points,{ox+x,oy+y})
-		table.insert(points,{ox+y,oy+x})
-		table.insert(points,{ox-x,oy+y})
-		table.insert(points,{ox-y,oy+x})
-
-		table.insert(points,{ox-x,oy-y})
-		table.insert(points,{ox-y,oy-x})
-		table.insert(points,{ox+x,oy-y})
-		table.insert(points,{ox+y,oy-x})
-		y = y + 1
-		if decisionOver2 < 0 then
-			decisionOver2 = decisionOver2 + 2 * y + 1
-		else
-			x = x - 1
-			decisionOver2 = decisionOver2 + 2 * (y-x) + 1
-		end
-	end
-	if #points > 0 then
-		love.graphics.points(points)
-	end
-end
-
 function _plot4points(points,cx,cy,x,y)
 	_horizontal_line(points, cx - x, cy + y, cx + x)
 	if y ~= 0 then

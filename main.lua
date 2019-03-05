@@ -1367,36 +1367,6 @@ function _horizontal_line(points,x0,y,x1)
 	end
 end
 
-function api.circfill(cx,cy,r,col)
-	col = col or pico8.color
-	api.color(col)
-	cx = api.flr(cx)
-	cy = api.flr(cy)
-	r = api.flr(r)
-	local x = r
-	local y = 0
-	local err = 1 - r
-
-	local points = {}
-
-	while y <= x do
-		_plot4points(points,cx,cy,x,y)
-		if err < 0 then
-			err = err + 2 * y + 3
-		else
-			if x ~= y then
-				_plot4points(points,cx,cy,y,x)
-			end
-			x = x - 1
-			err = err + 2 * (y - x) + 3
-		end
-		y = y + 1
-	end
-	if #points > 0 then
-		love.graphics.points(points)
-	end
-end
-
 function help()
 	api.print('')
 	api.color(12)

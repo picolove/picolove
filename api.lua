@@ -143,4 +143,27 @@ function api.pget(x,y)
 		return 0
 	end
 end
+
+function api.print(str,x,y,col)
+	if col then api.color(col) end
+	local canscroll = y==nil
+	if y==nil then
+		y = pico8.cursor[2]
+		pico8.cursor[2] = pico8.cursor[2] + 6
+	end
+	if x==nil then
+		x = pico8.cursor[1]
+	end
+	if canscroll and y > 121 then
+		local c = col or pico8.color
+		scroll(6)
+		y = 120
+		api.rectfill(0,y,127,y+6,0)
+		api.color(c)
+		api.cursor(0, y+6)
+	end
+	love.graphics.setShader(__text_shader)
+	love.graphics.print(str,api.flr(x),api.flr(y))
+end
+
 return api

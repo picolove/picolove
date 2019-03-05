@@ -205,4 +205,26 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(__draw_shader)
 end
 
+function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
+-- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
+-- and draw in rectangle (dx, dy, dw, dh)
+-- Colour 0 drawn as transparent by default (see palt())
+-- dw, dh defaults to sw, sh
+-- flip_x=true to flip horizontally
+-- flip_y=true to flip vertically
+	dw = dw or sw
+	dh = dh or sh
+	-- FIXME: cache this quad
+	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
+	love.graphics.setShader(__sprite_shader)
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	love.graphics.draw(__pico_spritesheet,q,
+		api.flr(dx)+(dw*(flip_x and 1 or 0)),
+		api.flr(dy)+(dh*(flip_y and 1 or 0)),
+		0,
+		flip_x and -1 or 1 * (dw/sw),
+		flip_y and -1 or 1 * (dh/sh))
+	love.graphics.setShader(__draw_shader)
+end
+
 return api

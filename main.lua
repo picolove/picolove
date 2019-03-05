@@ -1588,22 +1588,6 @@ function _load(_cartname)
 	end
 end
 
-function api.rectfill(x0,y0,x1,y1,col)
-	col = col or pico8.color
-	api.color(col)
-	local w = (x1-x0)+1
-	local h = (y1-y0)+1
-	if w < 0 then
-		w = -w
-		x0 = x0-w
-	end
-	if h < 0 then
-		h = -h
-		y0 = y0-h
-	end
-	love.graphics.rectangle('fill',api.flr(x0),api.flr(y0),w,h)
-end
-
 function api.run()
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.setShader(__draw_shader)

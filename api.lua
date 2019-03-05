@@ -233,4 +233,20 @@ function api.rect(x0,y0,x1,y1,col)
 	love.graphics.rectangle('line',api.flr(x0)+1,api.flr(y0)+1,api.flr(x1-x0),api.flr(y1-y0))
 end
 
+function api.rectfill(x0,y0,x1,y1,col)
+	col = col or pico8.color
+	api.color(col)
+	local w = (x1-x0)+1
+	local h = (y1-y0)+1
+	if w < 0 then
+		w = -w
+		x0 = x0-w
+	end
+	if h < 0 then
+		h = -h
+		y0 = y0-h
+	end
+	love.graphics.rectangle('fill',api.flr(x0),api.flr(y0),w,h)
+end
+
 return api

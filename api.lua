@@ -166,4 +166,8 @@ function api.print(str,x,y,col)
 	love.graphics.print(str,api.flr(x),api.flr(y))
 end
 
+function api.cursor(x,y)
+	pico8.cursor = {x,y}
+end
+
 return api

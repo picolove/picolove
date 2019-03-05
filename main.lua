@@ -1320,10 +1320,6 @@ end
 
 log = print
 
-function api.cursor(x,y)
-	pico8.cursor = {x,y}
-end
-
 function _getcursorx()
 	return pico8.cursor[1]
 end

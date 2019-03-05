@@ -1630,15 +1630,6 @@ function _load(_cartname)
 	end
 end
 
-function api.mkdir(name)
-	if name == nil then
-		api.color(6)
-		api.print('mkdir [name]')
-	else
-		love.filesystem.createDirectory(currentDirectory..name)
-	end
-end
-
 function api.rect(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)

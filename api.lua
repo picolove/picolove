@@ -118,4 +118,13 @@ function api.cd(name)
 	end
 end
 
+function api.mkdir(name)
+	if name == nil then
+		api.color(6)
+		api.print('mkdir [name]')
+	else
+		love.filesystem.createDirectory(currentDirectory..name)
+	end
+end
+
 return api

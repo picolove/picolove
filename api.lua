@@ -127,4 +127,10 @@ function api.mkdir(name)
 	end
 end
 
+function api.pset(x,y,c)
+	if not c then return end
+	api.color(c)
+	love.graphics.point(api.flr(x),api.flr(y),c*16,0,0,255)
+end
+
 return api

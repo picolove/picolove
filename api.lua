@@ -133,4 +133,14 @@ function api.pset(x,y,c)
 	love.graphics.point(api.flr(x),api.flr(y),c*16,0,0,255)
 end
 
+function api.pget(x,y)
+	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
+		local __screen_img = pico8.screen:newImageData()
+		local r,g,b,a = __screen_img:getPixel(api.flr(x),api.flr(y))
+		return api.flr(r/17.0)
+	else
+		warning(string.format('pget out of screen %d,%d',x,y))
+		return 0
+	end
+end
 return api

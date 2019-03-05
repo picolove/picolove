@@ -170,4 +170,39 @@ function api.cursor(x,y)
 	pico8.cursor = {x,y}
 end
 
+function api.spr(n,x,y,w,h,flip_x,flip_y)
+	n = api.flr(n)
+	love.graphics.setShader(__sprite_shader)
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	n = api.flr(n)
+	w = w or 1
+	h = h or 1
+	local q
+	if w == 1 and h == 1 then
+		q = __pico_quads[n]
+		if not q then
+			log('warning: sprite '..n..' is missing')
+			return
+		end
+	else
+		local id = string.format('%d-%d-%d',n,w,h)
+		if __pico_quads[id] then
+			q = __pico_quads[id]
+		else
+			q = love.graphics.newQuad(api.flr(n%16)*8,api.flr(n/16)*8,8*w,8*h,128,128)
+			__pico_quads[id] = q
+		end
+	end
+	if not q then
+		log('missing quad',n)
+	end
+	love.graphics.draw(__pico_spritesheet,q,
+		api.flr(x)+(w*8*(flip_x and 1 or 0)),
+		api.flr(y)+(h*8*(flip_y and 1 or 0)),
+		0,
+		flip_x and -1 or 1,
+		flip_y and -1 or 1)
+	love.graphics.setShader(__draw_shader)
+end
+
 return api

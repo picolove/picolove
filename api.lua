@@ -227,4 +227,10 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	love.graphics.setShader(__draw_shader)
 end
 
+function api.rect(x0,y0,x1,y1,col)
+	col = col or pico8.color
+	api.color(col)
+	love.graphics.rectangle('line',api.flr(x0)+1,api.flr(y0)+1,api.flr(x1-x0),api.flr(y1-y0))
+end
+
 return api

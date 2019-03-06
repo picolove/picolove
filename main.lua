@@ -1181,33 +1181,6 @@ function love.textinput(text)
 	end
 end
 
-function api.sfx(n,channel,offset)
-	-- n = -1 stop sound on channel
-	-- n = -2 to stop looping on channel
-	channel = channel or -1
-	if n == -1 and channel >= 0 then
-		pico8.audio_channels[channel].sfx = nil
-		return
-	elseif n == -2 and channel >= 0 then
-		pico8.audio_channels[channel].loop = false
-	end
-	offset = offset or 0
-	if channel == -1 then
-		-- find a free channel
-		for i=0,3 do
-			if pico8.audio_channels[i].sfx == nil then
-				channel = i
-			end
-		end
-	end
-	if channel == -1 then return end
-	local ch = pico8.audio_channels[channel]
-	ch.sfx=n
-	ch.offset=offset
-	ch.last_step=offset-1
-	ch.loop=true
-end
-
 function restore_clip()
 	if pico8.clip then
 		love.graphics.setScissor(unpack(pico8.clip))

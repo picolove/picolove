@@ -522,4 +522,12 @@ function api.fset(n,f,v)
 	end
 end
 
+function api.sget(x,y)
+	-- return the color from the spritesheet
+	x = api.flr(x)
+	y = api.flr(y)
+	local r,g,b,a = __pico_spritesheet_data:getPixel(x,y)
+	return api.flr(r/16)
+end
+
 return api

@@ -1615,12 +1615,6 @@ function api.btnp(i,p)
 	end
 end
 
-function api.mget(x,y)
-	if x == nil or y == nil then return 0 end
-	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
-	return pico8.map[api.flr(y)][api.flr(x)]
-end
-
 function api.mset(x,y,v)
 	if x >= 0 and x < 128 and y >= 0 and y < 64 then
 		pico8.map[api.flr(y)][api.flr(x)] = v

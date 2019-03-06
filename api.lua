@@ -477,4 +477,10 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	love.graphics.setShader(__draw_shader)
 end
 
+function api.mget(x,y)
+	if x == nil or y == nil then return 0 end
+	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
+	return pico8.map[api.flr(y)][api.flr(x)]
+end
+
 return api

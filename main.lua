@@ -1615,12 +1615,6 @@ function api.btnp(i,p)
 	end
 end
 
-function api.mset(x,y,v)
-	if x >= 0 and x < 128 and y >= 0 and y < 64 then
-		pico8.map[api.flr(y)][api.flr(x)] = v
-	end
-end
-
 function api.memset(dest_addr,val,len)
 	-- only for range 0x6000+0x8000
 	if dest_addr >= 0x6000 then

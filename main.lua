@@ -1278,26 +1278,6 @@ assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
 assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
 assert(bit.band(0x05,bit.lshift(1,3)) == 0)
 
-function api.fset(n,f,v)
-	-- fset n [f] v
-	-- f is the flag index 0..7
-	-- v is boolean
-	if v == nil then
-		v,f = f,nil
-	end
-	if f then
-		-- set specific bit to v (true or false)
-		if f then
-			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],api.shl(1,f))
-		else
-			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],api.shl(1,f)))
-		end
-	else
-		-- set bitfield to v (number)
-		pico8.spriteflags[n] = v
-	end
-end
-
 function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40

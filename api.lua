@@ -502,4 +502,24 @@ function api.fget(n,f)
 	return pico8.spriteflags[api.flr(n)]
 end
 
+function api.fset(n,f,v)
+	-- fset n [f] v
+	-- f is the flag index 0..7
+	-- v is boolean
+	if v == nil then
+		v,f = f,nil
+	end
+	if f then
+		-- set specific bit to v (true or false)
+		if f then
+			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],api.shl(1,f))
+		else
+			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],api.shl(1,f)))
+		end
+	else
+		-- set bitfield to v (number)
+		pico8.spriteflags[n] = v
+	end
+end
+
 return api

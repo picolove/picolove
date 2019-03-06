@@ -1627,39 +1627,6 @@ function api.mset(x,y,v)
 	end
 end
 
-function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
-	cel_x = cel_x or 0
-	cel_y = cel_y or 0
-	love.graphics.setShader(__sprite_shader)
-	love.graphics.setColor(255,255,255,255)
-	cel_x = api.flr(cel_x)
-	cel_y = api.flr(cel_y)
-	sx = api.flr(sx)
-	sy = api.flr(sy)
-	cel_w = api.flr(cel_w)
-	cel_h = api.flr(cel_h)
-	for y=0,cel_h-1 do
-		if cel_y+y < 64 and cel_y+y >= 0 then
-			for x=0,cel_w-1 do
-				if cel_x+x < 128 and cel_x+x >= 0 then
-					local v = pico8.map[api.flr(cel_y+y)][api.flr(cel_x+x)]
-					if v > 0 then
-						if bitmask == nil or bitmask == 0 then
-							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
-						else
-							if api.band(pico8.spriteflags[v],bitmask) ~= 0 then
-								love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
-							else
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	love.graphics.setShader(__draw_shader)
-end
-
 function api.memset(dest_addr,val,len)
 	-- only for range 0x6000+0x8000
 	if dest_addr >= 0x6000 then

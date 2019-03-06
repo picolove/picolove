@@ -530,4 +530,11 @@ function api.sget(x,y)
 	return api.flr(r/16)
 end
 
+function api.sset(x,y,c)
+	x = api.flr(x)
+	y = api.flr(y)
+	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
+	__pico_spritesheet:refresh()
+end
+
 return api

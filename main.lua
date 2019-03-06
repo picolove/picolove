@@ -55,7 +55,7 @@ api.shr = bit.rshift
 frametime = 1 / pico8.fps
 
 __pico_quads = nil -- used by api.spr
-local __pico_spritesheet_data
+__pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
 __draw_shader = nil -- used by api.spr
 __sprite_shader = nil -- used by api.spr
@@ -1253,13 +1253,6 @@ function restore_clip()
 	else
 		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
 	end
-end
-
-function api.sset(x,y,c)
-	x = api.flr(x)
-	y = api.flr(y)
-	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
-	__pico_spritesheet:refresh()
 end
 
 assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)

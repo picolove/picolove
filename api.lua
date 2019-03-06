@@ -428,4 +428,20 @@ function api.pal(c0,c1,p)
 	end
 end
 
+function api.palt(c,t)
+	if type(c) ~= 'number' then
+		for i=1,16 do
+			pico8.pal_transparent[i] = i == 1 and 0 or 1
+		end
+	else
+		c = api.flr(c)%16
+		if t == false then
+			pico8.pal_transparent[c+1] = 1
+		elseif t == true then
+			pico8.pal_transparent[c+1] = 0
+		end
+	end
+	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+end
+
 return api

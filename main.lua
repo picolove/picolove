@@ -60,7 +60,7 @@ __pico_spritesheet = nil -- used by api.spr
 __draw_shader = nil -- used by api.spr
 __sprite_shader = nil -- used by api.spr
 __text_shader = nil -- used by api.print
-local __display_shader
+__display_shader = nil
 local __accum = 0
 local loaded_code = nil
 
@@ -1487,44 +1487,6 @@ end
 function api.reload(dest_addr,source_addr,len)
 	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
 	_load(cartname)
-end
-
-local __palette_modified = true
-
-function api.pal(c0,c1,p)
-	if type(c0) ~= 'number' then
-		if __palette_modified == false then return end
-		for i=1,16 do
-			pico8.draw_palette[i] = i
-			pico8.display_palette[i] = pico8.palette[i]
-		end
-		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
-		__palette_modified = false
-		-- According to PICO-8 manual:
-		-- pal() to reset to system defaults (including transparency values)
-		api.palt()
-	elseif p == 1 and c1 ~= nil then
-		c0 = api.flr(c0)%16
-		c1 = api.flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
-		pico8.display_palette[c0] = pico8.palette[c1]
-		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
-		__palette_modified = true
-	elseif c1 ~= nil then
-		c0 = api.flr(c0)%16
-		c1 = api.flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
-		pico8.draw_palette[c0] = c1
-		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__palette_modified = true
-	end
 end
 
 function api.palt(c,t)

@@ -489,4 +489,17 @@ function api.mset(x,y,v)
 	end
 end
 
+function api.fget(n,f)
+	if n == nil then return nil end
+	if f ~= nil then
+		-- return just that bit as a boolean
+		if not pico8.spriteflags[api.flr(n)] then
+			warning(string.format('fget(%d,%d)',n,f))
+			return 0
+		end
+		return api.band(pico8.spriteflags[api.flr(n)],api.shl(1,api.flr(f))) ~= 0
+	end
+	return pico8.spriteflags[api.flr(n)]
+end
+
 return api

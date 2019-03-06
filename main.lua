@@ -1270,19 +1270,6 @@ function api.sset(x,y,c)
 	__pico_spritesheet:refresh()
 end
 
-function api.fget(n,f)
-	if n == nil then return nil end
-	if f ~= nil then
-		-- return just that bit as a boolean
-		if not pico8.spriteflags[api.flr(n)] then
-			warning(string.format('fget(%d,%d)',n,f))
-			return 0
-		end
-		return api.band(pico8.spriteflags[api.flr(n)],api.shl(1,api.flr(f))) ~= 0
-	end
-	return pico8.spriteflags[api.flr(n)]
-end
-
 assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
 assert(bit.band(0x02,bit.lshift(1,1)) ~= 0)
 assert(bit.band(0x04,bit.lshift(1,2)) ~= 0)

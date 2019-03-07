@@ -45,13 +45,6 @@ pico8 = {
 
 local bit = require('bit')
 
-api.band = bit.band
-api.bor = bit.bor
-api.bxor = bit.bxor
-api.bnot = bit.bnot
-api.shl = bit.lshift
-api.shr = bit.rshift
-
 frametime = 1 / pico8.fps
 
 __pico_quads = nil -- used by api.spr

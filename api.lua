@@ -640,8 +640,8 @@ function api.memcpy(dest_addr,source_addr,len)
 		local x = api.flr(source_addr-0x6000+i)%64*2
 		local y = api.flr((source_addr-0x6000+i)/64)
 		--TODO: why are colors broken?
-		local c = ceil(img:getPixel(x,y)/16)
-		local d = ceil(img:getPixel(x+1,y)/16)
+		local c = api.ceil(img:getPixel(x,y)/16)
+		local d = api.ceil(img:getPixel(x+1,y)/16)
 		if c ~= 0 then
 			c = c - 1
 		end

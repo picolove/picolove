@@ -683,5 +683,6 @@ function api.srand(seed)
 end
 
 api.flr = math.floor
+api.ceil = math.ceil
 
 return api

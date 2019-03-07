@@ -1547,17 +1547,6 @@ function api.memcpy(dest_addr,source_addr,len)
 	end
 end
 
-function api.peek(addr, val)
-	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = api.flr(addr-0x6000)%64
-		local dy = api.flr((addr-0x6000)/64)
-		local low = api.pget(dx, dy)
-		local high = bit.lshift(api.pget(dx + 1, dy))
-		return bit.band(low, high)
-	end
-end
-
 function api.poke(addr, val)
 	-- TODO: implement for non screen space
 	if addr >= 0x6000 and addr < 0x8000 then

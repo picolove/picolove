@@ -603,7 +603,7 @@ function api.sfx(n,channel,offset)
 	ch.loop=true
 end
 
-function api.peek(addr, val)
+function api.peek(addr)
 	-- TODO: implement for non screen space
 	if addr >= 0x6000 and addr < 0x8000 then
 		local dx = api.flr(addr-0x6000)%64

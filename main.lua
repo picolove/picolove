@@ -1547,16 +1547,6 @@ function api.memcpy(dest_addr,source_addr,len)
 	end
 end
 
-function api.poke(addr, val)
-	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
-		local dx = api.flr(addr-0x6000)%64*2
-		local dy = api.flr((addr-0x6000)/64)
-		api.pset(dx, dy, bit.band(val, 15))
-		api.pset(dx + 1, dy, bit.rshift(val, 4))
-	end
-end
-
 function api.min(a,b)
 	if a == nil or b == nil then
 		warning('min a or b are nil returning 0')

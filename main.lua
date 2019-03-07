@@ -3,7 +3,7 @@ local api = require 'api'
 
 
 local cart = nil
-local cartname = nil
+cartname = nil -- used by api.reload
 local love_args = nil
 
 pico8 = {
@@ -1368,11 +1368,6 @@ end
 function api.reboot()
 	_load('nocart.p8')
 	api.run()
-end
-
-function api.reload(dest_addr,source_addr,len)
-	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
-	_load(cartname)
 end
 
 function api.add(a,v)

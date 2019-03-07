@@ -670,4 +670,9 @@ function api.memset(dest_addr,val,len)
 	end
 end
 
+function api.reload(dest_addr,source_addr,len)
+	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
+	_load(cartname)
+end
+
 return api

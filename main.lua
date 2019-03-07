@@ -1497,28 +1497,6 @@ function api.btnp(i,p)
 	end
 end
 
-function api.min(a,b)
-	if a == nil or b == nil then
-		warning('min a or b are nil returning 0')
-		return 0
-	end
-	return a < b and a or b
-end
-
-function api.max(a,b)
-	if a == nil or b == nil then
-		warning('max a or b are nil returning 0')
-		return 0
-	end
-	return a > b and a or b
-end
-
-function api.mid(x,y,z)
-	x, y, z = x or 0, y or 0, z or 0
-	if x > y then x, y = y, x end
-	return api.max(x, api.min(y, z))
-end
-
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)
 

@@ -624,4 +624,36 @@ function api.poke(addr, val)
 	end
 end
 
+function api.memcpy(dest_addr,source_addr,len)
+	-- only for range 0x6000+0x8000
+	if len <= 0 then
+		return
+	end
+	if source_addr < 0x6000 or dest_addr < 0x6000 then
+		return
+	end
+	if source_addr + len > 0x8000 or dest_addr + len > 0x8000 then
+		return
+	end
+	local img = pico8.screen:newImageData()
+	for i=0,len-1 do
+		local x = api.flr(source_addr-0x6000+i)%64*2
+		local y = api.flr((source_addr-0x6000+i)/64)
+		--TODO: why are colors broken?
+		local c = ceil(img:getPixel(x,y)/16)
+		local d = ceil(img:getPixel(x+1,y)/16)
+		if c ~= 0 then
+			c = c - 1
+		end
+		if d ~= 0 then
+			d = d - 1
+		end
+
+		local dx = api.flr(dest_addr-0x6000+i)%64*2
+		local dy = api.flr((dest_addr-0x6000+i)/64)
+		api.pset(dx,dy,c)
+		api.pset(dx+1,dy,d)
+	end
+end
+
 return api

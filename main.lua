@@ -1543,13 +1543,6 @@ assert(api.atan2(0, 1) == 0.75)
 
 api.sqrt = math.sqrt
 api.abs = math.abs
-function api.sgn(x)
-	if x < 0 then
-		return -1
-	else
-		return 1
-	end
-end
 
 api.sub = string.sub
 

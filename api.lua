@@ -685,4 +685,12 @@ end
 api.flr = math.floor
 api.ceil = math.ceil
 
+function api.sgn(x)
+	if x < 0 then
+		return -1
+	else
+		return 1
+	end
+end
+
 return api

@@ -682,4 +682,6 @@ function api.srand(seed)
 	return love.math.setRandomSeed(api.flr(seed*32768))
 end
 
+api.flr = math.floor
+
 return api

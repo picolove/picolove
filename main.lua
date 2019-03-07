@@ -1531,7 +1531,6 @@ assert(api.mid(2, 3, 1) == 2)
 assert(api.mid(3, 1, 2) == 2)
 assert(api.mid(3, 2, 1) == 2)
 
-api.flr = math.floor
 ceil = math.ceil
 function api.cos(x) return math.cos((x or 0)*(math.pi*2)) end
 function api.sin(x) return math.sin(-(x or 0)*(math.pi*2)) end

@@ -1544,10 +1544,6 @@ assert(api.atan2(0, 1) == 0.75)
 
 api.sqrt = math.sqrt
 api.abs = math.abs
-function api.srand(seed)
-	if seed == 0 then seed = 1 end
-	return love.math.setRandomSeed(api.flr(seed*32768))
-end
 function api.sgn(x)
 	if x < 0 then
 		return -1

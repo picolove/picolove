@@ -609,7 +609,7 @@ function api.peek(addr)
 		local dx = api.flr(addr-0x6000)%64
 		local dy = api.flr((addr-0x6000)/64)
 		local low = api.pget(dx, dy)
-		local high = bit.lshift(api.pget(dx + 1, dy))
+		local high = bit.lshift(api.pget(dx + 1, dy), 4)
 		return bit.band(low, high)
 	end
 end

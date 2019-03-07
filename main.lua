@@ -1542,7 +1542,6 @@ assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
 api.sqrt = math.sqrt
-api.abs = math.abs
 
 api.sub = string.sub
 

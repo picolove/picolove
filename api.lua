@@ -693,4 +693,6 @@ function api.sgn(x)
 	end
 end
 
+api.abs = math.abs
+
 return api

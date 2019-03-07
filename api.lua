@@ -656,4 +656,18 @@ function api.memcpy(dest_addr,source_addr,len)
 	end
 end
 
+function api.memset(dest_addr,val,len)
+	-- only for range 0x6000+0x8000
+	if dest_addr >= 0x6000 then
+		for i=0,len-1 do
+			local dx = api.flr(dest_addr-0x6000+i)%64*2
+			local dy = api.flr((dest_addr-0x6000+i)/64)
+			local low = val
+			local high = bit.lshift(val,4)
+			api.pset(dx,dy,high)
+			api.pset(dx+1,dy,low)
+		end
+	end
+end
+
 return api

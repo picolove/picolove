@@ -1510,16 +1510,10 @@ assert(api.mid(2, 3, 1) == 2)
 assert(api.mid(3, 1, 2) == 2)
 assert(api.mid(3, 2, 1) == 2)
 
-function api.cos(x) return math.cos((x or 0)*(math.pi*2)) end
-function api.sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
-function api.atan2(x,y) return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0 end
-
 assert(api.atan2(1, 0) == 0)
 assert(api.atan2(0,-1) == 0.25)
 assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
-
-api.sqrt = math.sqrt
 
 api.sub = string.sub
 

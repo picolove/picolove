@@ -1402,15 +1402,6 @@ function api.count(a)
 	return #a
 end
 
-function api.all(a)
-	local i = 0
-	local n = table.getn(a)
-	return function()
-		i = i + 1
-		if i <= n then return a[i] end
-	end
-end
-
 __pico_keypressed = {
 	[0] = {},
 	[1] = {}

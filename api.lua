@@ -788,4 +788,13 @@ end
 
 api.sub = string.sub
 
+function api.all(a)
+	local i = 0
+	local n = table.getn(a)
+	return function()
+		i = i + 1
+		if i <= n then return a[i] end
+	end
+end
+
 return api

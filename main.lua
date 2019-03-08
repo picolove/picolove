@@ -74,13 +74,13 @@ pico8 = {
 	text_shader = nil,
 	quads = {},
 	spritesheet_data = nil,
+	spritesheet = nil,
 }
 
 local bit = require('bit')
 
 frametime = 1 / pico8.fps
 
-__pico_spritesheet = nil -- used by api.spr
 local __accum = 0
 local loaded_code = nil
 
@@ -471,11 +471,11 @@ function load_p8(filename)
 						outX = 0
 						if outY == 128 then
 							-- end of spritesheet, generate quads
-							__pico_spritesheet = love.graphics.newImage(pico8.spritesheet_data)
+							pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 							local sprite = 0
 							for yy=0,15 do
 								for xx=0,15 do
-									pico8.quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
+									pico8.quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,pico8.spritesheet:getDimensions())
 									sprite = sprite + 1
 								end
 							end
@@ -664,7 +664,7 @@ function load_p8(filename)
 
 		assert(sprite == 256,sprite)
 
-		__pico_spritesheet = love.graphics.newImage(pico8.spritesheet_data)
+		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 
 		-- load the sprite flags
 

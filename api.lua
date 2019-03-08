@@ -196,7 +196,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 	if not q then
 		log('missing quad',n)
 	end
-	love.graphics.draw(__pico_spritesheet,q,
+	love.graphics.draw(pico8.spritesheet,q,
 		api.flr(x)+(w*8*(flip_x and 1 or 0)),
 		api.flr(y)+(h*8*(flip_y and 1 or 0)),
 		0,
@@ -215,10 +215,10 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad
-	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
+	local q = love.graphics.newQuad(sx,sy,sw,sh,pico8.spritesheet:getDimensions())
 	love.graphics.setShader(pico8.sprite_shader)
 	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
-	love.graphics.draw(__pico_spritesheet,q,
+	love.graphics.draw(pico8.spritesheet,q,
 		api.flr(dx)+(dw*(flip_x and 1 or 0)),
 		api.flr(dy)+(dh*(flip_y and 1 or 0)),
 		0,
@@ -462,10 +462,10 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 					local v = pico8.map[api.flr(cel_y+y)][api.flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
-							love.graphics.draw(__pico_spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
+							love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 						else
 							if api.band(pico8.spriteflags[v],bitmask) ~= 0 then
-								love.graphics.draw(__pico_spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
+								love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 							else
 							end
 						end
@@ -534,7 +534,7 @@ function api.sset(x,y,c)
 	x = api.flr(x)
 	y = api.flr(y)
 	pico8.spritesheet_data:setPixel(x,y,c*16,0,0,255)
-	__pico_spritesheet:refresh()
+	pico8.spritesheet:refresh()
 end
 
 function api.music(n,fade_len,channel_mask)

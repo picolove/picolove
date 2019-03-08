@@ -172,8 +172,8 @@ end
 
 function api.spr(n,x,y,w,h,flip_x,flip_y)
 	n = api.flr(n)
-	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	love.graphics.setShader(pico8.sprite_shader)
+	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 	n = api.flr(n)
 	w = w or 1
 	h = h or 1
@@ -216,8 +216,8 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dh = dh or sh
 	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,__pico_spritesheet:getDimensions())
-	love.graphics.setShader(__sprite_shader)
-	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	love.graphics.setShader(pico8.sprite_shader)
+	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(__pico_spritesheet,q,
 		api.flr(dx)+(dw*(flip_x and 1 or 0)),
 		api.flr(dy)+(dh*(flip_y and 1 or 0)),
@@ -400,7 +400,7 @@ function api.pal(c0,c1,p)
 			pico8.display_palette[i] = pico8.palette[i]
 		end
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = false
@@ -422,7 +422,7 @@ function api.pal(c0,c1,p)
 		c0 = c0+1
 		pico8.draw_palette[c0] = c1
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
 	end
@@ -441,13 +441,13 @@ function api.palt(c,t)
 			pico8.pal_transparent[c+1] = 0
 		end
 	end
-	__sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 end
 
 function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 	cel_x = cel_x or 0
 	cel_y = cel_y or 0
-	love.graphics.setShader(__sprite_shader)
+	love.graphics.setShader(pico8.sprite_shader)
 	love.graphics.setColor(255,255,255,255)
 	cel_x = api.flr(cel_x)
 	cel_y = api.flr(cel_y)

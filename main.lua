@@ -1463,10 +1463,6 @@ function api.shutdown()
 	love.event.quit()
 end
 
-function api.stat(x)
-	return 0
-end
-
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end

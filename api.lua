@@ -782,4 +782,8 @@ function api.btnp(i,p)
 	end
 end
 
+function api.stat(x)
+	return 0
+end
+
 return api

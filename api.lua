@@ -734,7 +734,7 @@ api.shr = bit.rshift
 function api.btn(i,p)
 	if type(i) == 'number' then
 		p = p or 0
-		if __keymap[p] and __keymap[p][i] then
+		if pico8.keymap[p] and pico8.keymap[p][i] then
 			return pico8.keypressed[p][i] ~= nil
 		end
 		return false
@@ -758,7 +758,7 @@ end
 function api.btnp(i,p)
 	if type(i) == 'number' then
 		p = p or 0
-		if __keymap[p] and __keymap[p][i] then
+		if pico8.keymap[p] and pico8.keymap[p][i] then
 			local v = pico8.keypressed[p][i]
 			if v and (v == 0 or (v >= 12 and v % 4 == 0)) then
 				return true

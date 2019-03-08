@@ -39,6 +39,28 @@ pico8 = {
 		[0] = {},
 		[1] = {}
 	},
+	keymap = {
+		[0] = {
+			[0] = {'left','kp4'},
+			[1] = {'right','kp6'},
+			[2] = {'up','kp8'},
+			[3] = {'down','kp5'},
+			[4] = {'z','c','n','kp-','kp1','insert'},
+			[5] = {'x','v','m','8','kp2','delete'},
+			[6] = {'return','escape'},
+			[7] = {},
+		},
+		[1] = {
+			[0] = {'s'},
+			[1] = {'f'},
+			[2] = {'e'},
+			[3] = {'d'},
+			[4] = {'tab','lshift','w'},
+			[5] = {'q','a'},
+			[6] = {},
+			[7] = {},
+		}
+	},
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
@@ -802,8 +824,8 @@ end
 
 function love.update(dt)
 	for p=0,1 do
-		for i=0,#__keymap[p] do
-			for _,key in pairs(__keymap[p][i]) do
+		for i=0,#pico8.keymap[p] do
+			for _,key in pairs(pico8.keymap[p][i]) do
 				local v = pico8.keypressed[p][i]
 				if v then
 					v = v + 1
@@ -1134,8 +1156,8 @@ function love.keypressed(key)
 		love.window.setFullscreen(not love.window.getFullscreen(), 'desktop')
 	else
 		for p=0,1 do
-			for i=0,#__keymap[p] do
-				for _,testkey in pairs(__keymap[p][i]) do
+			for i=0,#pico8.keymap[p] do
+				for _,testkey in pairs(pico8.keymap[p][i]) do
 					if key == testkey then
 						pico8.keypressed[p][i] = -1 -- becomes 0 on the next frame
 						break
@@ -1151,8 +1173,8 @@ end
 
 function love.keyreleased(key)
 	for p=0,1 do
-		for i=0,#__keymap[p] do
-			for _,testkey in pairs(__keymap[p][i]) do
+		for i=0,#pico8.keymap[p] do
+			for _,testkey in pairs(pico8.keymap[p][i]) do
 				if key == testkey then
 					pico8.keypressed[p][i] = nil
 					break
@@ -1371,29 +1393,6 @@ end
 function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
-
-__keymap = {
-	[0] = {
-		[0] = {'left','kp4'},
-		[1] = {'right','kp6'},
-		[2] = {'up','kp8'},
-		[3] = {'down','kp5'},
-		[4] = {'z','c','n','kp-','kp1','insert'},
-		[5] = {'x','v','m','8','kp2','delete'},
-		[6] = {'return','escape'},
-		[7] = {},
-	},
-	[1] = {
-		[0] = {'s'},
-		[1] = {'f'},
-		[2] = {'e'},
-		[3] = {'d'},
-		[4] = {'tab','lshift','w'},
-		[5] = {'q','a'},
-		[6] = {},
-		[7] = {},
-	}
-}
 
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)

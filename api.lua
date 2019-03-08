@@ -10,7 +10,7 @@ function api.clip(x,y,w,h)
 		love.graphics.setScissor(x,y,w,h)
 		pico8.clip = {x,y,w,h}
 	else
-		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
+		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
 		pico8.clip = nil
 	end
 end
@@ -134,7 +134,7 @@ function api.pset(x,y,c)
 end
 
 function api.pget(x,y)
-	if x >= 0 and x < __pico_resolution[1] and y >= 0 and y < __pico_resolution[2] then
+	if x >= 0 and x < pico8.resolution[1] and y >= 0 and y < pico8.resolution[2] then
 		local __screen_img = pico8.screen:newImageData()
 		local r,g,b,a = __screen_img:getPixel(api.flr(x),api.flr(y))
 		return api.flr(r/17.0)

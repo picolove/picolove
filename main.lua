@@ -9,6 +9,7 @@ local love_args = nil
 pico8 = {
 	clip = nil,
 	fps = 30,
+	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
 		{0,0,0,255},
@@ -202,7 +203,7 @@ function love.load(argv)
 
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
-	pico8.screen = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
+	pico8.screen = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
 	pico8.screen:setFilter('linear','nearest')
 
 	local font = love.graphics.newImageFont('font.png', fontchars, 1)
@@ -842,9 +843,9 @@ function love.resize(w,h)
 	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
-		scale = h/(__pico_resolution[2]+ypadding*2)
+		scale = h/(pico8.resolution[2]+ypadding*2)
 	else
-		scale = w/(__pico_resolution[1]+xpadding*2)
+		scale = w/(pico8.resolution[1]+xpadding*2)
 	end
 end
 
@@ -1101,7 +1102,7 @@ function flip_screen()
 	love.graphics.present()
 
 	if video_frames then
-		local tmp = love.graphics.newCanvas(__pico_resolution[1],__pico_resolution[2])
+		local tmp = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
 		love.graphics.setCanvas(tmp)
 		love.graphics.draw(pico8.screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
@@ -1205,7 +1206,7 @@ function restore_clip()
 	if pico8.clip then
 		love.graphics.setScissor(unpack(pico8.clip))
 	else
-		love.graphics.setScissor(0,0,__pico_resolution[1],__pico_resolution[2])
+		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
 	end
 end
 

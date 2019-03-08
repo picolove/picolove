@@ -811,4 +811,12 @@ function api.count(a)
 	return #a
 end
 
+function api.add(a,v)
+	if a == nil then
+		warning('add to nil')
+		return
+	end
+	table.insert(a,v)
+end
+
 return api

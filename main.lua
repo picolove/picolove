@@ -1364,14 +1364,6 @@ function api.reboot()
 	api.run()
 end
 
-function api.add(a,v)
-	if a == nil then
-		warning('add to nil')
-		return
-	end
-	table.insert(a,v)
-end
-
 function api.del(a,dv)
 	if a == nil then
 		warning('del from nil')

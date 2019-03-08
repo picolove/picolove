@@ -202,7 +202,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 		0,
 		flip_x and -1 or 1,
 		flip_y and -1 or 1)
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 end
 
 function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
@@ -224,7 +224,7 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 		0,
 		flip_x and -1 or 1 * (dw/sw),
 		flip_y and -1 or 1 * (dh/sh))
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 end
 
 function api.rect(x0,y0,x1,y1,col)
@@ -399,7 +399,7 @@ function api.pal(c0,c1,p)
 			pico8.draw_palette[i] = i
 			pico8.display_palette[i] = pico8.palette[i]
 		end
-		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
@@ -421,7 +421,7 @@ function api.pal(c0,c1,p)
 		c1 = c1+1
 		c0 = c0+1
 		pico8.draw_palette[c0] = c1
-		__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
@@ -474,7 +474,7 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 			end
 		end
 	end
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 end
 
 function api.mget(x,y)

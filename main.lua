@@ -67,6 +67,7 @@ pico8 = {
 	draw_palette = {},
 	display_palette = {},
 	pal_transparent = {},
+	draw_shader = nil,
 }
 
 local bit = require('bit')
@@ -76,7 +77,6 @@ frametime = 1 / pico8.fps
 __pico_quads = nil -- used by api.spr
 __pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
-__draw_shader = nil -- used by api.spr
 __sprite_shader = nil -- used by api.spr
 __text_shader = nil -- used by api.print
 __display_shader = nil
@@ -229,14 +229,14 @@ function love.load(argv)
 	end
 
 
-	__draw_shader = love.graphics.newShader([[
+	pico8.draw_shader = love.graphics.newShader([[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+	pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 
 	__sprite_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -1107,7 +1107,7 @@ function flip_screen()
 		table.insert(video_frames,tmp:getImageData())
 	end
 	-- get ready for next time
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 	love.graphics.setCanvas(pico8.screen)
 	restore_clip()
 	restore_camera()
@@ -1118,7 +1118,7 @@ function love.draw()
 	restore_clip()
 	restore_camera()
 
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 
 	-- run the cart's draw function
 	if cart._draw then cart._draw() end
@@ -1342,7 +1342,7 @@ function _load(_cartname)
 		return
 	end
 
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.origin()
 	api.camera()
@@ -1355,7 +1355,7 @@ end
 
 function api.run()
 	love.graphics.setCanvas(pico8.screen)
-	love.graphics.setShader(__draw_shader)
+	love.graphics.setShader(pico8.draw_shader)
 	restore_clip()
 	love.graphics.origin()
 
@@ -1370,7 +1370,7 @@ function api.run()
 	else
 		local result
 		setfenv(f,cart)
-		love.graphics.setShader(__draw_shader)
+		love.graphics.setShader(pico8.draw_shader)
 		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
 		restore_clip()

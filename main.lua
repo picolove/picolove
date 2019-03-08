@@ -71,6 +71,7 @@ pico8 = {
 	draw_shader = nil,
 	sprite_shader = nil,
 	display_shader = nil,
+	text_shader = nil,
 }
 
 local bit = require('bit')
@@ -80,7 +81,6 @@ frametime = 1 / pico8.fps
 __pico_quads = nil -- used by api.spr
 __pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
-__text_shader = nil -- used by api.print
 local __accum = 0
 local loaded_code = nil
 
@@ -251,7 +251,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 
-	__text_shader = love.graphics.newShader([[
+	pico8.text_shader = love.graphics.newShader([[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
@@ -263,7 +263,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
+	pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 
 	pico8.display_shader = love.graphics.newShader([[
 

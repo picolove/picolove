@@ -162,7 +162,7 @@ function api.print(str,x,y,col)
 		api.color(c)
 		api.cursor(0, y+6)
 	end
-	love.graphics.setShader(__text_shader)
+	love.graphics.setShader(pico8.text_shader)
 	love.graphics.print(str,api.flr(x),api.flr(y))
 end
 
@@ -401,7 +401,7 @@ function api.pal(c0,c1,p)
 		end
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
@@ -423,7 +423,7 @@ function api.pal(c0,c1,p)
 		pico8.draw_palette[c0] = c1
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
 	end
 end

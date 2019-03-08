@@ -72,13 +72,13 @@ pico8 = {
 	sprite_shader = nil,
 	display_shader = nil,
 	text_shader = nil,
+	quads = {},
 }
 
 local bit = require('bit')
 
 frametime = 1 / pico8.fps
 
-__pico_quads = nil -- used by api.spr
 __pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
 local __accum = 0
@@ -391,7 +391,7 @@ function load_p8(filename)
 
 	local lua = ''
 	pico8.map = {}
-	__pico_quads = {}
+	pico8.quads = {}
 	for y=0,63 do
 		pico8.map[y] = {}
 		for x=0,127 do
@@ -475,7 +475,7 @@ function load_p8(filename)
 							local sprite = 0
 							for yy=0,15 do
 								for xx=0,15 do
-									__pico_quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
+									pico8.quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,__pico_spritesheet:getDimensions())
 									sprite = sprite + 1
 								end
 							end
@@ -657,7 +657,7 @@ function load_p8(filename)
 
 		for y=0,15 do
 			for x=0,15 do
-				__pico_quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
+				pico8.quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
 				sprite = sprite + 1
 			end
 		end

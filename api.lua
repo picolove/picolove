@@ -179,18 +179,18 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 	h = h or 1
 	local q
 	if w == 1 and h == 1 then
-		q = __pico_quads[n]
+		q = pico8.quads[n]
 		if not q then
 			log('warning: sprite '..n..' is missing')
 			return
 		end
 	else
 		local id = string.format('%d-%d-%d',n,w,h)
-		if __pico_quads[id] then
-			q = __pico_quads[id]
+		if pico8.quads[id] then
+			q = pico8.quads[id]
 		else
 			q = love.graphics.newQuad(api.flr(n%16)*8,api.flr(n/16)*8,8*w,8*h,128,128)
-			__pico_quads[id] = q
+			pico8.quads[id] = q
 		end
 	end
 	if not q then
@@ -462,10 +462,10 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 					local v = pico8.map[api.flr(cel_y+y)][api.flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
-							love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
+							love.graphics.draw(__pico_spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 						else
 							if api.band(pico8.spriteflags[v],bitmask) ~= 0 then
-								love.graphics.draw(__pico_spritesheet,__pico_quads[v],sx+8*x,sy+8*y)
+								love.graphics.draw(__pico_spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 							else
 							end
 						end

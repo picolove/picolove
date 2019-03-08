@@ -797,4 +797,14 @@ function api.all(a)
 	end
 end
 
+function api.foreach(a,f)
+	if not a then
+		warning('foreach got a nil value')
+		return
+	end
+	for i,v in ipairs(a) do
+		f(v)
+	end
+end
+
 return api

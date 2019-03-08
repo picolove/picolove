@@ -1388,16 +1388,6 @@ function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
 
-function api.foreach(a,f)
-	if not a then
-		warning('foreach got a nil value')
-		return
-	end
-	for i,v in ipairs(a) do
-		f(v)
-	end
-end
-
 function api.count(a)
 	return #a
 end

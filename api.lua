@@ -819,4 +819,16 @@ function api.add(a,v)
 	table.insert(a,v)
 end
 
+function api.del(a,dv)
+	if a == nil then
+		warning('del from nil')
+		return
+	end
+	for i,v in ipairs(a) do
+		if v==dv then
+			table.remove(a,i)
+		end
+	end
+end
+
 return api

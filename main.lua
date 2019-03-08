@@ -1364,18 +1364,6 @@ function api.reboot()
 	api.run()
 end
 
-function api.del(a,dv)
-	if a == nil then
-		warning('del from nil')
-		return
-	end
-	for i,v in ipairs(a) do
-		if v==dv then
-			table.remove(a,i)
-		end
-	end
-end
-
 function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end

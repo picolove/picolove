@@ -1388,10 +1388,6 @@ function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
 
-function api.count(a)
-	return #a
-end
-
 __pico_keypressed = {
 	[0] = {},
 	[1] = {}

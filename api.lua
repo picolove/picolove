@@ -807,4 +807,8 @@ function api.foreach(a,f)
 	end
 end
 
+function api.count(a)
+	return #a
+end
+
 return api

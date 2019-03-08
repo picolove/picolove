@@ -786,4 +786,6 @@ function api.stat(x)
 	return 0
 end
 
+api.sub = string.sub
+
 return api

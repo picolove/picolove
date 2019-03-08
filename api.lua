@@ -735,19 +735,19 @@ function api.btn(i,p)
 	if type(i) == 'number' then
 		p = p or 0
 		if __keymap[p] and __keymap[p][i] then
-			return __pico_keypressed[p][i] ~= nil
+			return pico8.keypressed[p][i] ~= nil
 		end
 		return false
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
 		for i=0,7 do
-			if __pico_keypressed[0][i] then
+			if pico8.keypressed[0][i] then
 				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		for i=0,7 do
-			if __pico_keypressed[1][i] then
+			if pico8.keypressed[1][i] then
 				bitfield = bitfield + bit.lshift(1,i+8)
 			end
 		end
@@ -759,7 +759,7 @@ function api.btnp(i,p)
 	if type(i) == 'number' then
 		p = p or 0
 		if __keymap[p] and __keymap[p][i] then
-			local v = __pico_keypressed[p][i]
+			local v = pico8.keypressed[p][i]
 			if v and (v == 0 or (v >= 12 and v % 4 == 0)) then
 				return true
 			end
@@ -769,12 +769,12 @@ function api.btnp(i,p)
 		-- return bitfield of buttons
 		local bitfield = 0
 		for i=0,7 do
-			if __pico_keypressed[0][i] then
+			if pico8.keypressed[0][i] then
 				bitfield = bitfield + bit.lshift(1,i)
 			end
 		end
 		for i=0,7 do
-			if __pico_keypressed[1][i] then
+			if pico8.keypressed[1][i] then
 				bitfield = bitfield + bit.lshift(1,i+8)
 			end
 		end

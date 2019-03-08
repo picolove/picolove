@@ -35,6 +35,10 @@ pico8 = {
 	sfx = {},
 	music = {},
 	current_music = nil,
+	keypressed = {
+		[0] = {},
+		[1] = {}
+	},
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
@@ -800,10 +804,10 @@ function love.update(dt)
 	for p=0,1 do
 		for i=0,#__keymap[p] do
 			for _,key in pairs(__keymap[p][i]) do
-				local v = __pico_keypressed[p][i]
+				local v = pico8.keypressed[p][i]
 				if v then
 					v = v + 1
-					__pico_keypressed[p][i] = v
+					pico8.keypressed[p][i] = v
 					break
 				end
 			end
@@ -1133,7 +1137,7 @@ function love.keypressed(key)
 			for i=0,#__keymap[p] do
 				for _,testkey in pairs(__keymap[p][i]) do
 					if key == testkey then
-						__pico_keypressed[p][i] = -1 -- becomes 0 on the next frame
+						pico8.keypressed[p][i] = -1 -- becomes 0 on the next frame
 						break
 					end
 				end
@@ -1150,7 +1154,7 @@ function love.keyreleased(key)
 		for i=0,#__keymap[p] do
 			for _,testkey in pairs(__keymap[p][i]) do
 				if key == testkey then
-					__pico_keypressed[p][i] = nil
+					pico8.keypressed[p][i] = nil
 					break
 				end
 			end
@@ -1367,11 +1371,6 @@ end
 function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
-
-__pico_keypressed = {
-	[0] = {},
-	[1] = {}
-}
 
 __keymap = {
 	[0] = {

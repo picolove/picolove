@@ -526,14 +526,14 @@ function api.sget(x,y)
 	-- return the color from the spritesheet
 	x = api.flr(x)
 	y = api.flr(y)
-	local r,g,b,a = __pico_spritesheet_data:getPixel(x,y)
+	local r,g,b,a = pico8.spritesheet_data:getPixel(x,y)
 	return api.flr(r/16)
 end
 
 function api.sset(x,y,c)
 	x = api.flr(x)
 	y = api.flr(y)
-	__pico_spritesheet_data:setPixel(x,y,c*16,0,0,255)
+	pico8.spritesheet_data:setPixel(x,y,c*16,0,0,255)
 	__pico_spritesheet:refresh()
 end
 

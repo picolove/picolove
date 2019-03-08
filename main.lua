@@ -73,13 +73,13 @@ pico8 = {
 	display_shader = nil,
 	text_shader = nil,
 	quads = {},
+	spritesheet_data = nil,
 }
 
 local bit = require('bit')
 
 frametime = 1 / pico8.fps
 
-__pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
 local __accum = 0
 local loaded_code = nil
@@ -398,7 +398,7 @@ function load_p8(filename)
 			pico8.map[y][x] = 0
 		end
 	end
-	__pico_spritesheet_data = love.image.newImageData(128,128)
+	pico8.spritesheet_data = love.image.newImageData(128,128)
 	pico8.spriteflags = {}
 
 	pico8.sfx = {}
@@ -462,16 +462,16 @@ function load_p8(filename)
 							mapY = mapY + 1
 						end
 					end
-					__pico_spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
+					pico8.spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
 					outX = outX + 1
-					__pico_spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
+					pico8.spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
 					outX = outX + 1
 					if outX == 128 then
 						outY = outY + 1
 						outX = 0
 						if outY == 128 then
 							-- end of spritesheet, generate quads
-							__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+							__pico_spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 							local sprite = 0
 							for yy=0,15 do
 								for xx=0,15 do
@@ -624,7 +624,7 @@ function load_p8(filename)
 			for i=1,#line do
 				local v = line:sub(i,i)
 				v = tonumber(v,16)
-				__pico_spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
+				pico8.spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
 
 				col = col + 1
 				if col == 128 then
@@ -640,8 +640,8 @@ function load_p8(filename)
 			for sy=64,127 do
 				for sx=0,127,2 do
 					-- get the two pixel values and merge them
-					local lo = api.flr(__pico_spritesheet_data:getPixel(sx,sy)/16)
-					local hi = api.flr(__pico_spritesheet_data:getPixel(sx+1,sy)/16)
+					local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
+					local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
 					local v = api.bor(api.shl(hi,4),lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
@@ -664,7 +664,7 @@ function load_p8(filename)
 
 		assert(sprite == 256,sprite)
 
-		__pico_spritesheet = love.graphics.newImage(__pico_spritesheet_data)
+		__pico_spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 
 		-- load the sprite flags
 

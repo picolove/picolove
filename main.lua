@@ -70,6 +70,7 @@ pico8 = {
 	pal_transparent = {},
 	draw_shader = nil,
 	sprite_shader = nil,
+	display_shader = nil,
 }
 
 local bit = require('bit')
@@ -80,7 +81,6 @@ __pico_quads = nil -- used by api.spr
 __pico_spritesheet_data = nil -- used by api.sget
 __pico_spritesheet = nil -- used by api.spr
 __text_shader = nil -- used by api.print
-__display_shader = nil
 local __accum = 0
 local loaded_code = nil
 
@@ -265,7 +265,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 }]])
 	__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
 
-	__display_shader = love.graphics.newShader([[
+	pico8.display_shader = love.graphics.newShader([[
 
 extern vec4 palette[16];
 
@@ -274,7 +274,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the colour in the palette by index
 	return palette[index]/256.0;
 }]])
-	__display_shader:send('palette',shdr_unpack(pico8.display_palette))
+	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 
 	-- load the cart
 	api.clip()
@@ -1081,8 +1081,8 @@ function update_audio(time)
 end
 
 function flip_screen()
-	love.graphics.setShader(__display_shader)
-	__display_shader:send('palette',shdr_unpack(pico8.display_palette))
+	love.graphics.setShader(pico8.display_shader)
+	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 

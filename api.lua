@@ -402,7 +402,7 @@ function api.pal(c0,c1,p)
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		__text_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
+		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
@@ -413,7 +413,7 @@ function api.pal(c0,c1,p)
 		c1 = c1+1
 		c0 = c0+1
 		pico8.display_palette[c0] = pico8.palette[c1]
-		__display_shader:send('palette',shdr_unpack(pico8.display_palette))
+		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
 		c0 = api.flr(c0)%16

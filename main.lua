@@ -380,10 +380,6 @@ function new_sandbox()
 	}
 end
 
-local __compression_map = {}
-for entry in ('\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_'):gmatch('.') do
-	table.insert(__compression_map,entry)
-end
 
 function love.update(dt)
 	for p=0,1 do

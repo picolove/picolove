@@ -1,5 +1,10 @@
 local api=require("api")
 
+local compression_map = {}
+for entry in ('\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_'):gmatch('.') do
+	table.insert(compression_map,entry)
+end
+
 local eol_chars = '\n'
 
 local cart={}
@@ -182,7 +187,7 @@ function cart.load_p8(filename)
 						mode = 1
 					elseif byte >= 0x01 and byte <= 0x3b then
 						-- output this byte from map
-						lua = lua .. __compression_map[byte]
+						lua = lua .. compression_map[byte]
 					elseif byte >= 0x3c then
 						-- copy previous bytes
 						mode = 2

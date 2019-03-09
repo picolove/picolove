@@ -320,7 +320,7 @@ function new_sandbox()
 		camera=api.camera,
 		circ=api.circ,
 		circfill=api.circfill,
-		help=help,
+		help=api.help,
 		dir=api.dir,
 		line=api.line,
 		load=_load,
@@ -832,7 +832,7 @@ function _horizontal_line(points,x0,y,x1)
 	end
 end
 
-function help()
+function api.help()
 	api.print('')
 	api.color(12)
 	api.print('commands')

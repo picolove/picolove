@@ -36,6 +36,7 @@ pico8 = {
 	sfx = {},
 	music = {},
 	current_music = nil,
+	cart = nil,
 	keypressed = {
 		[0] = {},
 		[1] = {}
@@ -836,7 +837,7 @@ function love.update(dt)
 			end
 		end
 	end
-	if cart._update then cart._update() end
+	if pico8.cart._update then pico8.cart._update() end
 end
 
 function love.resize(w,h)
@@ -1122,7 +1123,7 @@ function love.draw()
 	love.graphics.setShader(pico8.draw_shader)
 
 	-- run the cart's draw function
-	if cart._draw then cart._draw() end
+	if pico8.cart._draw then pico8.cart._draw() end
 
 	-- draw the contents of pico screen to our screen
 	flip_screen()
@@ -1167,8 +1168,8 @@ function love.keypressed(key)
 			end
 		end
 	end
-	if cart and cart._keydown then
-		return cart._keydown(key)
+	if pico8.cart and pico8.cart._keydown then
+		return pico8.cart._keydown(key)
 	end
 end
 
@@ -1183,8 +1184,8 @@ function love.keyreleased(key)
 			end
 		end
 	end
-	if cart and cart._keyup then
-		return cart._keyup(key)
+	if pico8.cart and pico8.cart._keyup then
+		return pico8.cart._keyup(key)
 	end
 end
 
@@ -1197,8 +1198,8 @@ function love.textinput(text)
 			break
 		end
 	end
-	if validchar and cart and cart._textinput then
-		return cart._textinput(text)
+	if validchar and pico8.cart and pico8.cart._textinput then
+		return pico8.cart._textinput(text)
 	end
 end
 
@@ -1304,7 +1305,7 @@ function _call(code)
 		return false
 	else
 		local result
-		setfenv(f,cart)
+		setfenv(f,pico8.cart)
 		ok,e = pcall(f)
 		if not ok then
 			api.print('runtime error', nil, nil, 14)
@@ -1360,7 +1361,7 @@ function api.run()
 	restore_clip()
 	love.graphics.origin()
 
-	cart = new_sandbox()
+	pico8.cart = new_sandbox()
 
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then
@@ -1370,7 +1371,7 @@ function api.run()
 		error('Error loading lua: '..tostring(e))
 	else
 		local result
-		setfenv(f,cart)
+		setfenv(f,pico8.cart)
 		love.graphics.setShader(pico8.draw_shader)
 		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
@@ -1383,7 +1384,7 @@ function api.run()
 		end
 	end
 
-	if cart._init then cart._init() end
+	if pico8.cart._init then pico8.cart._init() end
 end
 
 function api.reboot()

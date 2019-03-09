@@ -793,13 +793,6 @@ function _getcursory()
 	return pico8.cursor[2]
 end
 
-function api.color(c)
-	c = c and api.flr(c) or 0
-	assert(c >= 0 and c <= 16,string.format('c is %s',c))
-	pico8.color = c
-	love.graphics.setColor(c*16,0,0,255)
-end
-
 function restore_camera()
 	love.graphics.origin()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)

@@ -155,6 +155,13 @@ function api.pget(x,y)
 	end
 end
 
+function api.color(c)
+	c = c and api.flr(c) or 0
+	assert(c >= 0 and c <= 16,string.format('c is %s',c))
+	pico8.color = c
+	love.graphics.setColor(c*16,0,0,255)
+end
+
 function api.print(str,x,y,col)
 	if col then api.color(col) end
 	local canscroll = y==nil

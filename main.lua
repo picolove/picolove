@@ -832,28 +832,6 @@ function _horizontal_line(points,x0,y,x1)
 	end
 end
 
-function api.help()
-	api.print('')
-	api.color(12)
-	api.print('commands')
-	api.print('')
-	api.color(6)
-	api.print('load <filename>  save <filename>')
-	api.print('run              resume')
-	api.print('shutdown         reboot')
-	api.print('install_demos    dir')
-	api.print('cd <dirname>     mkdir <dirname>')
-	api.print('cd ..   go up a directory')
-	api.print('')
-	api.print('alt+enter to toggle fullscreen')
-	api.print('alt+f4 or command+q to fastquit')
-	api.print('')
-	api.color(12)
-	api.print('see readme.md for more info')
-	api.print('or visit: github.com/picolove')
-	api.print('')
-end
-
 function _call(code)
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then

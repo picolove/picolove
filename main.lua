@@ -2,7 +2,7 @@ require 'strict'
 local api = require 'api'
 
 
-local cart = nil
+local cart = require 'cart'
 cartname = nil -- used by api.reload
 local love_args = nil
 
@@ -387,7 +387,7 @@ for entry in ('\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_'):gm
 	table.insert(__compression_map,entry)
 end
 
-function load_p8(filename)
+function cart.load_p8(filename)
 	log('Loading',filename)
 
 	local lua = ''
@@ -1350,7 +1350,7 @@ function _load(_cartname)
 	api.camera()
 	restore_clip()
 	cartname = _cartname
-	if load_p8(currentDirectory.._cartname) then
+	if cart.load_p8(currentDirectory.._cartname) then
 		api.print('loaded '.._cartname, nil, nil, 6)
 	end
 end

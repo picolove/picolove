@@ -5,6 +5,17 @@ function api.flip()
 	love.timer.sleep(frametime)
 end
 
+function api.camera(x,y)
+	if type(x) == 'number' then
+		pico8.camera_x = api.flr(x)
+		pico8.camera_y = api.flr(y)
+	else
+		pico8.camera_x = 0
+		pico8.camera_y = 0
+	end
+	restore_camera()
+end
+
 function api.clip(x,y,w,h)
 	if type(x) == 'number' then
 		love.graphics.setScissor(x,y,w,h)

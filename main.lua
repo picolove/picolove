@@ -803,17 +803,6 @@ end
 pico8.camera_x = 0
 pico8.camera_y = 0
 
-function api.camera(x,y)
-	if type(x) == 'number' then
-		pico8.camera_x = api.flr(x)
-		pico8.camera_y = api.flr(y)
-	else
-		pico8.camera_x = 0
-		pico8.camera_y = 0
-	end
-	restore_camera()
-end
-
 function restore_camera()
 	love.graphics.origin()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)

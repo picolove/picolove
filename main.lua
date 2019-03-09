@@ -923,10 +923,6 @@ assert(api.atan2(0,-1) == 0.25)
 assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
-function api.shutdown()
-	love.event.quit()
-end
-
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end

@@ -7,6 +7,48 @@ end
 
 local eol_chars = '\n'
 
+local function decompress(code)
+	-- decompress code
+	local lua = ""
+	local mode = 0
+	local copy = nil
+	local i = 8
+	local codelen = bit.lshift(code:byte(5,5),8) + code:byte(6,6)
+	log('codelen',codelen)
+	while #lua < codelen do
+		i = i + 1
+		local byte = string.byte(code,i,i)
+		if byte == nil then
+			error('reached end of code')
+		else
+			if mode == 1 then
+				lua = lua .. code:sub(i,i)
+				mode = 0
+			elseif mode == 2 then
+				-- copy from buffer
+				local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
+				local length = bit.rshift(byte,4) + 2
+
+				local offset = #lua - offset
+				local buffer = lua:sub(offset+1,offset+1+length-1)
+				lua = lua .. buffer
+				mode = 0
+			elseif byte == 0x00 then
+				-- output next byte
+				mode = 1
+			elseif byte >= 0x01 and byte <= 0x3b then
+				-- output this byte from map
+				lua = lua .. compression_map[byte]
+			elseif byte >= 0x3c then
+				-- copy previous bytes
+				mode = 2
+				copy = byte
+			end
+		end
+	end
+	return lua
+end
+
 local cart={}
 
 function cart.load_p8(filename)
@@ -158,43 +200,7 @@ function cart.load_p8(filename)
 		if not compressed then
 			lua = code:match("(.-)%f[%z]")
 		else
-			-- decompress code
-			local mode = 0
-			local copy = nil
-			local i = 8
-			local codelen = bit.lshift(code:byte(5,5),8) + code:byte(6,6)
-			log('codelen',codelen)
-			while #lua < codelen do
-				i = i + 1
-				local byte = string.byte(code,i,i)
-				if byte == nil then
-					error('reached end of code')
-				else
-					if mode == 1 then
-						lua = lua .. code:sub(i,i)
-						mode = 0
-					elseif mode == 2 then
-						-- copy from buffer
-						local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
-						local length = bit.rshift(byte,4) + 2
-
-						local offset = #lua - offset
-						local buffer = lua:sub(offset+1,offset+1+length-1)
-						lua = lua .. buffer
-						mode = 0
-					elseif byte == 0x00 then
-						-- output next byte
-						mode = 1
-					elseif byte >= 0x01 and byte <= 0x3b then
-						-- output this byte from map
-						lua = lua .. compression_map[byte]
-					elseif byte >= 0x3c then
-						-- copy previous bytes
-						mode = 2
-						copy = byte
-					end
-				end
-			end
+			lua = decompress(code)
 		end
 
 	else

@@ -749,6 +749,11 @@ api.bnot = bit.bnot
 api.shl = bit.lshift
 api.shr = bit.rshift
 
+function api.reboot()
+	_load('nocart.p8')
+	api.run()
+end
+
 function api.help()
 	api.print('')
 	api.color(12)

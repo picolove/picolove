@@ -901,11 +901,6 @@ function api.run()
 	if pico8.cart._init then pico8.cart._init() end
 end
 
-function api.reboot()
-	_load('nocart.p8')
-	api.run()
-end
-
 function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end

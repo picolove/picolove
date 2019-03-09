@@ -800,9 +800,6 @@ function api.color(c)
 	love.graphics.setColor(c*16,0,0,255)
 end
 
-pico8.camera_x = 0
-pico8.camera_y = 0
-
 function restore_camera()
 	love.graphics.origin()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)

@@ -749,6 +749,38 @@ api.bnot = bit.bnot
 api.shl = bit.lshift
 api.shr = bit.rshift
 
+function api.run()
+	love.graphics.setCanvas(pico8.screen)
+	love.graphics.setShader(pico8.draw_shader)
+	restore_clip()
+	love.graphics.origin()
+
+	pico8.cart = new_sandbox()
+
+	local ok,f,e = pcall(load,loaded_code,cartname)
+	if not ok or f==nil then
+		log('=======8<========')
+		log(loaded_code)
+		log('=======>8========')
+		error('Error loading lua: '..tostring(e))
+	else
+		local result
+		setfenv(f,pico8.cart)
+		love.graphics.setShader(pico8.draw_shader)
+		love.graphics.setCanvas(pico8.screen)
+		love.graphics.origin()
+		restore_clip()
+		ok,result = pcall(f)
+		if not ok then
+			error('Error running lua: '..tostring(result))
+		else
+			log('lua completed')
+		end
+	end
+
+	if pico8.cart._init then pico8.cart._init() end
+end
+
 function api.reboot()
 	_load('nocart.p8')
 	api.run()

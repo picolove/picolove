@@ -88,7 +88,8 @@ function cart.load_p8(filename)
 		}
 	end
 
-	if filename:sub(#filename-3,#filename) == '.png' then
+	local header = love.filesystem.read(filename, 8)
+	if header == "\137PNG\r\n\26\n" then
 		local img = love.graphics.newImage(filename)
 		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
 			error('Image is the wrong size')

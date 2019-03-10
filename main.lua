@@ -869,10 +869,6 @@ function _load(_cartname)
 	end
 end
 
-function warning(msg)
-	log(debug.traceback('WARNING: '..msg,3))
-end
-
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)
 

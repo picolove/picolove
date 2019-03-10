@@ -1,3 +1,7 @@
+function warning(msg)
+	log(debug.traceback('WARNING: '..msg,3))
+end
+
 local api = {}
 
 function api.flip()

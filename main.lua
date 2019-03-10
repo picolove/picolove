@@ -798,13 +798,6 @@ function restore_camera()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
-function _plot4points(points,cx,cy,x,y)
-	_horizontal_line(points, cx - x, cy + y, cx + x)
-	if y ~= 0 then
-		_horizontal_line(points, cx - x, cy - y, cx + x)
-	end
-end
-
 function _horizontal_line(points,x0,y,x1)
 	for x=x0,x1 do
 		table.insert(points,{x,y})

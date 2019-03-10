@@ -2,6 +2,13 @@ function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
 
+function _plot4points(points,cx,cy,x,y)
+	_horizontal_line(points, cx - x, cy + y, cx + x)
+	if y ~= 0 then
+		_horizontal_line(points, cx - x, cy - y, cx + x)
+	end
+end
+
 local api = {}
 
 function api.flip()

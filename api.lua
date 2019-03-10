@@ -2,7 +2,13 @@ function warning(msg)
 	log(debug.traceback('WARNING: '..msg,3))
 end
 
-function _plot4points(points,cx,cy,x,y)
+local function _horizontal_line(points,x0,y,x1)
+	for x=x0,x1 do
+		table.insert(points,{x,y})
+	end
+end
+
+local function _plot4points(points,cx,cy,x,y)
 	_horizontal_line(points, cx - x, cy + y, cx + x)
 	if y ~= 0 then
 		_horizontal_line(points, cx - x, cy - y, cx + x)

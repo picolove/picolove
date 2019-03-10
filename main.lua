@@ -798,12 +798,6 @@ function restore_camera()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
-function _horizontal_line(points,x0,y,x1)
-	for x=x0,x1 do
-		table.insert(points,{x,y})
-	end
-end
-
 function _call(code)
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then

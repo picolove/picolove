@@ -856,24 +856,6 @@ function _load(_cartname)
 	end
 end
 
-assert(api.min(1, 2) == 1)
-assert(api.min(2, 1) == 1)
-
-assert(api.max(1, 2) == 2)
-assert(api.max(2, 1) == 2)
-
-assert(api.mid(1, 2, 3) == 2)
-assert(api.mid(1, 3, 2) == 2)
-assert(api.mid(2, 1, 3) == 2)
-assert(api.mid(2, 3, 1) == 2)
-assert(api.mid(3, 1, 2) == 2)
-assert(api.mid(3, 2, 1) == 2)
-
-assert(api.atan2(1, 0) == 0)
-assert(api.atan2(0,-1) == 0.25)
-assert(api.atan2(-1,0) == 0.5)
-assert(api.atan2(0, 1) == 0.75)
-
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end

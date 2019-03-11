@@ -107,21 +107,21 @@ function shdr_unpack(tbl)
 	return unpack(tbl, 1, 17) -- change to 16 once love2d shader bug is fixed
 end
 
-function get_bits(v,s,e)
+local function get_bits(v,s,e)
 	local mask = api.shl(api.shl(1,s)-1,e)
 	return api.shr(api.band(mask,v))
 end
 
 local QueueableSource = require 'QueueableSource'
 
-function lowpass(y0,y1, cutoff)
+local function lowpass(y0,y1, cutoff)
 	local RC = 1.0/(cutoff*2*3.14)
 	local dt = 1.0/__sample_rate
 	local alpha = dt/(RC+dt)
 	return y0 + (alpha*(y1 - y0))
 end
 
-function note_to_hz(note)
+local function note_to_hz(note)
 	return 440*math.pow(2,(note-33)/12)
 end
 

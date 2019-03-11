@@ -768,14 +768,6 @@ function restore_clip()
 	end
 end
 
-assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
-assert(bit.band(0x02,bit.lshift(1,1)) ~= 0)
-assert(bit.band(0x04,bit.lshift(1,2)) ~= 0)
-
-assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
-assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
-assert(bit.band(0x05,bit.lshift(1,3)) == 0)
-
 function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40

@@ -948,4 +948,12 @@ assert(api.atan2(0,-1) == 0.25)
 assert(api.atan2(-1,0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
+assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
+assert(bit.band(0x02,bit.lshift(1,1)) ~= 0)
+assert(bit.band(0x04,bit.lshift(1,2)) ~= 0)
+
+assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
+assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
+assert(bit.band(0x05,bit.lshift(1,3)) == 0)
+
 return api

@@ -46,8 +46,9 @@ function api.clip(x,y,w,h)
 	end
 end
 
-function api.cls()
-	love.graphics.clear(0,0,0,255)
+function api.cls(c)
+	c = api.flr(c or 0) % 16
+	love.graphics.clear(c * 16, 0, 0, 255)
 	pico8.cursor = {0,0}
 end
 

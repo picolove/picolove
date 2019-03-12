@@ -15,6 +15,9 @@ local function _plot4points(points,cx,cy,x,y)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- PICO-8 API
+
 local api = {}
 
 function api.flip()

@@ -120,6 +120,7 @@ function cart.load_p8(filename)
 				local lo = bit.band(byte,0x0f)
 				local hi = bit.rshift(byte,4)
 				if inbyte < 0x2000 then
+					-- spritesheet
 					if outY >= 64 then
 						pico8.map[mapY][mapX] = byte
 						mapX = mapX + 1
@@ -150,6 +151,7 @@ function cart.load_p8(filename)
 						end
 					end
 				elseif inbyte < 0x3000 then
+					-- map data
 					pico8.map[mapY][mapX] = byte
 					mapX = mapX + 1
 					if mapX == 128 then
@@ -157,6 +159,7 @@ function cart.load_p8(filename)
 						mapY = mapY + 1
 					end
 				elseif inbyte < 0x3100 then
+					-- sprite flags
 					pico8.spriteflags[sprite] = byte
 					sprite = sprite + 1
 				elseif inbyte < 0x3200 then

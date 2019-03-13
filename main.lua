@@ -108,8 +108,8 @@ function shdr_unpack(thing)
 end
 
 local function get_bits(v,s,e)
-	local mask = api.shl(api.shl(1,s)-1,e)
-	return api.shr(api.band(mask,v))
+	local mask = bit.lshift(bit.lshift(1,s)-1,e)
+	return bit.rshift(bit.band(mask,v))
 end
 
 local QueueableSource = require 'QueueableSource'

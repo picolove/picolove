@@ -756,9 +756,18 @@ function api.mid(x,y,z)
 	return api.max(x, api.min(y, z))
 end
 
-function api.cos(x) return math.cos((x or 0)*(math.pi*2)) end
-function api.sin(x) return math.sin(-(x or 0)*(math.pi*2)) end
-function api.atan2(x,y) return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0 end
+function api.cos(x)
+	return math.cos((x or 0)*(math.pi*2))
+end
+
+function api.sin(x)
+	return math.sin(-(x or 0)*(math.pi*2))
+end
+
+function api.atan2(x,y)
+	return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0
+end
+
 api.sqrt = math.sqrt
 
 local bit = require('bit')

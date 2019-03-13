@@ -435,8 +435,7 @@ function new_sandbox()
 	}
 end
 
-
-function love.update(dt)
+local function update_buttons()
 	for p=0,1 do
 		for i=0,#pico8.keymap[p] do
 			for _,key in pairs(pico8.keymap[p][i]) do
@@ -449,6 +448,10 @@ function love.update(dt)
 			end
 		end
 	end
+end
+
+function love.update(dt)
+	update_buttons()
 	if pico8.cart._update then pico8.cart._update() end
 end
 

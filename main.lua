@@ -103,8 +103,8 @@ local bits = 16
 currentDirectory = '/'
 local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
-function shdr_unpack(tbl)
-	return unpack(tbl, 1, 17) -- change to 16 once love2d shader bug is fixed
+function shdr_unpack(thing)
+	return unpack(thing, 1, 17) -- change to 16 once love2d shader bug is fixed
 end
 
 local function get_bits(v,s,e)

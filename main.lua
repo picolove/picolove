@@ -117,13 +117,6 @@ end
 
 local QueueableSource = require 'QueueableSource'
 
-local function lowpass(y0,y1, cutoff)
-	local RC = 1.0/(cutoff*2*3.14)
-	local dt = 1.0/__sample_rate
-	local alpha = dt/(RC+dt)
-	return y0 + (alpha*(y1 - y0))
-end
-
 local function note_to_hz(note)
 	return 440*2^((note-33)/12)
 end
@@ -479,6 +472,13 @@ end
 
 function love.focus(f)
 	focus = f
+end
+
+local function lowpass(y0,y1, cutoff)
+	local RC = 1.0/(cutoff*2*3.14)
+	local dt = 1.0/__sample_rate
+	local alpha = dt/(RC+dt)
+	return y0 + (alpha*(y1 - y0))
 end
 
 note_map = {

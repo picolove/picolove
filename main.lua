@@ -115,6 +115,14 @@ local function get_bits(v,s,e)
 	return bit.rshift(bit.band(mask,v))
 end
 
+function restore_clip()
+	if pico8.clip then
+		love.graphics.setScissor(unpack(pico8.clip))
+	else
+		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
+	end
+end
+
 local QueueableSource = require 'QueueableSource'
 
 local function note_to_hz(note)
@@ -761,14 +769,6 @@ function love.textinput(text)
 	end
 	if validchar and pico8.cart and pico8.cart._textinput then
 		return pico8.cart._textinput(text)
-	end
-end
-
-function restore_clip()
-	if pico8.clip then
-		love.graphics.setScissor(unpack(pico8.clip))
-	else
-		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
 	end
 end
 

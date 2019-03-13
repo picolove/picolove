@@ -90,7 +90,7 @@ local __audio_buffer_size = 1024
 
 local video_frames = nil
 local osc
-local host_time = 0
+host_time = 0
 local retro_mode = false
 local paused = false
 local focus = true
@@ -374,7 +374,8 @@ function new_sandbox()
 		shutdown=api.shutdown,
 		sub=api.sub,
 		stat=api.stat,
-		time=function() return host_time end,
+		time=api.time,
+		t=api.t,
 		-- deprecated pico-8 function aliases
 		mapdraw=api.map
 	}

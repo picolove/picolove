@@ -833,6 +833,11 @@ function api.help()
 	api.print('')
 end
 
+function api.time()
+	return host_time
+end
+api.t = api.time
+
 function api.btn(i,p)
 	if type(i) == 'number' then
 		p = p or 0

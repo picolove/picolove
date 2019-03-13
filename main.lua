@@ -476,6 +476,40 @@ function restore_camera()
 	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
+function flip_screen()
+	love.graphics.setShader(pico8.display_shader)
+	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
+	love.graphics.setCanvas()
+	love.graphics.origin()
+
+	-- love.graphics.setColor(255,255,255,255)
+	love.graphics.setScissor()
+
+	love.graphics.setBackgroundColor(3, 5, 10)
+	love.graphics.clear()
+
+	local screen_w,screen_h = love.graphics.getDimensions()
+	if screen_w > screen_h then
+		love.graphics.draw(pico8.screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
+	else
+		love.graphics.draw(pico8.screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
+	end
+
+	love.graphics.present()
+
+	if video_frames then
+		local tmp = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
+		love.graphics.setCanvas(tmp)
+		love.graphics.draw(pico8.screen,0,0)
+		table.insert(video_frames,tmp:getImageData())
+	end
+	-- get ready for next time
+	love.graphics.setShader(pico8.draw_shader)
+	love.graphics.setCanvas(pico8.screen)
+	restore_clip()
+	restore_camera()
+end
+
 function setfps(fps)
 	pico8.fps = api.flr(fps)
 	if pico8.fps <= 0 then
@@ -724,40 +758,6 @@ function update_audio(time)
 			end
 		end
 	end
-end
-
-function flip_screen()
-	love.graphics.setShader(pico8.display_shader)
-	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
-	love.graphics.setCanvas()
-	love.graphics.origin()
-
-	-- love.graphics.setColor(255,255,255,255)
-	love.graphics.setScissor()
-
-	love.graphics.setBackgroundColor(3, 5, 10)
-	love.graphics.clear()
-
-	local screen_w,screen_h = love.graphics.getDimensions()
-	if screen_w > screen_h then
-		love.graphics.draw(pico8.screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
-	else
-		love.graphics.draw(pico8.screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
-	end
-
-	love.graphics.present()
-
-	if video_frames then
-		local tmp = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
-		love.graphics.setCanvas(tmp)
-		love.graphics.draw(pico8.screen,0,0)
-		table.insert(video_frames,tmp:getImageData())
-	end
-	-- get ready for next time
-	love.graphics.setShader(pico8.draw_shader)
-	love.graphics.setCanvas(pico8.screen)
-	restore_clip()
-	restore_camera()
 end
 
 function love.keypressed(key)

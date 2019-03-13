@@ -452,7 +452,9 @@ end
 
 function love.update(dt)
 	update_buttons()
-	if pico8.cart._update then pico8.cart._update() end
+	if pico8.cart._update then
+		pico8.cart._update()
+	end
 end
 
 function setfps(fps)

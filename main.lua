@@ -126,25 +126,25 @@ end
 local QueueableSource = require 'QueueableSource'
 
 function _load(_cartname)
-	local ext = {'','.p8','.p8.png','.png'}
+	local exts = {'','.p8','.p8.png','.png'}
 	local cart_no_ext = _cartname
 
 	if _cartname:sub(-3) == '.p8' then
-		ext = {'.p8','.p8.png'}
+		exts = {'.p8','.p8.png'}
 		cart_no_ext = _cartname:sub(1,-4)
 	elseif _cartname:sub(-7) == '.p8.png' then
-		ext = {'.p8.png'}
+		exts = {'.p8.png'}
 		cart_no_ext = _cartname:sub(1,-8)
 	elseif _cartname:sub(-4) == '.png' then
-		ext = {'.png', '.p8.png'}
+		exts = {'.png', '.p8.png'}
 		cart_no_ext = _cartname:sub(1,-5)
 	end
 
 	local file_found = false
-	for i=1,#ext do
-		if love.filesystem.isFile(currentDirectory..cart_no_ext..ext[i]) then
+	for i=1,#exts do
+		if love.filesystem.isFile(currentDirectory..cart_no_ext..exts[i]) then
 			file_found = true
-			_cartname = cart_no_ext..ext[i]
+			_cartname = cart_no_ext..exts[i]
 			break
 		end
 	end

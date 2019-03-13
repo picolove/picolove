@@ -125,7 +125,7 @@ local function lowpass(y0,y1, cutoff)
 end
 
 local function note_to_hz(note)
-	return 440*math.pow(2,(note-33)/12)
+	return 440*2^((note-33)/12)
 end
 
 function love.load(argv)

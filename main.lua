@@ -471,6 +471,11 @@ function love.draw()
 	flip_screen()
 end
 
+function restore_camera()
+	love.graphics.origin()
+	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
+end
+
 function setfps(fps)
 	pico8.fps = api.flr(fps)
 	if pico8.fps <= 0 then
@@ -842,11 +847,6 @@ end
 
 function _getcursory()
 	return pico8.cursor[2]
-end
-
-function restore_camera()
-	love.graphics.origin()
-	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
 end
 
 function _call(code)

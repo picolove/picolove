@@ -103,6 +103,9 @@ local bits = 16
 currentDirectory = '/'
 local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
+log = print
+--log = function() end
+
 function shdr_unpack(thing)
 	return unpack(thing, 1, 17) -- change to 16 once love2d shader bug is fixed
 end
@@ -775,8 +778,6 @@ function scroll(pixels)
 	local basehigh = 0x8000
 	api.memcpy(base, delta, basehigh-delta)
 end
-
-log = print
 
 function _getcursorx()
 	return pico8.cursor[1]

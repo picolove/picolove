@@ -457,6 +457,20 @@ function love.update(dt)
 	end
 end
 
+function love.draw()
+	love.graphics.setCanvas(pico8.screen)
+	restore_clip()
+	restore_camera()
+
+	love.graphics.setShader(pico8.draw_shader)
+
+	-- run the cart's draw function
+	if pico8.cart._draw then pico8.cart._draw() end
+
+	-- draw the contents of pico screen to our screen
+	flip_screen()
+end
+
 function setfps(fps)
 	pico8.fps = api.flr(fps)
 	if pico8.fps <= 0 then
@@ -739,20 +753,6 @@ function flip_screen()
 	love.graphics.setCanvas(pico8.screen)
 	restore_clip()
 	restore_camera()
-end
-
-function love.draw()
-	love.graphics.setCanvas(pico8.screen)
-	restore_clip()
-	restore_camera()
-
-	love.graphics.setShader(pico8.draw_shader)
-
-	-- run the cart's draw function
-	if pico8.cart._draw then pico8.cart._draw() end
-
-	-- draw the contents of pico screen to our screen
-	flip_screen()
 end
 
 function love.keypressed(key)

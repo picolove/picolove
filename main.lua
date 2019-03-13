@@ -558,8 +558,8 @@ local function oldosc(osc)
 	end
 end
 
-local function lerp(a,b,t)
-	return (1-t)*a+t*b
+local function lerp(a, b, t)
+	return (b-a)*t+a
 end
 
 function update_audio(time)

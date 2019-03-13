@@ -558,6 +558,10 @@ local function oldosc(osc)
 	end
 end
 
+local function lerp(a,b,t)
+	return (1-t)*a+t*b
+end
+
 function update_audio(time)
 	-- check what sfx should be playing
 	local samples = api.flr(time*__sample_rate)
@@ -860,8 +864,4 @@ function setfps(fps)
 		pico8.fps = 30
 	end
 	frametime = 1 / pico8.fps
-end
-
-function lerp(a,b,t)
-	return (1-t)*a+t*b
 end

@@ -452,6 +452,14 @@ function love.resize(w,h)
 	end
 end
 
+function setfps(fps)
+	pico8.fps = api.flr(fps)
+	if pico8.fps <= 0 then
+		pico8.fps = 30
+	end
+	frametime = 1 / pico8.fps
+end
+
 function love.run()
 	if love.math then
 		love.math.setRandomSeed(os.time())
@@ -856,12 +864,4 @@ end
 
 love.graphics.point = function(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
-end
-
-function setfps(fps)
-	pico8.fps = api.flr(fps)
-	if pico8.fps <= 0 then
-		pico8.fps = 30
-	end
-	frametime = 1 / pico8.fps
 end

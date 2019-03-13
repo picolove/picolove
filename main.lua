@@ -165,6 +165,16 @@ function _load(_cartname)
 	end
 end
 
+function love.resize(w,h)
+	love.graphics.clear()
+	-- adjust stuff to fit the screen
+	if w > h then
+		scale = h/(pico8.resolution[2]+ypadding*2)
+	else
+		scale = w/(pico8.resolution[1]+xpadding*2)
+	end
+end
+
 local function note_to_hz(note)
 	return 440*2^((note-33)/12)
 end
@@ -440,16 +450,6 @@ function love.update(dt)
 		end
 	end
 	if pico8.cart._update then pico8.cart._update() end
-end
-
-function love.resize(w,h)
-	love.graphics.clear()
-	-- adjust stuff to fit the screen
-	if w > h then
-		scale = h/(pico8.resolution[2]+ypadding*2)
-	else
-		scale = w/(pico8.resolution[1]+xpadding*2)
-	end
 end
 
 function setfps(fps)

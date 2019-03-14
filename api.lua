@@ -714,7 +714,9 @@ function api.reload(dest_addr,source_addr,len)
 	_load(cartname)
 end
 
-function api.rnd(x) return love.math.random()*(x or 1) end
+function api.rnd(x)
+	return love.math.random()*(x or 1)
+end
 
 function api.srand(seed)
 	if seed == 0 then seed = 1 end

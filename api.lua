@@ -654,8 +654,11 @@ function api.peek(addr)
 end
 
 function api.poke(addr, val)
-	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
+	if addr < 0 or addr >= 0x8000 then
+		error('bad memory access')
+	elseif addr < 0x6000 then
+		-- TODO: implement for non screen space
+	elseif addr < 0x8000 then
 		local dx = api.flr(addr-0x6000)%64*2
 		local dy = api.flr((addr-0x6000)/64)
 		api.pset(dx, dy, bit.band(val, 15))

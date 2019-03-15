@@ -508,14 +508,6 @@ function flip_screen()
 	restore_camera()
 end
 
-function setfps(fps)
-	pico8.fps = api.flr(fps)
-	if pico8.fps <= 0 then
-		pico8.fps = 30
-	end
-	frametime = 1 / pico8.fps
-end
-
 function love.focus(f)
 	focus = f
 end
@@ -764,6 +756,14 @@ function love.textinput(text)
 	if validchar and pico8.cart and pico8.cart._textinput then
 		return pico8.cart._textinput(text)
 	end
+end
+
+function setfps(fps)
+	pico8.fps = api.flr(fps)
+	if pico8.fps <= 0 then
+		pico8.fps = 30
+	end
+	frametime = 1 / pico8.fps
 end
 
 function love.run()

@@ -250,7 +250,7 @@ function love.load(argv)
 	for i=0,3 do
 		pico8.audio_channels[i]={
 			oscpos=0,
-			noise=osc[6]()
+			noise=osc[6](),
 		}
 	end
 
@@ -452,7 +452,9 @@ end
 
 function love.update(dt)
 	update_buttons()
-	if pico8.cart._update then
+	if pico8.cart._update60 then
+		pico8.cart._update60()
+	elseif pico8.cart._update then
 		pico8.cart._update()
 	end
 end

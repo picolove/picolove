@@ -39,7 +39,7 @@ pico8 = {
 	cart = nil,
 	keypressed = {
 		[0] = {},
-		[1] = {}
+		[1] = {},
 	},
 	keymap = {
 		[0] = {
@@ -181,7 +181,7 @@ end
 
 function love.load(argv)
 	love_args = argv
-	if love.system.getOS() == 'Android' then
+	if love.system.getOS() == 'Android' or love.system.getOS() == 'iOS' then
 		love.resize(love.graphics.getDimensions())
 	end
 

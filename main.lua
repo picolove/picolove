@@ -803,7 +803,8 @@ function love.run()
 
 		-- Update dt, as we'll be passing it to update
 		if love.timer then
-			dt = dt + love.timer.step()
+			love.timer.step()
+			dt = dt + love.timer.getDelta()
 		end
 
 		-- Call update and draw

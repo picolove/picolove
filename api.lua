@@ -732,11 +732,7 @@ api.flr = math.floor
 api.ceil = math.ceil
 
 function api.sgn(x)
-	if x < 0 then
-		return -1
-	else
-		return 1
-	end
+	return x < 0 and -1 or 1
 end
 
 api.abs = math.abs

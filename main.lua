@@ -481,8 +481,6 @@ function flip_screen()
 	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
-
-	-- love.graphics.setColor(255,255,255,255)
 	love.graphics.setScissor()
 
 	love.graphics.setBackgroundColor(3, 5, 10)

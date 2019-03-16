@@ -80,6 +80,8 @@ pico8 = {
 
 local bit = require('bit')
 
+local flr = math.floor
+
 frametime = 1 / pico8.fps
 
 local __accum = 0
@@ -537,8 +539,8 @@ note_map = {
 }
 
 function note_to_string(note)
-	local octave = api.flr(note/12)
-	local note = api.flr(note%12)
+	local octave = flr(note/12)
+	local note = flr(note%12)
 	return string.format('%s%d',note_map[note],octave)
 end
 
@@ -556,7 +558,7 @@ end
 
 function update_audio(time)
 	-- check what sfx should be playing
-	local samples = api.flr(time*__sample_rate)
+	local samples = flr(time*__sample_rate)
 
 	for i=0,samples-1 do
 		if pico8.current_music then
@@ -611,9 +613,9 @@ function update_audio(time)
 			if ch.sfx and pico8.sfx[ch.sfx] then
 				local sfx = pico8.sfx[ch.sfx]
 				-- when we pass a new step
-				if api.flr(ch.offset) > ch.last_step then
+				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
-					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[api.flr(ch.offset)])
+					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
 					if ch.instr ~= 6 then
 						ch.osc = osc[ch.instr]
 					else
@@ -627,7 +629,7 @@ function update_audio(time)
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
 					end
-					ch.last_step = api.flr(ch.offset)
+					ch.last_step = flr(ch.offset)
 				end
 				if ch.vol and ch.vol > 0 then
 					local vol = ch.vol
@@ -651,17 +653,17 @@ function update_audio(time)
 						vol = lerp(ch.vol,0,ch.offset%1)
 					elseif ch.fx == 6 then
 						-- fast appreggio over 4 steps
-						local off = bit.band(api.flr(ch.offset),0xfc)
-						local lfo = api.flr(ch.lfo(8)*4)
+						local off = bit.band(flr(ch.offset),0xfc)
+						local lfo = flr(ch.lfo(8)*4)
 						off = off + lfo
-						local note = sfx[api.flr(off)][1]
+						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					elseif ch.fx == 7 then
 						-- slow appreggio over 4 steps
-						local off = bit.band(api.flr(ch.offset),0xfc)
-						local lfo = api.flr(ch.lfo(4)*4)
+						local off = bit.band(flr(ch.offset),0xfc)
+						local lfo = flr(ch.lfo(4)*4)
 						off = off + lfo
-						local note = sfx[api.flr(off)][1]
+						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
 					ch.sample = ch.osc(ch.oscpos) * vol/7
@@ -761,7 +763,7 @@ function love.textinput(text)
 end
 
 function setfps(fps)
-	pico8.fps = api.flr(fps)
+	pico8.fps = flr(fps)
 	if pico8.fps <= 0 then
 		pico8.fps = 30
 	end

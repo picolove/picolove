@@ -821,7 +821,9 @@ function love.run()
 		local render = false
 		while dt > frametime do
 			host_time = host_time + dt
-			if host_time > 65536 then host_time = host_time - 65536 end
+			if host_time > 65536 then
+				host_time = host_time - 65536
+			end
 			if paused or not focus then
 			else
 				if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
@@ -838,7 +840,9 @@ function love.run()
 			end
 		end
 
-		if love.timer then love.timer.sleep(0.001) end
+		if love.timer then
+			love.timer.sleep(0.001)
+		end
 	end
 end
 

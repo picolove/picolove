@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
 function _init()
+	_disable_pause()
 	t=0
 	linebuffer = ''
 	line = 0

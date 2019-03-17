@@ -29,7 +29,7 @@ local function decompress(code)
 				local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
 				local length = bit.rshift(byte,4) + 2
 				local offset = #lua - offset
-				local buffer = lua:sub(offset+1,offset+1+length-1)
+				local buffer = lua:sub(offset+1,offset+length)
 				lua = lua .. buffer
 				mode = 0
 			elseif byte == 0x00 then
@@ -54,8 +54,8 @@ function cart.load_p8(filename)
 	log("Loading",filename)
 
 	local lua = ""
-	pico8.map = {}
 	pico8.quads = {}
+	pico8.map = {}
 	for y=0,63 do
 		pico8.map[y] = {}
 		for x=0,127 do
@@ -199,10 +199,10 @@ function cart.load_p8(filename)
 			error(string.format('unknown file version %d',version))
 		end
 
-		if not compressed then
-			lua = code:match("(.-)%f[%z]")
-		else
+		if compressed then
 			lua = decompress(code)
+		else
+			lua = code:match("(.-)%f[%z]")
 		end
 
 	else

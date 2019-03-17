@@ -55,6 +55,7 @@ function cart.load_p8(filename)
 
 	local lua = ""
 	pico8.quads = {}
+	pico8.spritesheet_data = love.image.newImageData(128,128)
 	pico8.map = {}
 	for y=0,63 do
 		pico8.map[y] = {}
@@ -62,7 +63,6 @@ function cart.load_p8(filename)
 			pico8.map[y][x] = 0
 		end
 	end
-	pico8.spritesheet_data = love.image.newImageData(128,128)
 	pico8.spriteflags = {}
 	pico8.sfx = {}
 	for i=0,63 do
@@ -101,8 +101,6 @@ function cart.load_p8(filename)
 		local mapY = 32
 		local mapX = 0
 		local version = nil
-		local codelen = nil
-		local code = ""
 		local compressed = false
 		local sprite = 0
 		for y=0,204 do
@@ -114,7 +112,7 @@ function cart.load_p8(filename)
 				b = bit.band(b,0x0003)
 				a = bit.band(a,0x0003)
 				data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
-				local byte = b + bit.lshift(g,2) + bit.lshift(r,4) + bit.lshift(a,6)
+				local byte = bit.lshift(a,6) + bit.lshift(r,4) + bit.lshift(g,2)+ b
 				local lo = bit.band(byte,0x0f)
 				local hi = bit.rshift(byte,4)
 				if inbyte < 0x2000 then
@@ -184,7 +182,7 @@ function cart.load_p8(filename)
 					if inbyte == 0x4300 then
 						compressed = (byte == 58)
 					end
-					code = code .. string.char(byte)
+					lua = lua .. string.char(byte)
 				elseif inbyte == 0x8000 then
 					version = byte
 				end
@@ -200,9 +198,9 @@ function cart.load_p8(filename)
 		end
 
 		if compressed then
-			lua = decompress(code)
+			lua = decompress(lua)
 		else
-			lua = code:match("(.-)%f[%z]")
+			lua = lua:match("(.-)%f[%z]")
 		end
 
 	else
@@ -210,6 +208,8 @@ function cart.load_p8(filename)
 		if not data or size == 0 then
 			error(string.format("Unable to open: %s",filename))
 		end
+
+		-- check for header and vesion
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
 		local start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then

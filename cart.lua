@@ -1,11 +1,11 @@
 local api=require("api")
 
 local compression_map = {}
-for entry in ('\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_'):gmatch('.') do
+for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(".") do
 	table.insert(compression_map,entry)
 end
 
-local eol_chars = '\n'
+local eol_chars = "\n"
 
 local function decompress(code)
 	-- decompress code
@@ -52,9 +52,9 @@ end
 local cart={}
 
 function cart.load_p8(filename)
-	log('Loading',filename)
+	log("Loading",filename)
 
-	local lua = ''
+	local lua = ""
 	pico8.map = {}
 	pico8.quads = {}
 	for y=0,63 do
@@ -92,7 +92,7 @@ function cart.load_p8(filename)
 	if header == "\137PNG\r\n\26\n" then
 		local img = love.graphics.newImage(filename)
 		if img:getWidth() ~= 160 or img:getHeight() ~= 205 then
-			error('Image is the wrong size')
+			error("Image is the wrong size")
 		end
 		local data = img:getData()
 
@@ -104,7 +104,7 @@ function cart.load_p8(filename)
 		local mapX = 0
 		local version = nil
 		local codelen = nil
-		local code = ''
+		local code = ""
 		local compressed = false
 		local sprite = 0
 		for y=0,204 do
@@ -210,34 +210,34 @@ function cart.load_p8(filename)
 	else
 		local data,size = love.filesystem.read(filename)
 		if not data or size == 0 then
-			error(string.format('Unable to open %s',filename))
+			error(string.format("Unable to open %s",filename))
 		end
-		local header = 'pico-8 cartridge // http://www.pico-8.com\nversion '
-		local start = data:find('pico%-8 cartridge // http://www.pico%-8.com\nversion ')
+		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
+		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
 		if start == nil then
-			header = 'pico-8 cartridge // http://www.pico-8.com\r\nversion '
-			start = data:find('pico%-8 cartridge // http://www.pico%-8.com\r\nversion ')
+			header = "pico-8 cartridge // http://www.pico-8.com\r\nversion "
+			start = data:find("pico%-8 cartridge // http://www.pico%-8.com\r\nversion ")
 			if start == nil then
-				error('invalid cart')
+				error("invalid cart")
 			end
-			eol_chars = '\r\n'
+			eol_chars = "\r\n"
 		else
-			eol_chars = '\n'
+			eol_chars = "\n"
 		end
 		local next_line = data:find(eol_chars,start+#header)
 		local version_str = data:sub(start+#header,next_line-1)
 		local version = tonumber(version_str)
-		log('version',version)
+		log("version",version)
 		-- extract the lua
-		local lua_start = data:find('__lua__') + 7 + #eol_chars
-		local lua_end = data:find('__gfx__') - 1
+		local lua_start = data:find("__lua__") + 7 + #eol_chars
+		local lua_end = data:find("__gfx__") - 1
 
 		lua = data:sub(lua_start,lua_end)
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
-		local gfx_start = data:find('__gfx__') + 7 + #eol_chars
-		local gfx_end = data:find('__gff__') - 1
+		local gfx_start = data:find("__gfx__") + 7 + #eol_chars
+		local gfx_end = data:find("__gff__") - 1
 		local gfxdata = data:sub(gfx_start,gfx_end)
 
 		local row = 0
@@ -301,8 +301,8 @@ function cart.load_p8(filename)
 
 		-- load the sprite flags
 
-		local gff_start = data:find('__gff__') + 7 + #eol_chars
-		local gff_end = data:find('__map__') - 1
+		local gff_start = data:find("__gff__") + 7 + #eol_chars
+		local gff_end = data:find("__map__") - 1
 		local gffdata = data:sub(gff_start,gff_end)
 
 		local sprite = 0
@@ -331,12 +331,12 @@ function cart.load_p8(filename)
 			next_line = gffdata:find(eol_chars,end_of_line)+#eol_chars
 		end
 
-		assert(sprite == 256,'wrong number of spriteflags:'..sprite)
+		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
 
 		-- convert the tile data to a table
 
-		local map_start = data:find('__map__') + 7 + #eol_chars
-		local map_end = data:find('__sfx__') - 1
+		local map_start = data:find("__map__") + 7 + #eol_chars
+		local map_end = data:find("__sfx__") - 1
 		local mapdata = data:sub(map_start,map_end)
 
 		local row = 0
@@ -365,11 +365,11 @@ function cart.load_p8(filename)
 			end
 			next_line = mapdata:find(eol_chars,end_of_line)+#eol_chars
 		end
-		assert(tiles + shared == 128 * 64,string.format('%d + %d != %d',tiles,shared,128*64))
+		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 		-- load sfx
-		local sfx_start = data:find('__sfx__') + 7 + #eol_chars
-		local sfx_end = data:find('__music__') - 1
+		local sfx_start = data:find("__sfx__") + 7 + #eol_chars
+		local sfx_end = data:find("__music__") - 1
 		local sfxdata = data:sub(sfx_start,sfx_end)
 
 		local _sfx = 0
@@ -403,7 +403,7 @@ function cart.load_p8(filename)
 		assert(_sfx == 64)
 
 		-- load music
-		local music_start = data:find('__music__') + 9 + #eol_chars
+		local music_start = data:find("__music__") + 9 + #eol_chars
 		local music_end = #data-#eol_chars
 		local musicdata = data:sub(music_start,music_end)
 
@@ -411,7 +411,7 @@ function cart.load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = musicdata:find('\n',next_line)
+			local end_of_line = musicdata:find("\n",next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = musicdata:sub(next_line,end_of_line)
@@ -424,14 +424,14 @@ function cart.load_p8(filename)
 				[3] = tonumber(line:sub(10,11),16)
 			}
 			_music = _music + 1
-			next_line = musicdata:find('\n',end_of_line)+1
+			next_line = musicdata:find("\n",end_of_line)+1
 		end
 	end
 
 	-- patch the lua
-	lua = lua:gsub('!=','~=')
+	lua = lua:gsub("!=","~=")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua = lua:gsub('if%s*(%b())%s*([^\n]*)\n',function(a,b)
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
 		local nl = a:find('\n',nil,true)
 		local th = b:find('%f[%w]then%f[%W]')
 		local an = b:find('%f[%w]and%f[%W]')
@@ -440,16 +440,16 @@ function cart.load_p8(filename)
 		if not (nl or th or an or o) then
 			if ce then
 				local c,t = b:match("(.-)(%s-%-%-.*)")
-				return 'if '..a:sub(2,-2)..' then '..c..' end'..t..'\n'
+				return "if "..a:sub(2,-2).." then "..c.." end"..t.."\n"
 			else
-				return 'if '..a:sub(2,-2)..' then '..b..' end\n'
+				return "if "..a:sub(2,-2).." then "..b.." end\n"
 			end
 		end
 	end)
 	-- rewrite assignment operators
-	lua = lua:gsub('(%S+)%s*([%+-%*/%%])=','%1 = %1 %2 ')
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 
-	log('finished loading cart',filename)
+	log("finished loading cart",filename)
 
 	loaded_code = lua
 

@@ -211,10 +211,10 @@ function cart.load_p8(filename)
 			error(string.format("Unable to open: %s",filename))
 		end
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")
+		local start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then
 			header = "pico-8 cartridge // http://www.pico-8.com\r\nversion "
-			start = data:find("pico%-8 cartridge // http://www.pico%-8.com\r\nversion ")
+			start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\r\nversion ")
 			if start == nil then
 				error("invalid cart")
 			end

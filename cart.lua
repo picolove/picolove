@@ -28,7 +28,6 @@ local function decompress(code)
 				-- copy from buffer
 				local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
 				local length = bit.rshift(byte,4) + 2
-
 				local offset = #lua - offset
 				local buffer = lua:sub(offset+1,offset+1+length-1)
 				lua = lua .. buffer
@@ -65,7 +64,6 @@ function cart.load_p8(filename)
 	end
 	pico8.spritesheet_data = love.image.newImageData(128,128)
 	pico8.spriteflags = {}
-
 	pico8.sfx = {}
 	for i=0,63 do
 		pico8.sfx[i] = {
@@ -210,7 +208,7 @@ function cart.load_p8(filename)
 	else
 		local data,size = love.filesystem.read(filename)
 		if not data or size == 0 then
-			error(string.format("Unable to open %s",filename))
+			error(string.format("Unable to open: %s",filename))
 		end
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
 		local start = data:find("pico%-8 cartridge // http://www.pico%-8.com\nversion ")

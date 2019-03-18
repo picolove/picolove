@@ -643,7 +643,7 @@ function api.sfx(n,channel,offset)
 end
 
 function api.peek(addr)
-	addr = flr(tonumber(addr) or -1)
+	addr = flr(tonumber(addr) or 0)
 	if addr < 0 then
 		return 0
 	elseif addr < 0x6000 then

@@ -1,7 +1,7 @@
 local flr = math.floor
 
 function warning(msg)
-	log(debug.traceback('WARNING: '..msg,3))
+	log(debug.traceback("WARNING: "..msg,3))
 end
 
 local function _horizontal_line(points,x0,y,x1)
@@ -28,7 +28,7 @@ function api.flip()
 end
 
 function api.camera(x,y)
-	if type(x) == 'number' then
+	if type(x) == "number" then
 		pico8.camera_x = flr(x)
 		pico8.camera_y = flr(y)
 	else
@@ -39,7 +39,7 @@ function api.camera(x,y)
 end
 
 function api.clip(x,y,w,h)
-	if type(x) == 'number' then
+	if type(x) == "number" then
 		love.graphics.setScissor(x,y,w,h)
 		pico8.clip = {x,y,w,h}
 	else
@@ -55,14 +55,14 @@ function api.cls(c)
 end
 
 function api.folder()
-	love.system.openURL('file://'..love.filesystem.getWorkingDirectory())
+	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
 end
 
 -- TODO: move interactive implementatn into nocart
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-	api.print('directory: '..currentDirectory, nil, nil, 12)
+	api.print("directory: "..currentDirectory, nil, nil, 12)
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
@@ -71,7 +71,7 @@ function api.ls()
 	end
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
-		elseif file:sub(-3) == '.p8' or file:sub(-4) == '.png' then
+		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
 			output[#output+1] = {name=file:lower(), color=6}
 		else
 			output[#output+1] = {name=file:lower(), color=5}
@@ -86,7 +86,7 @@ function api.ls()
 			flip_screen()
 			count = count + 1
 			if count == 20 then
-				api.print('--more--', nil, nil, 12)
+				api.print("--more--", nil, nil, 12)
 				flip_screen()
 				local y = _getcursory() - 6
 				api.cursor(0, y)
@@ -94,7 +94,7 @@ function api.ls()
 				api.color(item.color)
 				while true do
 					local e = love.event.wait()
-					if e == 'keypressed' then
+					if e == "keypressed" then
 						break
 					end
 				end
@@ -108,37 +108,37 @@ end
 api.dir = api.ls
 
 function api.cd(name)
-	local output = ''
-	local newDirectory = currentDirectory..name..'/'
+	local output = ""
+	local newDirectory = currentDirectory..name.."/"
 
 	-- filter /TEXT/../ -> /
 	local count = 1
 	while count > 0 do
-		newDirectory, count = newDirectory:gsub('/[^/]*/%.%./','/')
+		newDirectory, count = newDirectory:gsub("/[^/]*/%.%./","/")
 	end
 
 	-- filter /TEXT/..$ -> /
 	count = 1
 	while count > 0 do
-		newDirectory, count = newDirectory:gsub('/[^/]*/%.%.$','/')
+		newDirectory, count = newDirectory:gsub("/[^/]*/%.%.$","/")
 	end
 
-	local failed = newDirectory:find('%.%.') ~= nil
+	local failed = newDirectory:find("%.%.") ~= nil
 
 	if #name == 0 then
-		output = 'directory: '..currentDirectory
+		output = "directory: "..currentDirectory
 	elseif failed then
-		if newDirectory == '/../' then
-			output = 'cd: failed'
+		if newDirectory == "/../" then
+			output = "cd: failed"
 		else
-			output = 'directory not found'
+			output = "directory not found"
 		end
 	elseif love.filesystem.exists(newDirectory) then
 		currentDirectory = newDirectory
 		output = currentDirectory
 	else
 		failed = true
-		output = 'directory not found'
+		output = "directory not found"
 	end
 
 	if not failed then
@@ -155,7 +155,7 @@ end
 function api.mkdir(name)
 	if name == nil then
 		api.color(6)
-		api.print('mkdir [name]')
+		api.print("mkdir [name]")
 	else
 		love.filesystem.createDirectory(currentDirectory..name)
 	end
@@ -173,14 +173,14 @@ function api.pget(x,y)
 		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
 		return flr(r/17.0)
 	else
-		warning(string.format('pget out of screen %d,%d',x,y))
+		warning(string.format("pget out of screen %d,%d",x,y))
 		return 0
 	end
 end
 
 function api.color(c)
 	c = c and flr(c) or 0
-	assert(c >= 0 and c <= 16,string.format('c is %s',c))
+	assert(c >= 0 and c <= 16,string.format("c is %s",c))
 	pico8.color = c
 	love.graphics.setColor(c*16,0,0,255)
 end
@@ -214,7 +214,7 @@ end
 function api.spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(pico8.sprite_shader)
-	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
 	n = flr(n)
 	w = w or 1
 	h = h or 1
@@ -226,7 +226,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 			return
 		end
 	else
-		local id = string.format('%d-%d-%d',n,w,h)
+		local id = string.format("%d-%d-%d",n,w,h)
 		if pico8.quads[id] then
 			q = pico8.quads[id]
 		else
@@ -258,7 +258,7 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	-- FIXME: cache this quad
 	local q = love.graphics.newQuad(sx,sy,sw,sh,pico8.spritesheet:getDimensions())
 	love.graphics.setShader(pico8.sprite_shader)
-	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(pico8.spritesheet,q,
 		flr(dx)+(dw*(flip_x and 1 or 0)),
 		flr(dy)+(dh*(flip_y and 1 or 0)),
@@ -271,7 +271,7 @@ end
 function api.rect(x0,y0,x1,y1,col)
 	col = col or pico8.color
 	api.color(col)
-	love.graphics.rectangle('line',flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
+	love.graphics.rectangle("line",flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function api.rectfill(x0,y0,x1,y1,col)
@@ -287,7 +287,7 @@ function api.rectfill(x0,y0,x1,y1,col)
 		h = -h
 		y0 = y0-h
 	end
-	love.graphics.rectangle('fill',flr(x0),flr(y0),w,h)
+	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
 end
 
 function api.circ(ox,oy,r,col)
@@ -359,7 +359,7 @@ function api.line(x0,y0,x1,y1,col)
 	api.color(col)
 
 	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
-		warning('line has NaN value')
+		warning("line has NaN value")
 		return
 	end
 
@@ -434,7 +434,7 @@ end
 local __palette_modified = true
 
 function api.pal(c0,c1,p)
-	if type(c0) ~= 'number' then
+	if type(c0) ~= "number" then
 		if __palette_modified == false then return end
 		for i=1,16 do
 			pico8.draw_palette[i] = i
@@ -470,7 +470,7 @@ function api.pal(c0,c1,p)
 end
 
 function api.palt(c,t)
-	if type(c) ~= 'number' then
+	if type(c) ~= "number" then
 		for i=1,16 do
 			pico8.pal_transparent[i] = i == 1 and 0 or 1
 		end
@@ -590,7 +590,7 @@ function api.music(n,fade_len,channel_mask)
 	end
 	local m = pico8.music[n]
 	if not m then
-		warning(string.format('music %d does not exist',n))
+		warning(string.format("music %d does not exist",n))
 		return
 	end
 	local slowest_speed = nil
@@ -664,7 +664,7 @@ function api.poke(addr, val)
 	end
 	addr, val = flr(tonumber(addr) or 0), flr(val)%256
 	if addr < 0 or addr >= 0x8000 then
-		error('bad memory access')
+		error("bad memory access")
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then
@@ -781,7 +781,7 @@ function api.atan2(x,y)
 end
 
 
-local bit = require('bit')
+local bit = require("bit")
 
 api.band = bit.band
 api.bor = bit.bor
@@ -830,7 +830,7 @@ function api.run()
 end
 
 function api.reboot()
-	_load('nocart.p8')
+	_load("nocart.p8")
 	api.run()
 end
 
@@ -839,25 +839,25 @@ function api.shutdown()
 end
 
 function api.help()
-	api.print('')
+	api.print("")
 	api.color(12)
-	api.print('commands')
-	api.print('')
+	api.print("commands")
+	api.print("")
 	api.color(6)
-	api.print('load <filename>  save <filename>')
-	api.print('run              resume')
-	api.print('shutdown         reboot')
-	api.print('install_demos    dir')
-	api.print('cd <dirname>     mkdir <dirname>')
-	api.print('cd ..   go up a directory')
-	api.print('')
-	api.print('alt+enter to toggle fullscreen')
-	api.print('alt+f4 or command+q to fastquit')
-	api.print('')
+	api.print("load <filename>  save <filename>")
+	api.print("run              resume")
+	api.print("shutdown         reboot")
+	api.print("install_demos    dir")
+	api.print("cd <dirname>     mkdir <dirname>")
+	api.print("cd ..   go up a directory")
+	api.print("")
+	api.print("alt+enter to toggle fullscreen")
+	api.print("alt+f4 or command+q to fastquit")
+	api.print("")
 	api.color(12)
-	api.print('see readme.md for more info')
-	api.print('or visit: github.com/picolove')
-	api.print('')
+	api.print("see readme.md for more info")
+	api.print("or visit: github.com/picolove")
+	api.print("")
 end
 
 function api.time()
@@ -866,7 +866,7 @@ end
 api.t = api.time
 
 function api.btn(i,p)
-	if type(i) == 'number' then
+	if type(i) == "number" then
 		p = p or 0
 		if pico8.keymap[p] and pico8.keymap[p][i] then
 			return pico8.keypressed[p][i] ~= nil
@@ -890,7 +890,7 @@ function api.btn(i,p)
 end
 
 function api.btnp(i,p)
-	if type(i) == 'number' then
+	if type(i) == "number" then
 		p = p or 0
 		if pico8.keymap[p] and pico8.keymap[p][i] then
 			local v = pico8.keypressed[p][i]
@@ -933,7 +933,7 @@ end
 
 function api.foreach(a,f)
 	if not a then
-		warning('foreach got a nil value')
+		warning("foreach got a nil value")
 		return
 	end
 	for i,v in ipairs(a) do
@@ -947,7 +947,7 @@ end
 
 function api.add(a,v)
 	if a == nil then
-		warning('add to nil')
+		warning("add to nil")
 		return
 	end
 	table.insert(a,v)
@@ -955,7 +955,7 @@ end
 
 function api.del(a,dv)
 	if a == nil then
-		warning('del from nil')
+		warning("del from nil")
 		return
 	end
 	for i,v in ipairs(a) do

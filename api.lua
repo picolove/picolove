@@ -659,7 +659,7 @@ function api.peek(addr)
 end
 
 function api.poke(addr, val)
-	addr = flr(tonumber(addr) or 0)
+	addr, val = flr(tonumber(addr) or 0), flr(val)%256
 	if addr < 0 or addr >= 0x8000 then
 		error('bad memory access')
 	elseif addr < 0x6000 then

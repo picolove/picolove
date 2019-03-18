@@ -668,8 +668,9 @@ function api.poke(addr, val)
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64*2
-		local dy = flr((addr-0x6000)/64)
+		addr = addr - 0x6000
+		local dx = addr%64*2
+		local dy = flr(addr/64)
 		api.pset(dx, dy, bit.band(val, 15))
 		api.pset(dx + 1, dy, bit.rshift(val, 4))
 	end

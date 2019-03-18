@@ -643,14 +643,18 @@ function api.sfx(n,channel,offset)
 end
 
 function api.peek(addr)
+	if addr < 0 then
+		return 0
+	elseif addr < 0x6000 then
 	-- TODO: implement for non screen space
-	if addr >= 0x6000 and addr < 0x8000 then
+	elseif addr < 0x8000 then
 		local dx = flr(addr-0x6000)%64
 		local dy = flr((addr-0x6000)/64)
 		local low = api.pget(dx, dy)
 		local high = bit.lshift(api.pget(dx + 1, dy), 4)
 		return bit.bor(low, high)
 	end
+	return 0
 end
 
 function api.poke(addr, val)

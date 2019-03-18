@@ -486,16 +486,14 @@ function api.palt(c,t)
 end
 
 function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
-	cel_x = cel_x or 0
-	cel_y = cel_y or 0
 	love.graphics.setShader(pico8.sprite_shader)
 	love.graphics.setColor(255,255,255,255)
-	cel_x = flr(cel_x)
-	cel_y = flr(cel_y)
-	sx = flr(sx)
-	sy = flr(sy)
-	cel_w = flr(cel_w)
-	cel_h = flr(cel_h)
+	cel_x = flr(cel_x or 0)
+	cel_y = flr(cel_y or 0)
+	sx = flr(sx or 0)
+	sy = flr(sy or 0)
+	cel_w = flr(cel_w or 128)
+	cel_h = flr(cel_h or 64)
 	for y=0,cel_h-1 do
 		if cel_y+y < 64 and cel_y+y >= 0 then
 			for x=0,cel_w-1 do

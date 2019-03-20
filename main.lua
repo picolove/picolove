@@ -768,7 +768,7 @@ function love.textinput(text)
 	end
 end
 
-love.graphics.point = function(x,y)
+function love.graphics.point(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end
 

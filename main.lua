@@ -768,6 +768,10 @@ function love.textinput(text)
 	end
 end
 
+love.graphics.point = function(x,y)
+	love.graphics.rectangle('fill',x,y,1,1)
+end
+
 function setfps(fps)
 	pico8.fps = flr(fps)
 	if pico8.fps <= 0 then
@@ -877,8 +881,4 @@ function _call(code)
 		end
 	end
 	return true
-end
-
-love.graphics.point = function(x,y)
-	love.graphics.rectangle('fill',x,y,1,1)
 end

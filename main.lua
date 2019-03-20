@@ -1,8 +1,9 @@
 require("strict")
+
 local api = require("api")
-
-
 local cart = require("cart")
+local QueueableSource = require("QueueableSource")
+
 cartname = nil -- used by api.reload
 local love_args = nil
 
@@ -125,8 +126,6 @@ function restore_clip()
 		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
 	end
 end
-
-local QueueableSource = require("QueueableSource")
 
 function _load(_cartname)
 	local exts = {"",".p8",".p8.png",".png"}

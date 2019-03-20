@@ -1,8 +1,8 @@
-require 'strict'
-local api = require 'api'
+require("strict")
+local api = require("api")
 
 
-local cart = require 'cart'
+local cart = require("cart")
 cartname = nil -- used by api.reload
 local love_args = nil
 
@@ -78,7 +78,7 @@ pico8 = {
 	spritesheet = nil,
 }
 
-local bit = require('bit')
+local bit = require("bit")
 
 local flr, abs = math.floor, math.abs
 
@@ -103,8 +103,8 @@ local __sample_rate = 22050
 local channels = 1
 local bits = 16
 
-currentDirectory = '/'
-local fontchars = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
+currentDirectory = "/"
+local fontchars = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
 log = print
 --log = function() end
@@ -126,20 +126,20 @@ function restore_clip()
 	end
 end
 
-local QueueableSource = require 'QueueableSource'
+local QueueableSource = require("QueueableSource")
 
 function _load(_cartname)
-	local exts = {'','.p8','.p8.png','.png'}
+	local exts = {"",".p8",".p8.png",".png"}
 	local cart_no_ext = _cartname
 
-	if _cartname:sub(-3) == '.p8' then
-		exts = {'.p8','.p8.png'}
+	if _cartname:sub(-3) == ".p8" then
+		exts = {".p8",".p8.png"}
 		cart_no_ext = _cartname:sub(1,-4)
-	elseif _cartname:sub(-7) == '.p8.png' then
-		exts = {'.p8.png'}
+	elseif _cartname:sub(-7) == ".p8.png" then
+		exts = {".p8.png"}
 		cart_no_ext = _cartname:sub(1,-8)
-	elseif _cartname:sub(-4) == '.png' then
-		exts = {'.png', '.p8.png'}
+	elseif _cartname:sub(-4) == ".png" then
+		exts = {".png", ".p8.png"}
 		cart_no_ext = _cartname:sub(1,-5)
 	end
 
@@ -153,7 +153,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
-		api.print('could not load', nil, nil, 6)
+		api.print("could not load", nil, nil, 6)
 		return
 	end
 
@@ -164,7 +164,7 @@ function _load(_cartname)
 	restore_clip()
 	cartname = _cartname
 	if cart.load_p8(currentDirectory.._cartname) then
-		api.print('loaded '.._cartname, nil, nil, 6)
+		api.print("loaded ".._cartname, nil, nil, 6)
 	end
 end
 
@@ -184,7 +184,7 @@ end
 
 function love.load(argv)
 	love_args = argv
-	if love.system.getOS() == 'Android' or love.system.getOS() == 'iOS' then
+	if love.system.getOS() == "Android" or love.system.getOS() == "iOS" then
 		love.resize(love.graphics.getDimensions())
 	end
 
@@ -235,7 +235,7 @@ function love.load(argv)
 		return (abs((x%2)-1)-0.5 + (abs(((x*127/128)%2)-1)-0.5)/2) - 1/4
 	end
 	-- saw from 0 to 1, used for arppregiator
-	osc['saw_lfo'] = function(x)
+	osc["saw_lfo"] = function(x)
 		return x%1
 	end
 
@@ -260,9 +260,9 @@ function love.load(argv)
 	love.graphics.clear()
 	love.graphics.setDefaultFilter('nearest','nearest')
 	pico8.screen = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
-	pico8.screen:setFilter('linear','nearest')
+	pico8.screen:setFilter("linear","nearest")
 
-	local font = love.graphics.newImageFont('font.png', fontchars, 1)
+	local font = love.graphics.newImageFont("font.png", fontchars, 1)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -484,7 +484,7 @@ end
 
 function flip_screen()
 	love.graphics.setShader(pico8.display_shader)
-	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
+	pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 	love.graphics.setScissor()
@@ -543,7 +543,7 @@ note_map = {
 function note_to_string(note)
 	local octave = flr(note/12)
 	local note = flr(note%12)
-	return string.format('%s%d',note_map[note],octave)
+	return string.format("%s%d",note_map[note],octave)
 end
 
 local function oldosc(osc)
@@ -626,7 +626,7 @@ function update_audio(time)
 					if ch.fx == 2 then
 						ch.lfo = oldosc(osc[0])
 					elseif ch.fx >= 6 then
-						ch.lfo = oldosc(osc['saw_lfo'])
+						ch.lfo = oldosc(osc["saw_lfo"])
 					end
 					if ch.vol > 0 then
 						ch.freq = note_to_hz(ch.note)
@@ -799,7 +799,7 @@ function love.run()
 		if love.event then
 			love.event.pump()
 			for e,a,b,c,d in love.event.poll() do
-				if e == 'quit' then
+				if e == "quit" then
 					if not love.quit or not love.quit() then
 						if love.audio then
 							love.audio.stop()

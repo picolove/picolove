@@ -650,8 +650,15 @@ function api.peek(addr)
 	addr = flr(tonumber(addr) or 0)
 	if addr < 0 then
 		return 0
+	elseif addr < 0x5f80 then
+		-- TODO: Hardware state
+		if addr == 0x5f26 then
+			return pico8.cursor[1]
+		elseif addr == 0x5f27 then
+			return pico8.cursor[2]
+		end
 	elseif addr < 0x6000 then
-	-- TODO: implement for non screen space
+		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then
 		local dx = flr(addr-0x6000)%64
 		local dy = flr((addr-0x6000)/64)

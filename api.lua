@@ -676,6 +676,12 @@ function api.poke(addr, val)
 	addr, val = flr(tonumber(addr) or 0), flr(val)%256
 	if addr < 0 or addr >= 0x8000 then
 		error("bad memory access")
+	elseif addr  < 0x5f80 then
+		if addr == 0x5f26 then
+			pico8.cursor[1] = val
+		elseif addr == 0x5f27 then
+			pico8.cursor[2] = val
+		end
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then

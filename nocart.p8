@@ -4,7 +4,7 @@ __lua__
 function _init()
 	_disable_pause()
 	t=0
-	linebuffer = ''
+	linebuffer = ""
 	line = 0
 	cursorx = 0
 	cls()
@@ -26,7 +26,7 @@ function _update()
 end
 
 function _keydown(key)
-	if key == 'backspace' then
+	if key == "backspace" then
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 
@@ -40,65 +40,65 @@ function _keydown(key)
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+1+delchars)
 		linebuffer = startbuffer .. endbuffer
-	elseif key == 'delete' then
+	elseif key == "delete" then
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+2)
 		linebuffer = startbuffer .. endbuffer
-	elseif key == 'home' then
+	elseif key == "home" then
 		cursorx = 0
-	elseif key == 'end' then
+	elseif key == "end" then
 		cursorx = #linebuffer
-	elseif key == 'left' then
+	elseif key == "left" then
 		cursorx-=1
 		if (cursorx < 0) then
 			cursorx = 0
 		end
-	elseif key == 'right' then
+	elseif key == "right" then
 		cursorx+=1
 		if (cursorx > #linebuffer) then
 			cursorx = #linebuffer
 		end
-	elseif key == 'return' or key == 'kpenter' then
+	elseif key == "return" or key == "kpenter" then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		--render command
-		print('> '..linebuffer, nil, nil, 7)
-		if linebuffer == 'dir' or linebuffer == 'ls'
-			or (#linebuffer > 4 and linebuffer:sub(1,4) == 'dir ')
-			or (#linebuffer > 3 and linebuffer:sub(1,3) == 'ls ') then
+		print("> "..linebuffer, nil, nil, 7)
+		if linebuffer == "dir" or linebuffer == "ls"
+			or (#linebuffer > 4 and linebuffer:sub(1,4) == "dir ")
+			or (#linebuffer > 3 and linebuffer:sub(1,3) == "ls ") then
 			ls()
-		elseif linebuffer:sub(1,5) == 'load ' then
+		elseif linebuffer:sub(1,5) == "load " then
 			load(linebuffer:sub(6,#linebuffer))
-		elseif linebuffer == 'cls' then
+		elseif linebuffer == "cls" then
 			line=-1
 			cls()
-		elseif linebuffer == 'help' then
+		elseif linebuffer == "help" then
 			help()
-		elseif linebuffer == 'shutdown' then
+		elseif linebuffer == "shutdown" then
 			shutdown()
-		elseif linebuffer == 'folder' then
+		elseif linebuffer == "folder" then
 			folder()
-		elseif linebuffer == 'run' then
+		elseif linebuffer == "run" then
 			run()
-		elseif linebuffer == 'cd' or linebuffer:sub(1,3) == 'cd ' then
+		elseif linebuffer == "cd" or linebuffer:sub(1,3) == "cd " then
 			cd(linebuffer:sub(4))
-		elseif linebuffer:sub(1,6) == 'mkdir ' and #linebuffer>6 then
+		elseif linebuffer:sub(1,6) == "mkdir " and #linebuffer>6 then
 			mkdir(linebuffer:sub(7))
 		elseif #linebuffer == 0 then
 			--do nothing
-		elseif linebuffer == 'resume' then
+		elseif linebuffer == "resume" then
 			--TODO
-		elseif linebuffer == 'reboot' then
+		elseif linebuffer == "reboot" then
 			reboot()
-		elseif linebuffer:sub(1,5) == 'save ' then
+		elseif linebuffer:sub(1,5) == "save " then
 			--TODO
 		else
 			_call(linebuffer)
 		end
-		linebuffer = ''
+		linebuffer = ""
 		cursorx = 0
 	end
 end
@@ -116,13 +116,13 @@ end
 function _draw()
 	-- stay on screen
 	if _getcursory() > 121 then
-		print('') -- scroll text
+		print("") -- scroll text
 		cursor(0, 120)
 	end
 	-- delete text and carret
 	rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 	-- render text
-	print('> '..linebuffer,0,_getcursory(),7)
+	print("> "..linebuffer,0,_getcursory(),7)
 	-- render carret
 	if t % 16 < 8 then
 		rectfill((cursorx+2)*4,_getcursory(),(cursorx+2)*4+3,_getcursory()+4,8)

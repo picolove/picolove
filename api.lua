@@ -210,7 +210,9 @@ function api.print(str,x,y,col)
 end
 
 function api.cursor(x,y)
-	pico8.cursor = {x,y}
+	local x = flr(tonumber(x) or 0) % 256
+	local y = flr(tonumber(y) or 0) % 256
+	pico8.cursor = {x, y}
 end
 
 function api.spr(n,x,y,w,h,flip_x,flip_y)

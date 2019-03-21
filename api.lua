@@ -186,7 +186,9 @@ function api.color(c)
 end
 
 function api.print(str,x,y,col)
-	if col then api.color(col) end
+	if col then
+		api.color(col)
+	end
 	local canscroll = y==nil
 	if y==nil then
 		y = pico8.cursor[2]

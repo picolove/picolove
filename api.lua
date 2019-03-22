@@ -945,6 +945,7 @@ function api.stat(x)
 end
 
 api.sub = string.sub
+api.pairs = pairs
 
 function api.all(a)
 	local i = 0

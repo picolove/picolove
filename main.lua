@@ -347,7 +347,6 @@ function new_sandbox()
 		assert=assert,
 		error=error,
 		log=log,
-		pairs=pairs,
 		ipairs=ipairs,
 		warning=warning,
 		setfps=setfps,
@@ -359,6 +358,7 @@ function new_sandbox()
 		_getcursory=_getcursory,
 		_disable_pause=_disable_pause,
 		-- pico8 api functions go here
+		pairs=api.pairs,
 		clip=api.clip,
 		pget=api.pget,
 		pset=api.pset,

@@ -810,6 +810,10 @@ api.bnot = bit.bnot
 api.shl = bit.lshift
 api.shr = bit.rshift
 
+function api.load(filename)
+	_load(filename)
+end
+
 function api.run()
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.setShader(pico8.draw_shader)

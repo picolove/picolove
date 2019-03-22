@@ -380,7 +380,7 @@ function new_sandbox()
 		help=api.help,
 		dir=api.dir,
 		line=api.line,
-		load=_load,
+		load=api.load,
 		ls=api.ls,
 		mkdir=api.mkdir,
 		rect=api.rect,

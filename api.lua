@@ -209,6 +209,8 @@ function api.print(str,x,y,col)
 	love.graphics.print(str,flr(x),flr(y))
 end
 
+api.printh=print
+
 function api.cursor(x,y)
 	local x = flr(tonumber(x) or 0) % 256
 	local y = flr(tonumber(y) or 0) % 256

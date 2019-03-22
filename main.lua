@@ -369,7 +369,7 @@ function new_sandbox()
 		flip=api.flip,
 		folder=api.folder,
 		print=api.print,
-		printh=log,
+		printh=api.printh,
 		cd=api.cd,
 		cursor=api.cursor,
 		color=api.color,

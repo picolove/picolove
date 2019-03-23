@@ -217,6 +217,10 @@ function api.cursor(x,y)
 	pico8.cursor = {x, y}
 end
 
+function api.tonum(val)
+	return tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+end
+
 function api.spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(pico8.sprite_shader)

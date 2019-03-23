@@ -433,6 +433,7 @@ function new_sandbox()
 		stat=api.stat,
 		time=api.time,
 		t=api.t,
+		tonum=api.tonum,
 		-- deprecated pico-8 function aliases
 		mapdraw=api.mapdraw
 	}

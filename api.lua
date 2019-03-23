@@ -954,6 +954,7 @@ end
 
 api.sub = string.sub
 api.pairs = pairs
+api.type = type
 
 function api.all(a)
 	local i = 0

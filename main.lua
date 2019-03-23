@@ -344,7 +344,6 @@ end
 function new_sandbox()
 	return {
 		-- extra functions provided by picolove
-		assert=assert,
 		error=error,
 		log=log,
 		ipairs=ipairs,
@@ -358,6 +357,7 @@ function new_sandbox()
 		_getcursory=_getcursory,
 		_disable_pause=_disable_pause,
 		-- pico8 api functions go here
+		assert=api.assert,
 		pairs=api.pairs,
 		clip=api.clip,
 		pget=api.pget,

@@ -955,6 +955,7 @@ end
 api.sub = string.sub
 api.pairs = pairs
 api.type = type
+api.assert = assert
 
 function api.all(a)
 	local i = 0

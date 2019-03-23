@@ -429,6 +429,7 @@ function new_sandbox()
 		shr=api.shr,
 		exit=api.shutdown,
 		shutdown=api.shutdown,
+		exit=api.exit,
 		sub=api.sub,
 		stat=api.stat,
 		time=api.time,

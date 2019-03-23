@@ -866,6 +866,10 @@ function api.shutdown()
 	love.event.quit()
 end
 
+function api.exit()
+	love.event.quit()
+end
+
 function api.help()
 	api.print("")
 	api.color(12)

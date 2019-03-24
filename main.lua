@@ -437,6 +437,25 @@ function new_sandbox()
 		type=api.type,
 		tonum=api.tonum,
 		tostr=api.tostr,
+		-- not implemented
+		install_demos=api.install_demos,
+		install_games=api.install_games,
+		keyconfig=api.keyconfig,
+		splore=api.splore,
+		fillp=api.fillp,
+		save=api.save,
+		stop=api.stop,
+		info=api.info,
+		export=api.export,
+		import=api.import,
+		login=api.login,
+		logout=api.logout,
+		bbsreq=api.bbsreq,
+		scoresub=api.scoresub,
+		extcmd=api.extcmd,
+		radio=api.radio,
+		holdframe=api.holdframe,
+		menuitem=api.menuitem,
 		-- deprecated pico-8 function aliases
 		mapdraw=api.mapdraw
 	}

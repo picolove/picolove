@@ -161,6 +161,22 @@ function api.mkdir(name)
 	end
 end
 
+function api.install_demos()
+	-- TODO: implement this
+end
+
+function api.install_games()
+	-- TODO: implement this
+end
+
+function api.keyconfig()
+	-- TODO: implement this
+end
+
+function api.splore()
+	-- TODO: implement this
+end
+
 function api.pset(x,y,c)
 	if not c then return end
 	api.color(c)
@@ -400,7 +416,6 @@ function api.line(x0,y0,x1,y1,col)
 	x1 = flr(x1)
 	y1 = flr(y1)
 
-
 	local dx = x1 - x0
 	local dy = y1 - y0
 	local stepx, stepy
@@ -515,6 +530,10 @@ function api.palt(c,t)
 		end
 	end
 	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+end
+
+function api.fillp(p)
+	-- TODO: implement this
 end
 
 function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
@@ -822,6 +841,7 @@ function api.sin(x)
 end
 
 api.sqrt = math.sqrt
+
 function api.atan2(x,y)
 	return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0
 end
@@ -838,6 +858,10 @@ api.shr = bit.rshift
 
 function api.load(filename)
 	_load(filename)
+end
+
+function api.save()
+	-- TODO: implement this
 end
 
 function api.run()
@@ -879,6 +903,10 @@ function api.run()
 	end
 end
 
+function api.stop()
+	-- TODO: implement this
+end
+
 function api.reboot()
 	_load("nocart.p8")
 	api.run()
@@ -890,6 +918,18 @@ end
 
 function api.exit()
 	love.event.quit()
+end
+
+function api.info()
+	-- TODO: implement this
+end
+
+function api.export()
+	-- TODO: implement this
+end
+
+function api.import()
+	-- TODO: implement this
 end
 
 function api.help()
@@ -918,6 +958,30 @@ function api.time()
 	return host_time
 end
 api.t = api.time
+
+function api.login()
+	return nil
+end
+
+function api.logout()
+	return nil
+end
+
+function api.bbsreq()
+	return nil
+end
+
+function api.scoresub()
+	return nil, 0
+end
+
+function api.extcmd(x)
+	-- TODO: Implement this?
+end
+
+function api.radio()
+	return nil, 0
+end
 
 function api.btn(i,p)
 	if type(i) == "number" then
@@ -972,6 +1036,13 @@ end
 
 function api.stat(x)
 	return 0
+end
+
+function api.holdframe()
+	-- TODO: Implement this
+end
+
+function api.menuitem()
 end
 
 api.sub = string.sub

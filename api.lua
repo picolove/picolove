@@ -1034,7 +1034,20 @@ function api.btnp(i,p)
 	end
 end
 
+function api.cartdata(id)
+	-- TODO: implement this
+end
+
+function api.dget(index)
+	-- TODO: implement this
+end
+
+function api.dset(index, value)
+	-- TODO: implement this
+end
+
 function api.stat(x)
+	-- TODO: implement this
 	return 0
 end
 

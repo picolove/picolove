@@ -438,7 +438,6 @@ function new_sandbox()
 		shutdown=api.shutdown,
 		exit=api.exit,
 		sub=api.sub,
-		stat=api.stat,
 		time=api.time,
 		t=api.t,
 		type=api.type,
@@ -461,6 +460,10 @@ function new_sandbox()
 		scoresub=api.scoresub,
 		extcmd=api.extcmd,
 		radio=api.radio,
+		cartdata=api.cartdata,
+		dget=api.dget,
+		dset=api.dset,
+		stat=api.stat,
 		holdframe=api.holdframe,
 		menuitem=api.menuitem,
 		-- deprecated pico-8 function aliases

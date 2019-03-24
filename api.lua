@@ -47,7 +47,7 @@ function api.clip(x,y,w,h)
 end
 
 function api.cls(c)
-	c = flr(c or 0) % 16
+	c = flr(tonumber(c) or 0) % 16
 	love.graphics.clear(c * 16, 0, 0, 255)
 	pico8.cursor = {0,0}
 end

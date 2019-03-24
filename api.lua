@@ -258,7 +258,6 @@ function api.tostr(val, hex)
 end
 
 function api.spr(n,x,y,w,h,flip_x,flip_y)
-	n = flr(n)
 	love.graphics.setShader(pico8.sprite_shader)
 	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
 	n = flr(n)

@@ -1049,6 +1049,13 @@ api.sub = string.sub
 api.pairs = pairs
 api.type = type
 api.assert = assert
+api.setmetatable = setmetatable
+api.getmetatable = getmetatable
+api.cocreate = coroutine.create
+api.coresume = coroutine.resume
+api.yield = coroutine.yield
+api.costatus = coroutine.status
+api.trace = debug.traceback
 
 function api.all(a)
 	local i = 0

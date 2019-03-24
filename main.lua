@@ -358,6 +358,13 @@ function new_sandbox()
 		_disable_pause=_disable_pause,
 		-- pico8 api functions go here
 		assert=api.assert,
+		setmetatable=api.setmetatable,
+		getmetatable=api.getmetatable,
+		cocreate=api.cocreate,
+		coresume=api.coresume,
+		yield=api.yield,
+		costatus=api.costatus,
+		trace=api.trace,
 		pairs=api.pairs,
 		clip=api.clip,
 		pget=api.pget,

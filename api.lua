@@ -48,6 +48,8 @@ end
 
 function api.cls(c)
 	c = flr(tonumber(c) or 0) % 16
+	c = c + 1 -- TODO: fix workaround
+
 	love.graphics.clear(c * 16, 0, 0, 255)
 	pico8.cursor = {0,0}
 end

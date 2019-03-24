@@ -221,6 +221,26 @@ function api.tonum(val)
 	return tonumber(val) -- not a direct assignment to prevent usage of the radix argument
 end
 
+function api.tostr(val, hex)
+	local kind=type(val)
+	if kind == "string" then
+		return val
+	elseif kind == "number" then
+		if hex then
+			val=val*0x10000
+			local part1 = bit.rshift(bit.band(val, 0xFFFF0000), 16)
+			local part2 = bit.band(val, 0xFFFF)
+			return string.format("0x%04x.%04x", part1, part2)
+		else
+			return tostring(val)
+		end
+	elseif kind == "boolean" then
+		return tostring(val)
+	else
+		return "[" .. kind .. "]"
+	end
+end
+
 function api.spr(n,x,y,w,h,flip_x,flip_y)
 	n = flr(n)
 	love.graphics.setShader(pico8.sprite_shader)

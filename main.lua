@@ -436,6 +436,7 @@ function new_sandbox()
 		t=api.t,
 		type=api.type,
 		tonum=api.tonum,
+		tostr=api.tostr,
 		-- deprecated pico-8 function aliases
 		mapdraw=api.mapdraw
 	}

@@ -1111,6 +1111,25 @@ end
 -- tests
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)
+assert(api.min(-1, 2) == -1)
+assert(api.min(2, -1) == -1)
+
+assert(api.min("1", "2") == 1)
+assert(api.min("2", "1") == 1)
+assert(api.min("-1", "2") == -1)
+assert(api.min("2", "-1") == -1)
+
+assert(api.min(1, nil) == 0)
+assert(api.min(nil, 1) == 0)
+assert(api.min(-1, nil) == -1)
+assert(api.min(nil, -1) == -1)
+
+assert(api.min(1, "X") == 0)
+assert(api.min("X", 1) == 0)
+assert(api.min(-1, "X") == -1)
+assert(api.min("X", -1) == -1)
+
+assert(api.min(nil, nil) == 0)
 
 assert(api.max(1, 2) == 2)
 assert(api.max(2, 1) == 2)

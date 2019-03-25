@@ -1133,6 +1133,25 @@ assert(api.min(nil, nil) == 0)
 
 assert(api.max(1, 2) == 2)
 assert(api.max(2, 1) == 2)
+assert(api.max(-1, 2) == 2)
+assert(api.max(2, -1) == 2)
+
+assert(api.max("1", "2") == 2)
+assert(api.max("2", "1") == 2)
+assert(api.max("-1", "2") == 2)
+assert(api.max("2", "-1") == 2)
+
+assert(api.max(1, nil) == 1)
+assert(api.max(nil, 1) == 1)
+assert(api.max(-1, nil) == 0)
+assert(api.max(nil, -1) == 0)
+
+assert(api.max(1, "X") == 1)
+assert(api.max("X", 1) == 1)
+assert(api.max(-1, "X") == 0)
+assert(api.max("X", -1) == 0)
+
+assert(api.max(nil, nil) == 0)
 
 assert(api.mid(1, 2, 3) == 2)
 assert(api.mid(1, 3, 2) == 2)

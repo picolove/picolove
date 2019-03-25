@@ -828,11 +828,11 @@ function api.mid(x,y,z)
 end
 
 function api.cos(x)
-	return math.cos((x or 0)*(math.pi*2))
+	return math.cos((x or 0)*math.pi*2)
 end
 
 function api.sin(x)
-	return math.sin(-(x or 0)*(math.pi*2))
+	return -math.sin((x or 0)*math.pi*2)
 end
 
 api.sqrt = math.sqrt

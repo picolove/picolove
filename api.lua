@@ -709,8 +709,8 @@ function api.peek(addr)
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then
-		local dx = flr(addr-0x6000)%64
-		local dy = flr((addr-0x6000)/64)
+		local dx = (addr - 0x6000) % 64
+		local dy = flr((addr - 0x6000) / 64)
 		local low = api.pget(dx, dy)
 		local high = bit.lshift(api.pget(dx + 1, dy), 4)
 		return bit.bor(low, high)

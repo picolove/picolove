@@ -781,16 +781,9 @@ function api.memset(dest_addr,val,len)
 	if len < 1 then
 		return
 	end
-	-- only for range 0x6000+0x8000
-	if dest_addr >= 0x6000 then
-		for i=0,len-1 do
-			local dx = flr(dest_addr-0x6000+i)%64*2
-			local dy = flr((dest_addr-0x6000+i)/64)
-			local low = val
-			local high = bit.lshift(val,4)
-			api.pset(dx,dy,high)
-			api.pset(dx+1,dy,low)
-		end
+
+	for i = dest_addr, dest_addr + len - 1 do
+		api.poke(i, val)
 	end
 end
 

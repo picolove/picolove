@@ -704,6 +704,8 @@ function api.peek(addr)
 		elseif addr == 0x5f27 then
 			return pico8.cursor[2]
 		end
+	elseif addr<0x5fc0 then
+		-- FIXME: Persistence data
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then
@@ -724,11 +726,14 @@ function api.poke(addr, val)
 	if addr < 0 or addr >= 0x8000 then
 		error("bad memory access")
 	elseif addr  < 0x5f80 then
+		-- FIXME: Draw state
 		if addr == 0x5f26 then
 			pico8.cursor[1] = val
 		elseif addr == 0x5f27 then
 			pico8.cursor[2] = val
 		end
+	elseif addr<0x5fc0 then
+		-- FIXME: Persistence data
 	elseif addr < 0x6000 then
 		-- TODO: implement for non screen space
 	elseif addr < 0x8000 then

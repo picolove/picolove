@@ -105,7 +105,7 @@ local channels = 1
 local bits = 16
 
 currentDirectory = "/"
-local fontchars = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
+local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
 log = print
 --log = function() end
@@ -261,7 +261,7 @@ function love.load(argv)
 	pico8.screen = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
 	pico8.screen:setFilter("linear","nearest")
 
-	local font = love.graphics.newImageFont("font.png", fontchars, 1)
+	local font = love.graphics.newImageFont("font.png", glyphs, 1)
 	love.graphics.setFont(font)
 	font:setFilter('nearest','nearest')
 
@@ -789,8 +789,8 @@ end
 function love.textinput(text)
 	text = text:lower()
 	local validchar = false
-	for i = 1,#fontchars do
-		if fontchars:sub(i,i) == text then
+	for i = 1,#glyphs do
+		if glyphs:sub(i,i) == text then
 			validchar = true
 			break
 		end

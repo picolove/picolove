@@ -778,6 +778,9 @@ function api.memcpy(dest_addr,source_addr,len)
 end
 
 function api.memset(dest_addr,val,len)
+	if len < 1 then
+		return
+	end
 	-- only for range 0x6000+0x8000
 	if dest_addr >= 0x6000 then
 		for i=0,len-1 do

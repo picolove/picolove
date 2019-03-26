@@ -557,7 +557,7 @@ local function lowpass(y0,y1, cutoff)
 	return y0 + (alpha*(y1 - y0))
 end
 
-note_map = {
+local note_map = {
 	[0] = 'C-',
 	'C#',
 	'D-',

@@ -1072,7 +1072,9 @@ function api.all(a)
 	local n = table.getn(a)
 	return function()
 		i = i + 1
-		if i <= n then return a[i] end
+		if i <= n then
+			return a[i]
+		end
 	end
 end
 

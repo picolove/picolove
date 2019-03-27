@@ -1045,6 +1045,11 @@ end
 
 function api.stat(x)
 	-- TODO: implement this
+	if x == 7 then
+		return pico8.fps -- current fps
+	elseif x == 8 then
+		return pico8.fps -- target fps
+	end
 	return 0
 end
 

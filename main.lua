@@ -127,6 +127,7 @@ function restore_clip()
 	end
 end
 
+
 function _load(_cartname)
 	local exts = {"",".p8",".p8.png",".png"}
 	local cart_no_ext = _cartname
@@ -342,8 +343,14 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 end
 
 function new_sandbox()
-	return {
-		-- extra functions provided by picolove
+	local cart_env = {}
+
+	for k, v in pairs(api) do
+		cart_env[k]=v
+	end
+
+	-- extra functions provided by picolove
+	local picolove_functions = {
 		error=error,
 		log=log,
 		ipairs=ipairs,
@@ -356,119 +363,12 @@ function new_sandbox()
 		_getcursorx=_getcursorx,
 		_getcursory=_getcursory,
 		_disable_pause=_disable_pause,
-		-- pico8 api functions go here
-		assert=api.assert,
-		setmetatable=api.setmetatable,
-		getmetatable=api.getmetatable,
-		cocreate=api.cocreate,
-		coresume=api.coresume,
-		yield=api.yield,
-		costatus=api.costatus,
-		trace=api.trace,
-		pairs=api.pairs,
-		clip=api.clip,
-		pget=api.pget,
-		pset=api.pset,
-		sget=api.sget,
-		sset=api.sset,
-		fget=api.fget,
-		fset=api.fset,
-		flip=api.flip,
-		folder=api.folder,
-		print=api.print,
-		printh=api.printh,
-		cd=api.cd,
-		cursor=api.cursor,
-		color=api.color,
-		cls=api.cls,
-		camera=api.camera,
-		circ=api.circ,
-		circfill=api.circfill,
-		help=api.help,
-		dir=api.dir,
-		line=api.line,
-		load=api.load,
-		ls=api.ls,
-		mkdir=api.mkdir,
-		rect=api.rect,
-		rectfill=api.rectfill,
-		run=api.run,
-		reload=api.reload,
-		reboot=api.reboot,
-		pal=api.pal,
-		palt=api.palt,
-		spr=api.spr,
-		sspr=api.sspr,
-		add=api.add,
-		del=api.del,
-		foreach=api.foreach,
-		count=api.count,
-		all=api.all,
-		btn=api.btn,
-		btnp=api.btnp,
-		sfx=api.sfx,
-		music=api.music,
-		mget=api.mget,
-		mset=api.mset,
-		map=api.map,
-		memcpy=api.memcpy,
-		memset=api.memset,
-		peek=api.peek,
-		poke=api.poke,
-		max=api.max,
-		min=api.min,
-		mid=api.mid,
-		flr=api.flr,
-		ceil=api.ceil,
-		cos=api.cos,
-		sin=api.sin,
-		atan2=api.atan2,
-		sqrt=api.sqrt,
-		abs=api.abs,
-		rnd=api.rnd,
-		srand=api.srand,
-		sgn=api.sgn,
-		band=api.band,
-		bor=api.bor,
-		bxor=api.bxor,
-		bnot=api.bnot,
-		shl=api.shl,
-		shr=api.shr,
-		exit=api.shutdown,
-		shutdown=api.shutdown,
-		exit=api.exit,
-		sub=api.sub,
-		time=api.time,
-		t=api.t,
-		type=api.type,
-		tonum=api.tonum,
-		tostr=api.tostr,
-		-- not implemented
-		install_demos=api.install_demos,
-		install_games=api.install_games,
-		keyconfig=api.keyconfig,
-		splore=api.splore,
-		fillp=api.fillp,
-		save=api.save,
-		stop=api.stop,
-		info=api.info,
-		export=api.export,
-		import=api.import,
-		login=api.login,
-		logout=api.logout,
-		bbsreq=api.bbsreq,
-		scoresub=api.scoresub,
-		extcmd=api.extcmd,
-		radio=api.radio,
-		cartdata=api.cartdata,
-		dget=api.dget,
-		dset=api.dset,
-		stat=api.stat,
-		holdframe=api.holdframe,
-		menuitem=api.menuitem,
-		-- deprecated pico-8 function aliases
-		mapdraw=api.mapdraw
 	}
+	for k, v in pairs(picolove_functions) do
+		cart_env[k]=v
+	end
+
+	return cart_env;
 end
 
 local function update_buttons()

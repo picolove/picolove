@@ -1049,6 +1049,8 @@ function api.stat(x)
 		return pico8.fps -- current fps
 	elseif x == 8 then
 		return pico8.fps -- target fps
+	elseif x == 9 then
+		return love.timer.getFPS()
 	end
 	return 0
 end

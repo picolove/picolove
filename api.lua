@@ -1088,6 +1088,7 @@ function api.foreach(a,f)
 	end
 end
 
+-- legacy function
 function api.count(a)
 	return #a
 end

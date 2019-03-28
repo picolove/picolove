@@ -1043,6 +1043,7 @@ function api.dset(index, value)
 	-- TODO: implement this
 end
 
+local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)
 	-- TODO: implement this
 	if x == 7 then
@@ -1055,6 +1056,14 @@ function api.stat(x)
 		return getmousex()
 	elseif x == 33 then
 		return getmousey()
+	elseif (x >= 80 and x <= 85) or (x >= 90 and x <= 95) then
+		local tinfo
+		if x < 90 then
+			tinfo = os.date("!*t")
+		else
+			tinfo = os.date("*t")
+		end
+		return tinfo[tfield[x%10]]
 	end
 	return 0
 end

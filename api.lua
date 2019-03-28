@@ -1064,6 +1064,8 @@ function api.stat(x)
 			tinfo = os.date("*t")
 		end
 		return tinfo[tfield[x%10]]
+	elseif x == 100 then
+		return nil -- TODO: breadcrumb not supported
 	end
 	return 0
 end

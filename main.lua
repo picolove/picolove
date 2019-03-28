@@ -712,6 +712,14 @@ function setfps(fps)
 	frametime = 1 / pico8.fps
 end
 
+function getmousex()
+	return math.floor((love.mouse.getX() - xpadding) / scale)
+end
+
+function getmousey()
+	return math.floor((love.mouse.getY() - ypadding) / scale)
+end
+
 function love.run()
 	if love.math then
 		love.math.setRandomSeed(os.time())

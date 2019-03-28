@@ -1051,6 +1051,10 @@ function api.stat(x)
 		return pico8.fps -- target fps
 	elseif x == 9 then
 		return love.timer.getFPS()
+	elseif x == 32 then
+		return getmousex()
+	elseif x == 33 then
+		return getmousey()
 	end
 	return 0
 end

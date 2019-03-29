@@ -1064,6 +1064,8 @@ function api.stat(x)
 			end
 		end
 		return btns
+	elseif x == 36 then
+		return pico8.mwheel
 	elseif (x >= 80 and x <= 85) or (x >= 90 and x <= 95) then
 		local tinfo
 		if x < 90 then

@@ -64,6 +64,7 @@ pico8 = {
 			[7] = {},
 		}
 	},
+	mwheel = 0,
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
@@ -700,6 +701,10 @@ function love.textinput(text)
 	end
 end
 
+function love.wheelmoved(x, y)
+	pico8.mwheel = pico8.mwheel + y
+end
+
 function love.graphics.point(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
 end
@@ -782,6 +787,8 @@ function love.run()
 			if not paused and focus then
 				if love.draw then love.draw() end
 			end
+			-- reset mouse wheel
+			pico8.mwheel = 0
 		end
 
 		if love.timer then

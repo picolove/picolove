@@ -1076,6 +1076,14 @@ function api.stat(x)
 		return tinfo[tfield[x%10]]
 	elseif x == 100 then
 		return nil -- TODO: breadcrumb not supported
+	elseif x == 101 then
+		return nil -- TODO: bbs id not supported
+	elseif x == 102 then
+		return 0 -- TODO: bbs site not supported
+	elseif x == 103 then
+		return 0
+	elseif x == 104 then
+		return false
 	end
 	return 0
 end

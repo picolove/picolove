@@ -1,5 +1,7 @@
 require("strict")
 
+local bit = require("bit")
+
 local api = require("api")
 local cart = require("cart")
 local QueueableSource = require("QueueableSource")
@@ -79,8 +81,6 @@ pico8 = {
 	spritesheet_data = nil,
 	spritesheet = nil,
 }
-
-local bit = require("bit")
 
 local flr, abs = math.floor, math.abs
 

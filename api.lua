@@ -1046,7 +1046,9 @@ end
 local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)
 	-- TODO: implement this
-	if x == 7 then
+	if x == 4 then
+		return pico8.clipboard
+	elseif x == 7 then
 		return pico8.fps -- current fps
 	elseif x == 8 then
 		return pico8.fps -- target fps

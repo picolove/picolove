@@ -40,6 +40,7 @@ pico8 = {
 	music = {},
 	current_music = nil,
 	cart = nil,
+	clipboard = "",
 	keypressed = {
 		[0] = {},
 		[1] = {},
@@ -633,6 +634,8 @@ function love.keypressed(key)
 		api.run()
 	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		love.event.quit()
+	elseif key == 'v' and love.keyboard.isDown('lctrl') then
+		pico8.clipboard = love.system.getClipboardText()
 	elseif can_pause and (key == 'pause' or key == 'p') then
 		paused = not paused
 	elseif key == 'f6' then

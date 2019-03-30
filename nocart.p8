@@ -4,6 +4,7 @@ __lua__
 function _init()
 	_disable_pause()
 	t=0
+	isctrldown = false
 	linebuffer = ""
 	line = 0
 	cursorx = 0
@@ -61,6 +62,13 @@ function _keydown(key)
 		if (cursorx > #linebuffer) then
 			cursorx = #linebuffer
 		end
+	elseif key == "lctrl" then
+		isctrldown = true
+	elseif key == "v" and isctrldown then
+		local startbuffer = linebuffer:sub(1,cursorx)
+		local endbuffer = linebuffer:sub(cursorx+1)
+		linebuffer = startbuffer .. stat(4) .. endbuffer
+		cursorx = cursorx + #stat(4)
 	elseif key == "return" or key == "kpenter" then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
@@ -100,6 +108,12 @@ function _keydown(key)
 		end
 		linebuffer = ""
 		cursorx = 0
+	end
+end
+
+function _keyup(key)
+	if key == "lctrl" then
+		isctrldown = false
 	end
 end
 

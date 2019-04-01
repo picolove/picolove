@@ -445,6 +445,8 @@ function cart.load_p8(filename)
 	end)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
+	-- rewrite inspect operator "?"
+	lua = lua:gsub("(%s*)?([^\n\r]*)","%1print(%2)")
 
 	log("finished loading cart",filename)
 

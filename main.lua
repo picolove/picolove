@@ -816,6 +816,10 @@ function _getcursory()
 end
 
 function _call(code)
+	-- TODO don't patch multiple times
+	-- rewrite inspect operator "?"
+	local code = code:gsub("^(%s*)?([^\n\r]*)","%1print(%2)")
+
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then
 		api.print('syntax error', nil, nil, 14)

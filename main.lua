@@ -815,10 +815,34 @@ function _getcursory()
 	return pico8.cursor[2]
 end
 
-function _call(code)
-	-- TODO don't patch multiple times
+function patch_lua(lua)
+	-- patch the lua
+	lua = lua:gsub("!=","~=")
+	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
+		local nl = a:find('\n',nil,true)
+		local th = b:find('%f[%w]then%f[%W]')
+		local an = b:find('%f[%w]and%f[%W]')
+		local o = b:find('%f[%w]or%f[%W]')
+		local ce = b:find('--',nil,true)
+		if not (nl or th or an or o) then
+			if ce then
+				local c,t = b:match("(.-)(%s-%-%-.*)")
+				return "if "..a:sub(2,-2).." then "..c.." end"..t.."\n"
+			else
+				return "if "..a:sub(2,-2).." then "..b.." end\n"
+			end
+		end
+	end)
+	-- rewrite assignment operators
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 	-- rewrite inspect operator "?"
-	local code = code:gsub("^(%s*)?([^\n\r]*)","%1print(%2)")
+	lua = lua:gsub("(%s*)?([^\n\r]*)","%1print(%2)")
+	return lua
+end
+
+function _call(code)
+	code = patch_lua(code)
 
 	local ok,f,e = pcall(load,code,'repl')
 	if not ok or f==nil then

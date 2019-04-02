@@ -602,10 +602,10 @@ function api.fset(n,f,v)
 	end
 	if f then
 		-- set specific bit to v (true or false)
-		if f then
-			pico8.spriteflags[n] = api.bor(pico8.spriteflags[n],api.shl(1,f))
+		if v then
+			pico8.spriteflags[n] = bit.bor(pico8.spriteflags[n], bit.lshift(1, f))
 		else
-			pico8.spriteflags[n] = api.band(api.bnot(pico8.spriteflags[n],api.shl(1,f)))
+			pico8.spriteflags[n] = bit.band(pico8.spriteflags[n], bit.bnot(bit.lshift(1, f)))
 		end
 	else
 		-- set bitfield to v (number)

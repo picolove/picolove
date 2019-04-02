@@ -7,6 +7,9 @@ function _init()
 	isctrldown = false
 	linebuffer = ""
 	line = 0
+	commandhistory = {}
+	commandindex = 0
+	commandbuffer = ""
 	cursorx = 0
 	cls()
 	spr(32,0,3,6,1)
@@ -62,6 +65,46 @@ function _keydown(key)
 		if (cursorx > #linebuffer) then
 			cursorx = #linebuffer
 		end
+	elseif key == "up" then
+		--delete text and carret
+		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+
+		if commandindex == #commandhistory + 1 then
+			commandbuffer = linebuffer
+		end
+		--if commandhistory[commandindex] != linebuffer then
+		--	commandbuffer = linebuffer
+		--end
+
+		commandindex -= 1
+		if commandindex < 1 then
+			commandindex = 1
+		end
+
+		linebuffer = commandhistory[commandindex] or linebuffer
+		cursorx = #linebuffer
+	elseif key == "down" then
+		--delete text and carret
+		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+
+		if commandindex == #commandhistory + 1 then
+			commandbuffer = linebuffer
+		end
+		--if commandhistory[commandindex] != linebuffer then
+		--	commandbuffer = linebuffer
+		--end
+
+		local newbuffer
+		commandindex += 1
+		if commandindex >= #commandhistory + 1 then
+			commandindex = #commandhistory + 1
+			newbuffer = commandbuffer
+		else
+			newbuffer = commandhistory[commandindex]
+		end
+
+		linebuffer = newbuffer or linebuffer
+		cursorx = #linebuffer
 	elseif key == "lctrl" then
 		isctrldown = true
 	elseif key == "v" and isctrldown then
@@ -70,6 +113,12 @@ function _keydown(key)
 		linebuffer = startbuffer .. stat(4) .. endbuffer
 		cursorx = cursorx + #stat(4)
 	elseif key == "return" or key == "kpenter" then
+		--add to history
+		if linebuffer != commandhistory[#commandhistory] then
+			add(commandhistory, linebuffer)
+		end
+		commandindex = #commandhistory + 1
+
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
 		--render command

@@ -574,9 +574,12 @@ function api.mget(x,y)
 	return pico8.map[flr(y)][flr(x)]
 end
 
-function api.mset(x,y,v)
+function api.mset(x, y, v)
+	x = flr(x or 0)
+	y = flr(y or 0)
+	v = flr(v or 0) % 256
 	if x >= 0 and x < 128 and y >= 0 and y < 64 then
-		pico8.map[flr(y)][flr(x)] = v
+		pico8.map[y][x] = v
 	end
 end
 

@@ -568,10 +568,13 @@ end
 -- deprecated pico-8 function
 api.mapdraw=api.map
 
-function api.mget(x,y)
-	if x == nil or y == nil then return 0 end
-	if y > 63 or x > 127 or x < 0 or y < 0 then return 0 end
-	return pico8.map[flr(y)][flr(x)]
+function api.mget(x, y)
+	x = flr(x or 0)
+	y = flr(y or 0)
+	if x>=0 and x<128 and y>=0 and y<64 then
+		return pico8.map[y][x]
+	end
+	return 0
 end
 
 function api.mset(x, y, v)

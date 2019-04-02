@@ -586,11 +586,11 @@ function api.fget(n,f)
 		-- return just that bit as a boolean
 		if not pico8.spriteflags[flr(n)] then
 			warning(string.format('fget(%d,%d)',n,f))
-			return 0
+			return false
 		end
-		return api.band(pico8.spriteflags[flr(n)],api.shl(1,flr(f))) ~= 0
+		return bit.band(pico8.spriteflags[flr(n)],bit.lshift(1,flr(f))) ~= 0
 	end
-	return pico8.spriteflags[flr(n)]
+	return pico8.spriteflags[flr(n)] or 0
 end
 
 function api.fset(n,f,v)

@@ -207,7 +207,7 @@ end
 
 function api.print(str,x,y,col)
 	if col then
-		api.color(col)
+		color(col)
 	end
 	local canscroll = y==nil
 	if y==nil then
@@ -318,14 +318,16 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 end
 
 function api.rect(x0,y0,x1,y1,col)
-	col = col or pico8.color
-	api.color(col)
+	if col then
+		color(col)
+	end
 	love.graphics.rectangle("line",flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
 end
 
 function api.rectfill(x0,y0,x1,y1,col)
-	col = col or pico8.color
-	api.color(col)
+	if col then
+		color(col)
+	end
 	local w = (x1-x0)+1
 	local h = (y1-y0)+1
 	if w < 0 then
@@ -340,8 +342,9 @@ function api.rectfill(x0,y0,x1,y1,col)
 end
 
 function api.circ(ox,oy,r,col)
-	col = col or pico8.color
-	api.color(col)
+	if col then
+		color(col)
+	end
 	ox = flr(ox)
 	oy = flr(oy)
 	r = flr(r)
@@ -374,8 +377,9 @@ function api.circ(ox,oy,r,col)
 end
 
 function api.circfill(cx,cy,r,col)
-	col = col or pico8.color
-	api.color(col)
+	if col then
+		color(col)
+	end
 	cx = flr(cx)
 	cy = flr(cy)
 	r = flr(r)
@@ -406,8 +410,9 @@ function api.circfill(cx,cy,r,col)
 end
 
 function api.line(x0,y0,x1,y1,col)
-	col = col or pico8.color
-	api.color(col)
+	if col then
+		color(col)
+	end
 
 	if x0 ~= x0 or y0 ~= y0 or x1 ~= x1 or y1 ~= y1 then
 		warning("line has NaN value")

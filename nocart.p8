@@ -72,9 +72,6 @@ function _keydown(key)
 		if commandindex == #commandhistory + 1 then
 			commandbuffer = linebuffer
 		end
-		--if commandhistory[commandindex] != linebuffer then
-		--	commandbuffer = linebuffer
-		--end
 
 		commandindex -= 1
 		if commandindex < 1 then
@@ -90,9 +87,6 @@ function _keydown(key)
 		if commandindex == #commandhistory + 1 then
 			commandbuffer = linebuffer
 		end
-		--if commandhistory[commandindex] != linebuffer then
-		--	commandbuffer = linebuffer
-		--end
 
 		local newbuffer
 		commandindex += 1

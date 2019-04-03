@@ -3,6 +3,7 @@ version 4
 __lua__
 function _init()
 	_disable_pause()
+	pencolor = 6
 	t=0
 	isctrldown = false
 	linebuffer = ""
@@ -147,7 +148,9 @@ function _keydown(key)
 		elseif linebuffer:sub(1,5) == "save " then
 			--TODO
 		else
+			color(pencolor)
 			_call(linebuffer)
+			pencolor = peek(0x5f25) or pencolor
 		end
 		linebuffer = ""
 		cursorx = 0

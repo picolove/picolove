@@ -202,10 +202,7 @@ function api.pget(x,y)
 end
 
 function api.color(c)
-	c = c and flr(c) or 0
-	assert(c >= 0 and c <= 16,string.format("c is %s",c))
-	pico8.color = c
-	love.graphics.setColor(c*16,0,0,255)
+	color(c)
 end
 
 function api.print(str,x,y,col)

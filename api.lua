@@ -761,6 +761,14 @@ function api.peek4(addr)
 	return val
 end
 
+function api.poke4(addr, val)
+	val=val*0x10000
+	api.poke(addr+0, bit.rshift(bit.band(val, 0x000000FF),  0))
+	api.poke(addr+1, bit.rshift(bit.band(val, 0x0000FF00),  8))
+	api.poke(addr+2, bit.rshift(bit.band(val, 0x00FF0000), 16))
+	api.poke(addr+3, bit.rshift(bit.band(val, 0xFF000000), 24))
+end
+
 function api.memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
 	if len <= 0 then

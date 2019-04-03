@@ -129,6 +129,9 @@ function restore_clip()
 	end
 end
 
+function setColor(c)
+	love.graphics.setColor(c*16, 0, 0, 255)
+end
 
 function _load(_cartname)
 	local exts = {"",".p8",".p8.png",".png"}

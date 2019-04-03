@@ -1,5 +1,11 @@
 local flr = math.floor
 
+local function color(c)
+	c = flr(c or 0) % 16
+	pico8.color = c
+	setColor(c)
+end
+
 function warning(msg)
 	log(debug.traceback("WARNING: "..msg,3))
 end

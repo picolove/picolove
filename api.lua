@@ -772,10 +772,11 @@ function api.poke4(addr, val)
 end
 
 function api.memcpy(dest_addr,source_addr,len)
-	-- only for range 0x6000+0x8000
-	if len <= 0 then
+	if len < 1 or dest_addr == source_addr then
 		return
 	end
+
+	-- only for range 0x6000+0x8000
 	if source_addr < 0x6000 or dest_addr < 0x6000 then
 		return
 	end

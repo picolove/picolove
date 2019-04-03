@@ -816,6 +816,10 @@ function api.reload(dest_addr,source_addr,len)
 	_load(cartname)
 end
 
+function api.cstore(dest_addr, source_addr, len)
+	-- TODO: implement this
+end
+
 function api.rnd(x)
 	return love.math.random()*(x or 1)
 end

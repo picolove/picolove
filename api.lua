@@ -328,17 +328,13 @@ function api.rectfill(x0,y0,x1,y1,col)
 	if col then
 		color(col)
 	end
-	local w = (x1-x0)+1
-	local h = (y1-y0)+1
-	if w < 0 then
-		w = -w
-		x0 = x0-w
+	if x1 < x0 then
+		x0, x1=x1, x0
 	end
-	if h < 0 then
-		h = -h
-		y0 = y0-h
+	if y1 < y0 then
+		y0, y1=y1, y0
 	end
-	love.graphics.rectangle("fill",flr(x0),flr(y0),w,h)
+	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1-x0)+1, flr(y1-y0)+1)
 end
 
 function api.circ(ox,oy,r,col)

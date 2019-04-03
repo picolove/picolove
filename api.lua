@@ -752,6 +752,15 @@ function api.poke(addr, val)
 	end
 end
 
+function api.peek4(addr)
+	local val = 0
+	val = val + api.peek(addr+0)/0x10000
+	val = val + api.peek(addr+1)/0x100
+	val = val + api.peek(addr+2)
+	val = val + api.peek(addr+3)*0x100
+	return val
+end
+
 function api.memcpy(dest_addr,source_addr,len)
 	-- only for range 0x6000+0x8000
 	if len <= 0 then

@@ -184,11 +184,10 @@ function api.splore()
 end
 
 function api.pset(x,y,c)
-	if not c then
-		return
+	if c then
+		color(c)
 	end
-	api.color(c)
-	love.graphics.point(flr(x), flr(y), c*16, 0, 0, 255)
+	love.graphics.point(flr(x), flr(y))
 end
 
 function api.pget(x,y)

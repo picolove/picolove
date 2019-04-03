@@ -852,7 +852,9 @@ end
 
 function api.mid(x,y,z)
 	x, y, z = x or 0, y or 0, z or 0
-	if x > y then x, y = y, x end
+	if x > y then
+		x, y = y, x
+	end
 	return api.max(x, api.min(y, z))
 end
 

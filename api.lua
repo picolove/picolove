@@ -31,7 +31,7 @@ function api.flip()
 	love.timer.sleep(frametime)
 end
 
-function api.camera(x,y)
+function api.camera(x, y)
 	if type(x) == "number" then
 		pico8.camera_x = flr(x)
 		pico8.camera_y = flr(y)
@@ -42,12 +42,12 @@ function api.camera(x,y)
 	restore_camera()
 end
 
-function api.clip(x,y,w,h)
+function api.clip(x, y, w, h)
 	if type(x) == "number" then
-		love.graphics.setScissor(x,y,w,h)
-		pico8.clip = {x,y,w,h}
+		love.graphics.setScissor(x, y, w, h)
+		pico8.clip = {x, y, w, h}
 	else
-		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
+		love.graphics.setScissor(0, 0, pico8.resolution[1], pico8.resolution[2])
 		pico8.clip = nil
 	end
 end
@@ -57,7 +57,7 @@ function api.cls(c)
 	c = c + 1 -- TODO: fix workaround
 
 	love.graphics.clear(c * 16, 0, 0, 255)
-	pico8.cursor = {0,0}
+	pico8.cursor = {0, 0}
 end
 
 function api.folder()
@@ -183,20 +183,20 @@ function api.splore()
 	-- TODO: implement this
 end
 
-function api.pset(x,y,c)
+function api.pset(x, y, c)
 	if c then
 		color(c)
 	end
 	love.graphics.point(flr(x), flr(y))
 end
 
-function api.pget(x,y)
+function api.pget(x, y)
 	if x >= 0 and x < pico8.resolution[1] and y >= 0 and y < pico8.resolution[2] then
 		local __screen_img = pico8.screen:newImageData()
-		local r,g,b,a = __screen_img:getPixel(flr(x),flr(y))
-		return flr(r/17.0)
+		local r,g,b,a = __screen_img:getPixel(flr(x), flr(y))
+		return flr(r / 17.0)
 	else
-		warning(string.format("pget out of screen %d,%d",x,y))
+		warning(string.format("pget out of screen %d,%d", x, y))
 		return 0
 	end
 end
@@ -205,7 +205,7 @@ function api.color(c)
 	color(c)
 end
 
-function api.print(str,x,y,col)
+function api.print(str, x, y, col)
 	if col then
 		color(col)
 	end
@@ -226,12 +226,12 @@ function api.print(str,x,y,col)
 		api.cursor(0, y+6)
 	end
 	love.graphics.setShader(pico8.text_shader)
-	love.graphics.print(api.tostr(str),flr(x),flr(y))
+	love.graphics.print(api.tostr(str), flr(x), flr(y))
 end
 
 api.printh=print
 
-function api.cursor(x,y)
+function api.cursor(x, y)
 	local x = flr(tonumber(x) or 0) % 256
 	local y = flr(tonumber(y) or 0) % 256
 	pico8.cursor = {x, y}
@@ -261,9 +261,9 @@ function api.tostr(val, hex)
 	end
 end
 
-function api.spr(n,x,y,w,h,flip_x,flip_y)
+function api.spr(n, x, y, w, h, flip_x, flip_y)
 	love.graphics.setShader(pico8.sprite_shader)
-	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 	n = flr(n)
 	w = w or 1
 	h = h or 1
@@ -275,18 +275,18 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 			return
 		end
 	else
-		local id = string.format("%d-%d-%d",n,w,h)
+		local id = string.format("%d-%d-%d", n, w, h)
 		if pico8.quads[id] then
 			q = pico8.quads[id]
 		else
-			q = love.graphics.newQuad(flr(n%16)*8,flr(n/16)*8,8*w,8*h,128,128)
+			q = love.graphics.newQuad(flr(n%16)*8, flr(n/16)*8, 8*w, 8*h, 128, 128)
 			pico8.quads[id] = q
 		end
 	end
 	if not q then
-		log('missing quad',n)
+		log('missing quad', n)
 	end
-	love.graphics.draw(pico8.spritesheet,q,
+	love.graphics.draw(pico8.spritesheet, q,
 		flr(x)+(w*8*(flip_x and 1 or 0)),
 		flr(y)+(h*8*(flip_y and 1 or 0)),
 		0,
@@ -295,7 +295,7 @@ function api.spr(n,x,y,w,h,flip_x,flip_y)
 	love.graphics.setShader(pico8.draw_shader)
 end
 
-function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
+function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 -- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
 -- and draw in rectangle (dx, dy, dw, dh)
 -- Colour 0 drawn as transparent by default (see palt())
@@ -305,10 +305,10 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad
-	local q = love.graphics.newQuad(sx,sy,sw,sh,pico8.spritesheet:getDimensions())
+	local q = love.graphics.newQuad(sx, sy, sw, sh, pico8.spritesheet:getDimensions())
 	love.graphics.setShader(pico8.sprite_shader)
-	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
-	love.graphics.draw(pico8.spritesheet,q,
+	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
+	love.graphics.draw(pico8.spritesheet, q,
 		flr(dx)+(dw*(flip_x and 1 or 0)),
 		flr(dy)+(dh*(flip_y and 1 or 0)),
 		0,
@@ -317,14 +317,14 @@ function api.sspr(sx,sy,sw,sh,dx,dy,dw,dh,flip_x,flip_y)
 	love.graphics.setShader(pico8.draw_shader)
 end
 
-function api.rect(x0,y0,x1,y1,col)
+function api.rect(x0, y0, x1, y1, col)
 	if col then
 		color(col)
 	end
-	love.graphics.rectangle("line",flr(x0)+1,flr(y0)+1,flr(x1-x0),flr(y1-y0))
+	love.graphics.rectangle("line", flr(x0)+1, flr(y0)+1, flr(x1-x0), flr(y1-y0))
 end
 
-function api.rectfill(x0,y0,x1,y1,col)
+function api.rectfill(x0, y0, x1, y1, col)
 	if col then
 		color(col)
 	end
@@ -337,7 +337,7 @@ function api.rectfill(x0,y0,x1,y1,col)
 	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1-x0)+1, flr(y1-y0)+1)
 end
 
-function api.circ(ox,oy,r,col)
+function api.circ(ox, oy, r, col)
 	if col then
 		color(col)
 	end
@@ -350,15 +350,15 @@ function api.circ(ox,oy,r,col)
 	local decisionOver2 = 1 - x
 
 	while y <= x do
-		table.insert(points,{ox+x,oy+y})
-		table.insert(points,{ox+y,oy+x})
-		table.insert(points,{ox-x,oy+y})
-		table.insert(points,{ox-y,oy+x})
+		table.insert(points, {ox+x, oy+y})
+		table.insert(points, {ox+y, oy+x})
+		table.insert(points, {ox-x, oy+y})
+		table.insert(points, {ox-y, oy+x})
 
-		table.insert(points,{ox-x,oy-y})
-		table.insert(points,{ox-y,oy-x})
-		table.insert(points,{ox+x,oy-y})
-		table.insert(points,{ox+y,oy-x})
+		table.insert(points, {ox-x, oy-y})
+		table.insert(points, {ox-y, oy-x})
+		table.insert(points, {ox+x, oy-y})
+		table.insert(points, {ox+y, oy-x})
 		y = y + 1
 		if decisionOver2 < 0 then
 			decisionOver2 = decisionOver2 + 2 * y + 1
@@ -372,7 +372,7 @@ function api.circ(ox,oy,r,col)
 	end
 end
 
-function api.circfill(cx,cy,r,col)
+function api.circfill(cx, cy, r, col)
 	if col then
 		color(col)
 	end
@@ -386,12 +386,12 @@ function api.circfill(cx,cy,r,col)
 	local lines = {}
 
 	while y <= x do
-		_plot4points(lines,cx,cy,x,y)
+		_plot4points(lines, cx, cy, x, y)
 		if err < 0 then
 			err = err + 2 * y + 3
 		else
 			if x ~= y then
-				_plot4points(lines,cx,cy,y,x)
+				_plot4points(lines, cx, cy, y, x)
 			end
 			x = x - 1
 			err = err + 2 * (y - x) + 3

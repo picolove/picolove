@@ -7,14 +7,14 @@ local function color(c)
 end
 
 function warning(msg)
-	log(debug.traceback("WARNING: "..msg,3))
+	log(debug.traceback("WARNING: "..msg, 3))
 end
 
-local function _horizontal_line(lines,x0,y,x1)
-	table.insert(lines,{x0+0.5,y+0.5,x1+0.5,y+0.5})
+local function _horizontal_line(lines, x0, y, x1)
+	table.insert(lines, {x0 + 0.5,y + 0.5,x1 + 0.5,y + 0.5})
 end
 
-local function _plot4points(lines,cx,cy,x,y)
+local function _plot4points(lines, cx, cy, x, y)
 	_horizontal_line(lines, cx - x, cy + y, cx + x)
 	if y ~= 0 then
 		_horizontal_line(lines, cx - x, cy - y, cx + x)

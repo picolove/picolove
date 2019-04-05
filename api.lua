@@ -309,11 +309,11 @@ function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 	love.graphics.setShader(pico8.sprite_shader)
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(pico8.spritesheet, q,
-		flr(dx)+(dw*(flip_x and 1 or 0)),
-		flr(dy)+(dh*(flip_y and 1 or 0)),
+		flr(dx) + (flip_x and dw or 0),
+		flr(dy) + (flip_y and dh or 0),
 		0,
-		flip_x and -1 or 1 * (dw/sw),
-		flip_y and -1 or 1 * (dh/sh))
+		dw/sw * (flip_x and -1 or 1),
+		dh/sh * (flip_y and -1 or 1))
 	love.graphics.setShader(pico8.draw_shader)
 end
 

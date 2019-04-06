@@ -32,13 +32,8 @@ function api.flip()
 end
 
 function api.camera(x, y)
-	if type(x) == "number" then
-		pico8.camera_x = flr(x)
-		pico8.camera_y = flr(y)
-	else
-		pico8.camera_x = 0
-		pico8.camera_y = 0
-	end
+		pico8.camera_x = flr(tonumber(x) or 0)
+		pico8.camera_y = flr(tonumber(y) or 0)
 	restore_camera()
 end
 

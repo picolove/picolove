@@ -712,6 +712,14 @@ function api.peek(addr)
 			return pico8.cursor[1]
 		elseif addr == 0x5f27 then
 			return pico8.cursor[2]
+		elseif addr == 0x5f28 then
+			return pico8.camera_x % 256
+		elseif addr == 0x5f29 then
+			return flr(pico8.camera_x / 256)
+		elseif addr == 0x5f2a then
+			return pico8.camera_y % 256
+		elseif addr == 0x5f2b then
+			return flr(pico8.camera_y / 256)
 		end
 	elseif addr<0x5fc0 then
 		-- FIXME: Persistence data

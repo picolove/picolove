@@ -60,3 +60,9 @@ Extra features:
  * `setfps(fps)` changes the consoles framerate
  * `_keyup`, `_keydown`, `_textinput` allow using direct keyboard input
  * `_getcursorx()`, `_getcursory()` allow access to the cursor position
+
+Android Packaging:
+
+Replace nocart.p8 with your game, since this is the default cartridge on boot. Text P8 or PNG P8.PNG is supported.  
+Follow the steps at [Android Game Packaging](https://bitbucket.org/MartinFelis/love-android-sdl2/wiki/Game_Packaging)  
+An additional step when editing AndroidManifest.xml is to remove ```android:screenOrientation="landscape"``` if you would like your game to support orientation rotation (Portrait and Landscape)

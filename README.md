@@ -23,7 +23,7 @@ Why:
 
  * For a fun challenge!
  * Allow standalone publishing of PICO-8 games on other platforms
-  * should work on mobile devices
+  * should work on mobile devices [*](#android-packaging)
  * Configurable controls
  * Extendable
  * No arbitrary cpu or memory limitations

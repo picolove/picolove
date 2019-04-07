@@ -190,10 +190,9 @@ function api.pget(x, y)
 		local __screen_img = pico8.screen:newImageData()
 		local r,g,b,a = __screen_img:getPixel(flr(x), flr(y))
 		return flr(r / 17.0)
-	else
-		warning(string.format("pget out of screen %d,%d", x, y))
-		return 0
 	end
+	warning(string.format("pget out of screen %d,%d", x, y))
+	return 0
 end
 
 function api.color(c)

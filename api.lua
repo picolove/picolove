@@ -747,6 +747,14 @@ function api.poke(addr, val)
 			pico8.cursor[1] = val
 		elseif addr == 0x5f27 then
 			pico8.cursor[2] = val
+		elseif addr == 0x5f28 then
+			pico8.camera_x = flr(pico8.camera_x / 256) + val % 256
+		elseif addr == 0x5f29 then
+			pico8.camera_x = flr((val % 256) * 256) + pico8.camera_x % 256
+		elseif addr == 0x5f2a then
+			pico8.camera_y = flr(pico8.camera_y / 256) + val % 256
+		elseif addr == 0x5f2b then
+			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
 		end
 	elseif addr<0x5fc0 then
 		-- FIXME: Persistence data

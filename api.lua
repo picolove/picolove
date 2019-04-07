@@ -939,7 +939,9 @@ function api.run()
 
 	can_pause = true
 
-	if pico8.cart._init then pico8.cart._init() end
+	if pico8.cart._init then
+		pico8.cart._init()
+	end
 	if pico8.cart._update60 then
 		setfps(60)
 	else

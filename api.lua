@@ -843,7 +843,9 @@ function api.rnd(x)
 end
 
 function api.srand(seed)
-	if seed == 0 then seed = 1 end
+	if seed == 0 then
+		seed = 1
+	end
 	return love.math.setRandomSeed(flr(seed*32768))
 end
 

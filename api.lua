@@ -650,19 +650,19 @@ function api.music(n,fade_len,channel_mask)
 		warning(string.format("music %d does not exist",n))
 		return
 	end
-	local slowest_speed = nil
+	local music_speed = nil
 	local slowest_channel = nil
 	for i=0,3 do
 		if m[i] < 64 then
 			local sfx = pico8.sfx[m[i]]
-			if slowest_speed == nil or slowest_speed > sfx.speed then
-				slowest_speed = sfx.speed
+			if music_speed == nil or music_speed > sfx.speed then
+				music_speed = sfx.speed
 				slowest_channel = i
 			end
 		end
 	end
 	pico8.audio_channels[slowest_channel].loop = false
-	pico8.current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=slowest_speed}
+	pico8.current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=music_speed}
 	for i=0,3 do
 		if pico8.music[n][i] < 64 then
 			pico8.audio_channels[i].sfx = pico8.music[n][i]

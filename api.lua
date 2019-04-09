@@ -552,7 +552,7 @@ function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 						else
-							if api.band(pico8.spriteflags[v],bitmask) ~= 0 then
+							if bit.band(pico8.spriteflags[v],bitmask) ~= 0 then
 								love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
 							else
 							end

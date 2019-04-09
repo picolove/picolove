@@ -662,7 +662,7 @@ function api.music(n,fade_len,channel_mask)
 		end
 	end
 	pico8.audio_channels[music_channel].loop = false
-	pico8.current_music = {music=n,offset=0,channel_mask=channel_mask or 15,speed=music_speed}
+	pico8.current_music = {music=n, offset=0, channel_mask=channel_mask or 15, speed=music_speed}
 	for i=0,3 do
 		if pico8.music[n][i] < 64 then
 			pico8.audio_channels[i].sfx = pico8.music[n][i]

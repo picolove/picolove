@@ -43,7 +43,7 @@ function api.clip(x, y, w, h)
 		pico8.clip = {x, y, w, h}
 	else
 		love.graphics.setScissor(0, 0, pico8.resolution[1], pico8.resolution[2])
-		pico8.clip = nil
+		pico8.clip = {0, 0, pico8.resolution[1], pico8.resolution[2]}
 	end
 end
 

@@ -705,7 +705,15 @@ function api.peek(addr)
 		return 0
 	elseif addr < 0x5f80 then
 		-- TODO: Hardware state
-		if addr == 0x5f25 then
+		if addr == 0x5f20 then
+			return pico8.clip[1]
+		elseif addr == 0x5f21 then
+			return pico8.clip[2]
+		elseif addr == 0x5f22 then
+			return pico8.clip[1] + pico8.clip[3]
+		elseif addr == 0x5f23 then
+			return pico8.clip[2] + pico8.clip[4]
+		elseif addr == 0x5f25 then
 			return pico8.color
 		elseif addr == 0x5f26 then
 			return pico8.cursor[1]

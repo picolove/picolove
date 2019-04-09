@@ -916,6 +916,7 @@ function api.run()
 	restore_clip()
 	love.graphics.origin()
 
+	api.clip()
 	pico8.cart = new_sandbox()
 
 	local ok,f,e = pcall(load,loaded_code,cartname)

@@ -780,7 +780,10 @@ function love.run()
 			end
 			if paused or not focus then
 			else
-				if love.update then love.update(pico8.frametime) end -- will pass 0 if love.timer is disabled
+				-- will pass 0 if love.timer is disabled
+				if love.update then
+					love.update(pico8.frametime)
+				end
 				update_audio(pico8.frametime)
 			end
 			dt = dt - pico8.frametime

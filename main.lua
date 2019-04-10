@@ -12,6 +12,7 @@ local love_args = nil
 pico8 = {
 	clip = nil,
 	fps = 30,
+	frametime = 1 / 30,
 	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
@@ -84,8 +85,6 @@ pico8 = {
 }
 
 local flr, abs = math.floor, math.abs
-
-frametime = 1 / pico8.fps
 
 local __accum = 0
 loaded_code = nil
@@ -720,7 +719,7 @@ function setfps(fps)
 	if pico8.fps <= 0 then
 		pico8.fps = 30
 	end
-	frametime = 1 / pico8.fps
+	pico8.frametime = 1 / pico8.fps
 end
 
 function getmousex()
@@ -774,17 +773,17 @@ function love.run()
 
 		-- Call update and draw
 		local render = false
-		while dt > frametime do
+		while dt > pico8.frametime do
 			host_time = host_time + dt
 			if host_time > 65536 then
 				host_time = host_time - 65536
 			end
 			if paused or not focus then
 			else
-				if love.update then love.update(frametime) end -- will pass 0 if love.timer is disabled
-				update_audio(frametime)
+				if love.update then love.update(pico8.frametime) end -- will pass 0 if love.timer is disabled
+				update_audio(pico8.frametime)
 			end
-			dt = dt - frametime
+			dt = dt - pico8.frametime
 			render = true
 		end
 

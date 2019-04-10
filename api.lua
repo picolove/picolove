@@ -28,7 +28,7 @@ local api = {}
 
 function api.flip()
 	flip_screen()
-	love.timer.sleep(frametime)
+	love.timer.sleep(pico8.frametime)
 end
 
 function api.camera(x, y)

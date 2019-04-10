@@ -635,12 +635,12 @@ local function isCtrlOrGuiDown()
 end
 
 function love.keypressed(key)
-	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
+	if key == 'r' and isCtrlOrGuiDown() then
 		api.reload()
 		api.run()
-	elseif key == 'q' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
+	elseif key == 'q' and isCtrlOrGuiDown() then
 		love.event.quit()
-	elseif key == 'v' and love.keyboard.isDown('lctrl') then
+	elseif key == 'v' and isCtrlOrGuiDown() then
 		pico8.clipboard = love.system.getClipboardText()
 	elseif can_pause and (key == 'pause' or key == 'p') then
 		paused = not paused

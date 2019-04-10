@@ -789,7 +789,10 @@ function love.run()
 
 		if render and love.window and love.graphics and love.window.isCreated() then
 			love.graphics.origin()
-			if not paused and focus then
+			if paused or not focus then
+				api.rectfill(64-4*4, 60, 64+4*4-2, 64+4+4, 1)
+				api.print("paused", 64-3*4, 64, (host_time*20)%8<4 and 7 or 13)
+			else
 				if love.draw then love.draw() end
 			end
 			-- reset mouse wheel

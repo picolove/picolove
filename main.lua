@@ -630,6 +630,10 @@ function _disable_pause()
 	can_pause = false
 end
 
+local function isCtrlOrGuiDown()
+	return (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui') or love.keyboard.isDown('rctrl') or love.keyboard.isDown('rgui'))
+end
+
 function love.keypressed(key)
 	if key == 'r' and (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui')) then
 		api.reload()

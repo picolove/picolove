@@ -644,7 +644,7 @@ function love.keypressed(key)
 		pico8.clipboard = love.system.getClipboardText()
 	elseif can_pause and (key == 'pause' or key == 'p') then
 		paused = not paused
-	elseif key == 'f6' then
+	elseif key == 'f1' or key == 'f6' then
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)
 		local filename = cartname..'-'..os.time()..'.png'

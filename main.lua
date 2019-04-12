@@ -650,10 +650,10 @@ function love.keypressed(key)
 		local filename = cartname..'-'..os.time()..'.png'
 		screenshot:encode("png", filename)
 		log('saved screenshot to',filename)
-	elseif key == 'f8' then
+	elseif key == 'f3' or key=='f8' then
 		-- start recording
 		video_frames = {}
-	elseif key == 'f9' then
+	elseif key == 'f4' or key == 'f9' then
 		-- stop recording and save
 		local basename = cartname..'-'..os.time()..'-'
 		for i,v in ipairs(video_frames) do

@@ -648,7 +648,7 @@ function love.keypressed(key)
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)
 		local filename = cartname..'-'..os.time()..'.png'
-		screenshot:encode(filename)
+		screenshot:encode("png", filename)
 		log('saved screenshot to',filename)
 	elseif key == 'f8' then
 		-- start recording

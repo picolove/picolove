@@ -397,24 +397,26 @@ function cart.load_p8(filename)
 		-- load music
 		local musicdata = data:match("\n__music__.-\n(.-\n)\n-__")
 
-		local _music = 0
+		if musicdata then
+			local _music = 0
 
-		local next_line = 1
-		while next_line do
-			local end_of_line = musicdata:find("\n",next_line)
-			if end_of_line == nil then break end
-			end_of_line = end_of_line - 1
-			local line = musicdata:sub(next_line,end_of_line)
+			local next_line = 1
+			while next_line do
+				local end_of_line = musicdata:find("\n",next_line)
+				if end_of_line == nil then break end
+				end_of_line = end_of_line - 1
+				local line = musicdata:sub(next_line,end_of_line)
 
-			pico8.music[_music] = {
-				loop = tonumber(line:sub(1,2),16),
-				[0] = tonumber(line:sub(4,5),16),
-				[1] = tonumber(line:sub(6,7),16),
-				[2] = tonumber(line:sub(8,9),16),
-				[3] = tonumber(line:sub(10,11),16)
-			}
-			_music = _music + 1
-			next_line = musicdata:find("\n",end_of_line)+1
+				pico8.music[_music] = {
+					loop = tonumber(line:sub(1,2),16),
+					[0] = tonumber(line:sub(4,5),16),
+					[1] = tonumber(line:sub(6,7),16),
+					[2] = tonumber(line:sub(8,9),16),
+					[3] = tonumber(line:sub(10,11),16)
+				}
+				_music = _music + 1
+				next_line = musicdata:find("\n",end_of_line)+1
+			end
 		end
 	end
 

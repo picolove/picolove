@@ -208,16 +208,14 @@ function cart.load_p8(filename)
 			error(string.format("Unable to open: %s",filename))
 		end
 
+		-- strip carriage returns pico-8 style
+		data = data:gsub("\r\n", "\n")
+
 		-- check for header and vesion
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
 		local start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then
-			header = "pico-8 cartridge // http://www.pico-8.com\r\nversion "
-			start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\r\nversion ")
-			if start == nil then
-				error("invalid cart")
-			end
-			eol_chars = "\r\n"
+			error("invalid cart")
 		else
 			eol_chars = "\n"
 		end

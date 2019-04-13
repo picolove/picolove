@@ -208,6 +208,11 @@ function cart.load_p8(filename)
 
 		-- strip carriage returns pico-8 style
 		data = data:gsub("\r\n", "\n")
+		-- tack on a fake header
+		if data:sub(-1) ~= "\n" then
+			data = data .. "\n"
+		end
+		data = data .. "__eof__\n"
 
 		-- check for header and vesion
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
@@ -219,17 +224,13 @@ function cart.load_p8(filename)
 		local version_str = data:sub(start+#header,next_line-1)
 		local version = tonumber(version_str)
 		log("version",version)
-		-- extract the lua
-		local lua_start = data:find("__lua__") + 7 + 1
-		local lua_end = data:find("__gfx__") - 1
 
-		lua = data:sub(lua_start,lua_end)
+		-- extract the lua
+		lua = data:match("\n__lua__.-\n(.-)\n__") or ""
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
-		local gfx_start = data:find("__gfx__") + 7 + 1
-		local gfx_end = data:find("__gff__") - 1
-		local gfxdata = data:sub(gfx_start,gfx_end)
+		local gfxdata = data:match("\n__gfx__.-\n(.-\n)\n-__")
 
 		local row = 0
 		local tile_row = 32
@@ -291,10 +292,7 @@ function cart.load_p8(filename)
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 
 		-- load the sprite flags
-
-		local gff_start = data:find("__gff__") + 7 + 1
-		local gff_end = data:find("__map__") - 1
-		local gffdata = data:sub(gff_start,gff_end)
+		local gffdata = data:match("\n__gff__.-\n(.-\n)\n-__")
 
 		local sprite = 0
 
@@ -325,10 +323,7 @@ function cart.load_p8(filename)
 		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
 
 		-- convert the tile data to a table
-
-		local map_start = data:find("__map__") + 7 + 1
-		local map_end = data:find("__sfx__") - 1
-		local mapdata = data:sub(map_start,map_end)
+		local mapdata = data:match("\n__map__.-\n(.-\n)\n-__")
 
 		local row = 0
 		local col = 0
@@ -359,9 +354,7 @@ function cart.load_p8(filename)
 		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 		-- load sfx
-		local sfx_start = data:find("__sfx__") + 7 + 1
-		local sfx_end = data:find("__music__") - 1
-		local sfxdata = data:sub(sfx_start,sfx_end)
+		local sfxdata = data:match("\n__sfx__.-\n(.-\n)\n-__")
 
 		local _sfx = 0
 		local step = 0
@@ -394,9 +387,7 @@ function cart.load_p8(filename)
 		assert(_sfx == 64)
 
 		-- load music
-		local music_start = data:find("__music__") + 9 + 1
-		local music_end = #data-1
-		local musicdata = data:sub(music_start,music_end)
+		local musicdata = data:match("\n__music__.-\n(.-\n)\n-__")
 
 		local _music = 0
 

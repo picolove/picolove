@@ -329,33 +329,35 @@ function cart.load_p8(filename)
 		-- convert the tile data to a table
 		local mapdata = data:match("\n__map__.-\n(.-\n)\n-__")
 
-		local row = 0
-		local col = 0
+		if mapdata then
+			local row = 0
+			local col = 0
 
-		local next_line = 1
-		while next_line do
-			local end_of_line = mapdata:find("\n",next_line)
-			if end_of_line == nil then
-				break
-			end
-			end_of_line = end_of_line - 1
-			local line = mapdata:sub(next_line,end_of_line)
-			for i=1,#line,2 do
-				local v = line:sub(i,i+1)
-				v = tonumber(v,16)
-				if col == 0 then
+			local next_line = 1
+			while next_line do
+				local end_of_line = mapdata:find("\n",next_line)
+				if end_of_line == nil then
+					break
 				end
-				pico8.map[row][col] = v
-				col = col + 1
-				tiles = tiles + 1
-				if col == 128 then
-					col = 0
-					row = row + 1
+				end_of_line = end_of_line - 1
+				local line = mapdata:sub(next_line,end_of_line)
+				for i=1,#line,2 do
+					local v = line:sub(i,i+1)
+					v = tonumber(v,16)
+					if col == 0 then
+					end
+					pico8.map[row][col] = v
+					col = col + 1
+					tiles = tiles + 1
+					if col == 128 then
+						col = 0
+						row = row + 1
+					end
 				end
+				next_line = mapdata:find("\n",end_of_line)+1
 			end
-			next_line = mapdata:find("\n",end_of_line)+1
+			assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 		end
-		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 		-- load sfx
 		local sfxdata = data:match("\n__sfx__.-\n(.-\n)\n-__")

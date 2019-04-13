@@ -232,7 +232,6 @@ function cart.load_p8(filename)
 		-- generate a quad for each sprite index
 		local gfxdata = data:match("\n__gfx__.-\n(.-\n)\n-__")
 
-		local row = 0
 		local tile_row = 32
 		local tile_col = 0
 		local col = 0
@@ -240,54 +239,57 @@ function cart.load_p8(filename)
 		local tiles = 0
 		local shared = 0
 
-		local next_line = 1
-		while next_line do
-			local end_of_line = gfxdata:find("\n",next_line)
-			if end_of_line == nil then break end
-			end_of_line = end_of_line - 1
-			local line = gfxdata:sub(next_line,end_of_line)
-			for i=1,#line do
-				local v = line:sub(i,i)
-				v = tonumber(v,16)
-				pico8.spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
+		if gfxdata then
+			local row = 0
+			local next_line = 1
+			while next_line do
+				local end_of_line = gfxdata:find("\n",next_line)
+				if end_of_line == nil then break end
+				end_of_line = end_of_line - 1
+				local line = gfxdata:sub(next_line,end_of_line)
+				for i=1,#line do
+					local v = line:sub(i,i)
+					v = tonumber(v,16)
+					pico8.spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
 
-				col = col + 1
-				if col == 128 then
-					col = 0
-					row = row + 1
-				end
-			end
-			next_line = gfxdata:find("\n",end_of_line)+1
-		end
-
-		if version > 3 then
-			local tx,ty = 0,32
-			for sy=64,127 do
-				for sx=0,127,2 do
-					-- get the two pixel values and merge them
-					local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
-					local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
-					local v = api.bor(api.shl(hi,4),lo)
-					pico8.map[ty][tx] = v
-					shared = shared + 1
-					tx = tx + 1
-					if tx == 128 then
-						tx = 0
-						ty = ty + 1
+					col = col + 1
+					if col == 128 then
+						col = 0
+						row = row + 1
 					end
 				end
+				next_line = gfxdata:find("\n",end_of_line)+1
 			end
-			assert(shared == 128 * 32,shared)
-		end
 
-		for y=0,15 do
-			for x=0,15 do
-				pico8.quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
-				sprite = sprite + 1
+			if version > 3 then
+				local tx,ty = 0,32
+				for sy=64,127 do
+					for sx=0,127,2 do
+						-- get the two pixel values and merge them
+						local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
+						local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
+						local v = api.bor(api.shl(hi,4),lo)
+						pico8.map[ty][tx] = v
+						shared = shared + 1
+						tx = tx + 1
+						if tx == 128 then
+							tx = 0
+							ty = ty + 1
+						end
+					end
+				end
+				assert(shared == 128 * 32,shared)
 			end
-		end
 
-		assert(sprite == 256,sprite)
+			for y=0,15 do
+				for x=0,15 do
+					pico8.quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
+					sprite = sprite + 1
+				end
+			end
+
+			assert(sprite == 256,sprite)
+		end
 
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 

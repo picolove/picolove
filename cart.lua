@@ -296,33 +296,35 @@ function cart.load_p8(filename)
 		-- load the sprite flags
 		local gffdata = data:match("\n__gff__.-\n(.-\n)\n-__")
 
-		local sprite = 0
+		if gffdata then
+			local sprite = 0
 
-		local next_line = 1
-		while next_line do
-			local end_of_line = gffdata:find("\n",next_line)
-			if end_of_line == nil then break end
-			end_of_line = end_of_line - 1
-			local line = gffdata:sub(next_line,end_of_line)
-			if version <= 2 then
-				for i=1,#line do
-					local v = line:sub(i)
-					v = tonumber(v,16)
-					pico8.spriteflags[sprite] = v
-					sprite = sprite + 1
+			local next_line = 1
+			while next_line do
+				local end_of_line = gffdata:find("\n",next_line)
+				if end_of_line == nil then break end
+				end_of_line = end_of_line - 1
+				local line = gffdata:sub(next_line,end_of_line)
+				if version <= 2 then
+					for i=1,#line do
+						local v = line:sub(i)
+						v = tonumber(v,16)
+						pico8.spriteflags[sprite] = v
+						sprite = sprite + 1
+					end
+				else
+					for i=1,#line,2 do
+						local v = line:sub(i,i+1)
+						v = tonumber(v,16)
+						pico8.spriteflags[sprite] = v
+						sprite = sprite + 1
+					end
 				end
-			else
-				for i=1,#line,2 do
-					local v = line:sub(i,i+1)
-					v = tonumber(v,16)
-					pico8.spriteflags[sprite] = v
-					sprite = sprite + 1
-				end
+				next_line = gffdata:find("\n",end_of_line)+1
 			end
-			next_line = gffdata:find("\n",end_of_line)+1
-		end
 
-		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
+			assert(sprite == 256,"wrong number of spriteflags:"..sprite)
+		end
 
 		-- convert the tile data to a table
 		local mapdata = data:match("\n__map__.-\n(.-\n)\n-__")

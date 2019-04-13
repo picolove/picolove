@@ -362,35 +362,37 @@ function cart.load_p8(filename)
 		-- load sfx
 		local sfxdata = data:match("\n__sfx__.-\n(.-\n)\n-__")
 
-		local _sfx = 0
-		local step = 0
+		if sfxdata then
+			local _sfx = 0
+			local step = 0
 
-		local next_line = 1
-		while next_line do
-			local end_of_line = sfxdata:find("\n",next_line)
-			if end_of_line == nil then break end
-			end_of_line = end_of_line - 1
-			local line = sfxdata:sub(next_line,end_of_line)
-			local editor_mode = tonumber(line:sub(1,2),16)
-			pico8.sfx[_sfx].speed = tonumber(line:sub(3,4),16)
-			pico8.sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
-			pico8.sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
-			for i=9,#line,5 do
-				local v = line:sub(i,i+4)
-				assert(#v == 5)
-				local note  = tonumber(line:sub(i,i+1),16)
-				local instr = tonumber(line:sub(i+2,i+2),16)
-				local vol   = tonumber(line:sub(i+3,i+3),16)
-				local fx    = tonumber(line:sub(i+4,i+4),16)
-				pico8.sfx[_sfx][step] = {note,instr,vol,fx}
-				step = step + 1
+			local next_line = 1
+			while next_line do
+				local end_of_line = sfxdata:find("\n",next_line)
+				if end_of_line == nil then break end
+				end_of_line = end_of_line - 1
+				local line = sfxdata:sub(next_line,end_of_line)
+				local editor_mode = tonumber(line:sub(1,2),16)
+				pico8.sfx[_sfx].speed = tonumber(line:sub(3,4),16)
+				pico8.sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
+				pico8.sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
+				for i=9,#line,5 do
+					local v = line:sub(i,i+4)
+					assert(#v == 5)
+					local note  = tonumber(line:sub(i,i+1),16)
+					local instr = tonumber(line:sub(i+2,i+2),16)
+					local vol   = tonumber(line:sub(i+3,i+3),16)
+					local fx    = tonumber(line:sub(i+4,i+4),16)
+					pico8.sfx[_sfx][step] = {note,instr,vol,fx}
+					step = step + 1
+				end
+				_sfx = _sfx + 1
+				step = 0
+				next_line = sfxdata:find("\n",end_of_line)+1
 			end
-			_sfx = _sfx + 1
-			step = 0
-			next_line = sfxdata:find("\n",end_of_line)+1
-		end
 
-		assert(_sfx == 64)
+			assert(_sfx == 64)
+		end
 
 		-- load music
 		local musicdata = data:match("\n__music__.-\n(.-\n)\n-__")

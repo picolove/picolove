@@ -5,8 +5,6 @@ for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gm
 	table.insert(compression_map,entry)
 end
 
-local eol_chars = "\n"
-
 local function decompress(code)
 	-- decompress code
 	local lua = ""
@@ -216,22 +214,20 @@ function cart.load_p8(filename)
 		local start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then
 			error("invalid cart")
-		else
-			eol_chars = "\n"
 		end
-		local next_line = data:find(eol_chars,start+#header)
+		local next_line = data:find("\n",start+#header)
 		local version_str = data:sub(start+#header,next_line-1)
 		local version = tonumber(version_str)
 		log("version",version)
 		-- extract the lua
-		local lua_start = data:find("__lua__") + 7 + #eol_chars
+		local lua_start = data:find("__lua__") + 7 + 1
 		local lua_end = data:find("__gfx__") - 1
 
 		lua = data:sub(lua_start,lua_end)
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
-		local gfx_start = data:find("__gfx__") + 7 + #eol_chars
+		local gfx_start = data:find("__gfx__") + 7 + 1
 		local gfx_end = data:find("__gff__") - 1
 		local gfxdata = data:sub(gfx_start,gfx_end)
 
@@ -245,7 +241,7 @@ function cart.load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = gfxdata:find(eol_chars,next_line)
+			local end_of_line = gfxdata:find("\n",next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = gfxdata:sub(next_line,end_of_line)
@@ -260,7 +256,7 @@ function cart.load_p8(filename)
 					row = row + 1
 				end
 			end
-			next_line = gfxdata:find(eol_chars,end_of_line)+#eol_chars
+			next_line = gfxdata:find("\n",end_of_line)+1
 		end
 
 		if version > 3 then
@@ -296,7 +292,7 @@ function cart.load_p8(filename)
 
 		-- load the sprite flags
 
-		local gff_start = data:find("__gff__") + 7 + #eol_chars
+		local gff_start = data:find("__gff__") + 7 + 1
 		local gff_end = data:find("__map__") - 1
 		local gffdata = data:sub(gff_start,gff_end)
 
@@ -304,7 +300,7 @@ function cart.load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = gffdata:find(eol_chars,next_line)
+			local end_of_line = gffdata:find("\n",next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = gffdata:sub(next_line,end_of_line)
@@ -323,14 +319,14 @@ function cart.load_p8(filename)
 					sprite = sprite + 1
 				end
 			end
-			next_line = gffdata:find(eol_chars,end_of_line)+#eol_chars
+			next_line = gffdata:find("\n",end_of_line)+1
 		end
 
 		assert(sprite == 256,"wrong number of spriteflags:"..sprite)
 
 		-- convert the tile data to a table
 
-		local map_start = data:find("__map__") + 7 + #eol_chars
+		local map_start = data:find("__map__") + 7 + 1
 		local map_end = data:find("__sfx__") - 1
 		local mapdata = data:sub(map_start,map_end)
 
@@ -339,7 +335,7 @@ function cart.load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = mapdata:find(eol_chars,next_line)
+			local end_of_line = mapdata:find("\n",next_line)
 			if end_of_line == nil then
 				break
 			end
@@ -358,12 +354,12 @@ function cart.load_p8(filename)
 					row = row + 1
 				end
 			end
-			next_line = mapdata:find(eol_chars,end_of_line)+#eol_chars
+			next_line = mapdata:find("\n",end_of_line)+1
 		end
 		assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 
 		-- load sfx
-		local sfx_start = data:find("__sfx__") + 7 + #eol_chars
+		local sfx_start = data:find("__sfx__") + 7 + 1
 		local sfx_end = data:find("__music__") - 1
 		local sfxdata = data:sub(sfx_start,sfx_end)
 
@@ -372,7 +368,7 @@ function cart.load_p8(filename)
 
 		local next_line = 1
 		while next_line do
-			local end_of_line = sfxdata:find(eol_chars,next_line)
+			local end_of_line = sfxdata:find("\n",next_line)
 			if end_of_line == nil then break end
 			end_of_line = end_of_line - 1
 			local line = sfxdata:sub(next_line,end_of_line)
@@ -392,14 +388,14 @@ function cart.load_p8(filename)
 			end
 			_sfx = _sfx + 1
 			step = 0
-			next_line = sfxdata:find(eol_chars,end_of_line)+#eol_chars
+			next_line = sfxdata:find("\n",end_of_line)+1
 		end
 
 		assert(_sfx == 64)
 
 		-- load music
-		local music_start = data:find("__music__") + 9 + #eol_chars
-		local music_end = #data-#eol_chars
+		local music_start = data:find("__music__") + 9 + 1
+		local music_end = #data-1
 		local musicdata = data:sub(music_start,music_end)
 
 		local _music = 0

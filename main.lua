@@ -124,7 +124,7 @@ function restore_clip()
 	if pico8.clip then
 		love.graphics.setScissor(unpack(pico8.clip))
 	else
-		love.graphics.setScissor(0,0,pico8.resolution[1],pico8.resolution[2])
+		love.graphics.setScissor()
 	end
 end
 

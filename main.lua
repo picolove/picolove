@@ -476,7 +476,7 @@ local note_map = {
 	'B-',
 }
 
-function note_to_string(note)
+local function note_to_string(note)
 	local octave = flr(note/12)
 	local note = flr(note%12)
 	return string.format("%s%d",note_map[note],octave)

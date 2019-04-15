@@ -796,7 +796,7 @@ function love.run()
 			render = true
 		end
 
-		if render and love.window and love.graphics and love.window.isCreated() then
+		if render and love.graphics and love.graphics.isActive() then
 			love.graphics.origin()
 			if paused or not focus then
 				api.rectfill(64-4*4, 60, 64+4*4-2, 64+4+4, 1)

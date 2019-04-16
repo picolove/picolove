@@ -631,8 +631,9 @@ function api.sget(x,y)
 end
 
 function api.sset(x,y,c)
-	x = flr(x)
-	y = flr(y)
+	x = flr(tonumber(x) or 0)
+	y = flr(tonumber(y) or 0)
+	c = flr(tonumber(c) or 0)
 	pico8.spritesheet_data:setPixel(x,y,c*16,0,0,255)
 	pico8.spritesheet:refresh()
 end

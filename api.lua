@@ -624,8 +624,8 @@ function api.sget(x,y)
 	y = flr(tonumber(y) or 0)
 
 	if x >= 0 and x < 128 and y >=0 and y < 128 then
-		local r,g,b,a = pico8.spritesheet_data:getPixel(x,y)
-		return flr(r/16)
+		local c = pico8.spritesheet_data:getPixel(x, y)
+		return flr(c / 16)
 	end
 	return 0
 end

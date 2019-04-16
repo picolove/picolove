@@ -622,8 +622,12 @@ function api.sget(x,y)
 	-- return the color from the spritesheet
 	x = flr(tonumber(x) or 0)
 	y = flr(tonumber(y) or 0)
-	local r,g,b,a = pico8.spritesheet_data:getPixel(x,y)
-	return flr(r/16)
+
+	if x >= 0 and x < 128 and y >=0 and y < 128 then
+		local r,g,b,a = pico8.spritesheet_data:getPixel(x,y)
+		return flr(r/16)
+	end
+	return 0
 end
 
 function api.sset(x,y,c)

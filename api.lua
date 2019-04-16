@@ -290,12 +290,12 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 end
 
 function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
--- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
--- and draw in rectangle (dx, dy, dw, dh)
--- Colour 0 drawn as transparent by default (see palt())
--- dw, dh defaults to sw, sh
--- flip_x=true to flip horizontally
--- flip_y=true to flip vertically
+	-- Stretch rectangle from sprite sheet (sx, sy, sw, sh) // given in pixels
+	-- and draw in rectangle (dx, dy, dw, dh)
+	-- Color 0 drawn as transparent by default (see palt())
+	-- dw, dh defaults to sw, sh
+	-- flip_x = true to flip horizontally
+	-- flip_y = true to flip vertically
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad

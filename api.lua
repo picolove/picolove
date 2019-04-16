@@ -220,7 +220,7 @@ function api.print(str, x, y, col)
 		api.cursor(0, y+6)
 	end
 	love.graphics.setShader(pico8.text_shader)
-	love.graphics.print(api.tostr(str), flr(x), flr(y))
+	love.graphics.print(tostring(str), flr(x), flr(y))
 end
 
 api.printh=print

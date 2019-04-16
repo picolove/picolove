@@ -236,7 +236,6 @@ function cart.load_p8(filename)
 		local tile_col = 0
 		local col = 0
 		local sprite = 0
-		local tiles = 0
 		local shared = 0
 
 		if gfxdata then
@@ -331,6 +330,7 @@ function cart.load_p8(filename)
 
 		if mapdata then
 			local row = 0
+			local tiles = 0
 			local col = 0
 
 			local next_line = 1

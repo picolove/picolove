@@ -112,6 +112,10 @@ function api.cd(name)
 	local output = ""
 	local newDirectory = currentDirectory..name.."/"
 
+	if name == "/" then
+		newDirectory = "/"
+	end
+
 	-- filter /TEXT/../ -> /
 	local count = 1
 	while count > 0 do

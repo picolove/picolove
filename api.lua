@@ -129,6 +129,7 @@ function api.cd(name)
 	end
 
 	local failed = newDirectory:find("%.%.") ~= nil
+	failed = failed or newDirectory:find("/[ ]+/") ~= nil
 
 	if #name == 0 then
 		output = "directory: "..currentDirectory

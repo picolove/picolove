@@ -128,6 +128,12 @@ function api.cd(name)
 		newDirectory, count = newDirectory:gsub("/[^/]*/%.%.$","/")
 	end
 
+	-- filter /TEXT//$ -> /
+	count = 1
+	while count > 0 do
+		newDirectory, count = newDirectory:gsub("//","/")
+	end
+
 	local failed = newDirectory:find("%.%.") ~= nil
 	failed = failed or newDirectory:find("/[ ]+/") ~= nil
 

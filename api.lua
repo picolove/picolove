@@ -111,7 +111,16 @@ api.dir = api.ls
 function api.cd(name)
 	local output = ""
 	local count
-	local newDirectory = currentDirectory..name.."/"
+
+	name = name .. "/"
+
+	-- filter /TEXT//$ -> /
+	count = 1
+	while count > 0 do
+		name, count = name:gsub("//","/")
+	end
+
+	local newDirectory = currentDirectory .. name
 
 	if name == "/" then
 		newDirectory = "/"
@@ -127,12 +136,6 @@ function api.cd(name)
 	count = 1
 	while count > 0 do
 		newDirectory, count = newDirectory:gsub("/[^/]*/%.%.$","/")
-	end
-
-	-- filter /TEXT//$ -> /
-	count = 1
-	while count > 0 do
-		newDirectory, count = newDirectory:gsub("//","/")
 	end
 
 	local failed = newDirectory:find("%.%.") ~= nil

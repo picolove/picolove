@@ -110,6 +110,7 @@ api.dir = api.ls
 
 function api.cd(name)
 	local output = ""
+	local count
 	local newDirectory = currentDirectory..name.."/"
 
 	if name == "/" then
@@ -117,7 +118,7 @@ function api.cd(name)
 	end
 
 	-- filter /TEXT/../ -> /
-	local count = 1
+	count = 1
 	while count > 0 do
 		newDirectory, count = newDirectory:gsub("/[^/]*/%.%./","/")
 	end

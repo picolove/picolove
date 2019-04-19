@@ -19,6 +19,4 @@ ignore = {
 exclude_files = {
   "lib",
   "spec",
-  "QueueableSource.lua",
-  "openal.lua",
 }

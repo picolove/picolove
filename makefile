@@ -1,4 +1,7 @@
-.PHONY: all
+.PHONY: all check
 
 all:
 	@love .
+
+check:
+	luacheck .

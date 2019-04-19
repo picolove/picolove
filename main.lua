@@ -378,7 +378,7 @@ end
 local function update_buttons()
 	for p=0,1 do
 		for i=0,#pico8.keymap[p] do
-			for _,key in pairs(pico8.keymap[p][i]) do
+			for _,_ in pairs(pico8.keymap[p][i]) do
 				local v = pico8.keypressed[p][i]
 				if v then
 					v = v + 1
@@ -498,7 +498,7 @@ function update_audio(time)
 	-- check what sfx should be playing
 	local samples = flr(time*__sample_rate)
 
-	for i=0,samples-1 do
+	for _=0,samples-1 do
 		if pico8.current_music then
 			pico8.current_music.offset = pico8.current_music.offset + 7350/(61*pico8.current_music.speed*__sample_rate)
 			if pico8.current_music.offset >= 32 then
@@ -737,7 +737,7 @@ end
 function love.run()
 	if love.math then
 		love.math.setRandomSeed(os.time())
-		for i=1,3 do love.math.random() end
+		for _=1,3 do love.math.random() end
 	end
 
 	if love.event then

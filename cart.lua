@@ -166,7 +166,12 @@ function cart.load_p8(filename)
 					local step = (inbyte-0x3200)%68
 					if step < 64 and inbyte%2 == 1 then
 						local note = bit.lshift(byte,8)+lastbyte
-						pico8.sfx[_sfx][(step-1)/2] = {bit.band(note,0x3f),bit.rshift(bit.band(note,0x1c0),6),bit.rshift(bit.band(note, 0xe00),9),bit.rshift(bit.band(note,0x7000),12)}
+						pico8.sfx[_sfx][(step-1)/2] = {
+							bit.band(note,0x3f),
+							bit.rshift(bit.band(note,0x1c0),6),
+							bit.rshift(bit.band(note, 0xe00),9),
+							bit.rshift(bit.band(note,0x7000),12)
+						}
 					elseif step == 65 then
 						pico8.sfx[_sfx].speed = byte
 					elseif step == 66 then

@@ -631,7 +631,10 @@ function _disable_pause()
 end
 
 local function isCtrlOrGuiDown()
-	return (love.keyboard.isDown('lctrl') or love.keyboard.isDown('lgui') or love.keyboard.isDown('rctrl') or love.keyboard.isDown('rgui'))
+	return (love.keyboard.isDown('lctrl') or
+		love.keyboard.isDown('lgui') or
+		love.keyboard.isDown('rctrl') or
+		love.keyboard.isDown('rgui'))
 end
 
 function love.keypressed(key)

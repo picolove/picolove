@@ -1,10 +1,12 @@
-require("strict")
+package.path = package.path .. ";./lib/?.lua"
+
+require("lib.strict")
+local QueueableSource = require("lib.QueueableSource")
 
 local bit = require("bit")
 
 local api = require("api")
 local cart = require("cart")
-local QueueableSource = require("QueueableSource")
 
 cartname = nil -- used by api.reload
 local love_args = nil

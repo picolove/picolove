@@ -68,10 +68,6 @@ function api.ls()
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
 			output[#output+1] = {name=file:lower(), color=14}
-		end
-	end
-	for _, file in ipairs(files) do
-		if love.filesystem.isDirectory(currentDirectory..file) then
 		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
 			output[#output+1] = {name=file:lower(), color=6}
 		else

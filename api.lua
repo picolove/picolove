@@ -240,7 +240,10 @@ end
 
 api.printh=print
 
-function api.cursor(x, y)
+function api.cursor(x, y, col)
+	if col then
+		color(col)
+	end
 	local x = flr(tonumber(x) or 0) % 256
 	local y = flr(tonumber(y) or 0) % 256
 	pico8.cursor = {x, y}

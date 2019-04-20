@@ -796,6 +796,9 @@ function api.poke(addr, val)
 	end
 end
 
+function api.peek2(addr)
+end
+
 function api.peek4(addr)
 	local val = 0
 	val = val + api.peek(addr+0)/0x10000
@@ -803,6 +806,9 @@ function api.peek4(addr)
 	val = val + api.peek(addr+2)
 	val = val + api.peek(addr+3)*0x100
 	return val
+end
+
+function api.poke2(addr, val)
 end
 
 function api.poke4(addr, val)

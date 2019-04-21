@@ -797,6 +797,7 @@ function api.poke(addr, val)
 end
 
 function api.peek2(addr)
+	-- TODO: implement this
 end
 
 function api.peek4(addr)
@@ -809,6 +810,7 @@ function api.peek4(addr)
 end
 
 function api.poke2(addr, val)
+	-- TODO: implement this
 end
 
 function api.poke4(addr, val)

@@ -74,6 +74,7 @@ pico8 = {
 	cursor = {0, 0},
 	camera_x = 0,
 	camera_y = 0,
+	can_pause = true,
 	draw_palette = {},
 	display_palette = {},
 	pal_transparent = {},
@@ -99,7 +100,6 @@ local osc
 host_time = 0
 local retro_mode = false
 local paused = false
-can_pause = true
 local focus = true
 
 local __audio_channels
@@ -629,7 +629,7 @@ function update_audio(time)
 end
 
 function _disable_pause()
-	can_pause = false
+	pico8.can_pause = false
 end
 
 local function isCtrlOrGuiDown()
@@ -647,7 +647,7 @@ function love.keypressed(key)
 		love.event.quit()
 	elseif key == 'v' and isCtrlOrGuiDown() then
 		pico8.clipboard = love.system.getClipboardText()
-	elseif can_pause and (key == 'pause' or key == 'p') then
+	elseif pico8.can_pause and (key == 'pause' or key == 'p') then
 		paused = not paused
 	elseif key == 'f1' or key == 'f6' then
 		-- screenshot

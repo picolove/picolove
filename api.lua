@@ -973,7 +973,7 @@ function api.run()
 		end
 	end
 
-	can_pause = true
+	pico8.can_pause = true
 
 	if pico8.cart._init then
 		pico8.cart._init()

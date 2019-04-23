@@ -26,6 +26,13 @@ end
 
 local api = {}
 
+function scroll(pixels)
+	local base = 0x6000
+	local delta = base + pixels*0x40
+	local basehigh = 0x8000
+	api.memcpy(base, delta, basehigh-delta)
+end
+
 function api.flip()
 	flip_screen()
 	love.timer.sleep(pico8.frametime)

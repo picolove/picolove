@@ -849,13 +849,6 @@ function love.run()
 	end
 end
 
-function scroll(pixels)
-	local base = 0x6000
-	local delta = base + pixels*0x40
-	local basehigh = 0x8000
-	api.memcpy(base, delta, basehigh-delta)
-end
-
 function patch_lua(lua)
 	-- patch the lua
 	lua = lua:gsub("!=","~=")

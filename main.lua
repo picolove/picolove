@@ -110,6 +110,14 @@ local bits = 16
 currentDirectory = "/"
 local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
+function _getcursorx()
+	return pico8.cursor[1]
+end
+
+function _getcursory()
+	return pico8.cursor[2]
+end
+
 log = print
 --log = function() end
 
@@ -824,14 +832,6 @@ function scroll(pixels)
 	local delta = base + pixels*0x40
 	local basehigh = 0x8000
 	api.memcpy(base, delta, basehigh-delta)
-end
-
-function _getcursorx()
-	return pico8.cursor[1]
-end
-
-function _getcursory()
-	return pico8.cursor[2]
 end
 
 function patch_lua(lua)

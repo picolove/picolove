@@ -110,11 +110,11 @@ local bits = 16
 currentDirectory = "/"
 local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
-function _getcursorx()
+local function _getcursorx()
 	return pico8.cursor[1]
 end
 
-function _getcursory()
+local function _getcursory()
 	return pico8.cursor[2]
 end
 

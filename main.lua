@@ -118,7 +118,7 @@ local function _getcursory()
 	return pico8.cursor[2]
 end
 
-function _call(code)
+local function _call(code)
 	code = patch_lua(code)
 
 	local ok,f,e = pcall(load,code,'repl')

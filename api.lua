@@ -26,7 +26,7 @@ end
 
 local api = {}
 
-function scroll(pixels)
+local function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
 	local basehigh = 0x8000

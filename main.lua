@@ -118,6 +118,26 @@ local function _getcursory()
 	return pico8.cursor[2]
 end
 
+function _call(code)
+	code = patch_lua(code)
+
+	local ok,f,e = pcall(load,code,'repl')
+	if not ok or f==nil then
+		api.print('syntax error', nil, nil, 14)
+		api.print(api.sub(e,20), nil, nil, 6)
+		return false
+	else
+		local result
+		setfenv(f,pico8.cart)
+		ok,e = pcall(f)
+		if not ok then
+			api.print('runtime error', nil, nil, 14)
+			api.print(api.sub(e,20), nil, nil, 6)
+		end
+	end
+	return true
+end
+
 log = print
 --log = function() end
 
@@ -858,24 +878,4 @@ function patch_lua(lua)
 	-- rewrite inspect operator "?"
 	lua = lua:gsub("(%s*)?([^\n\r]*)","%1print(%2)")
 	return lua
-end
-
-function _call(code)
-	code = patch_lua(code)
-
-	local ok,f,e = pcall(load,code,'repl')
-	if not ok or f==nil then
-		api.print('syntax error', nil, nil, 14)
-		api.print(api.sub(e,20), nil, nil, 6)
-		return false
-	else
-		local result
-		setfenv(f,pico8.cart)
-		ok,e = pcall(f)
-		if not ok then
-			api.print('runtime error', nil, nil, 14)
-			api.print(api.sub(e,20), nil, nil, 6)
-		end
-	end
-	return true
 end

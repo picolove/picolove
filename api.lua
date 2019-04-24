@@ -101,7 +101,7 @@ function api.ls()
 			if count == 20 then
 				api.print("--more--", nil, nil, 12)
 				flip_screen()
-				local y = _getcursory() - 6
+				local y = api._getcursory() - 6
 				api.cursor(0, y)
 				api.rectfill(0, y, 127, y+6, 0)
 				api.color(item.color)

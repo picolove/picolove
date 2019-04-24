@@ -342,7 +342,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 		return vec4(0.0,0.0,0.0,0.0);
 	}
 	int index = int(color.r*16.0);
-	// lookup the colour in the palette by index
+	// lookup the color in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
 	pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
@@ -353,7 +353,7 @@ extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(Texel(texture, texture_coords).r*15.0);
-	// lookup the colour in the palette by index
+	// lookup the color in the palette by index
 	return palette[index]/256.0;
 }]])
 	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))

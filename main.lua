@@ -110,14 +110,6 @@ local bits = 16
 currentDirectory = "/"
 local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
-local function _getcursorx()
-	return pico8.cursor[1]
-end
-
-local function _getcursory()
-	return pico8.cursor[2]
-end
-
 local function _call(code)
 	code = patch_lua(code)
 
@@ -394,8 +386,6 @@ function new_sandbox()
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
-		_getcursorx=_getcursorx,
-		_getcursory=_getcursory,
 		_disable_pause=_disable_pause,
 	}
 	for k, v in pairs(picolove_functions) do

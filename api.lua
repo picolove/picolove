@@ -30,6 +30,15 @@ local function scroll(pixels)
 	api.memcpy(base, delta, basehigh-delta)
 end
 
+-- extra functions provided by picolove
+function api._getcursorx()
+	return pico8.cursor[1]
+end
+
+function api._getcursory()
+	return pico8.cursor[2]
+end
+
 --------------------------------------------------------------------------------
 -- PICO-8 API
 

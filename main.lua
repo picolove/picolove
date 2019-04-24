@@ -782,7 +782,9 @@ function love.run()
 	while true do
 		-- Process events.
 		if love.event then
+			love.graphics.setCanvas() -- TODO: Rework this
 			love.event.pump()
+			love.graphics.setCanvas(pico8.screen) -- TODO: Rework this
 			for name, a, b, c, d, e, f in love.event.poll() do
 				if name == "quit" then
 					if not love.quit or not love.quit() then

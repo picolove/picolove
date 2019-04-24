@@ -214,7 +214,9 @@ end
 
 function api.pget(x, y)
 	if x >= 0 and x < pico8.resolution[1] and y >= 0 and y < pico8.resolution[2] then
+		love.graphics.setCanvas()
 		local __screen_img = pico8.screen:newImageData()
+		love.graphics.setCanvas(pico8.screen)
 		local r,g,b,a = __screen_img:getPixel(flr(x), flr(y))
 		return flr(r / 17.0)
 	end
@@ -849,7 +851,9 @@ function api.memcpy(dest_addr,source_addr,len)
 	if source_addr + len > 0x8000 or dest_addr + len > 0x8000 then
 		return
 	end
+	love.graphics.setCanvas()
 	local img = pico8.screen:newImageData()
+	love.graphics.setCanvas(pico8.screen)
 	for i=0,len-1 do
 		local x = flr(source_addr-0x6000+i)%64*2
 		local y = flr((source_addr-0x6000+i)/64)

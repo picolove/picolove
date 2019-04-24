@@ -1,3 +1,5 @@
+local api = {}
+
 local flr = math.floor
 
 local function color(c)
@@ -21,17 +23,15 @@ local function _plot4points(lines, cx, cy, x, y)
 	end
 end
 
---------------------------------------------------------------------------------
--- PICO-8 API
-
-local api = {}
-
 local function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
 	local basehigh = 0x8000
 	api.memcpy(base, delta, basehigh-delta)
 end
+
+--------------------------------------------------------------------------------
+-- PICO-8 API
 
 function api.flip()
 	flip_screen()

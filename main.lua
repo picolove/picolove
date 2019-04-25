@@ -110,7 +110,7 @@ local bits = 16
 currentDirectory = "/"
 local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
-function _disable_pause()
+local function _disable_pause()
 	pico8.can_pause = false
 end
 

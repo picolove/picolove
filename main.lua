@@ -514,7 +514,7 @@ local function lerp(a, b, t)
 	return (b-a)*t+a
 end
 
-function update_audio(time)
+local function update_audio(time)
 	-- check what sfx should be playing
 	local samples = flr(time*__sample_rate)
 

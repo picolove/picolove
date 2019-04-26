@@ -114,26 +114,6 @@ local function _disable_pause()
 	pico8.can_pause = false
 end
 
-local function _call(code)
-	code = patch_lua(code)
-
-	local ok,f,e = pcall(load,code,'repl')
-	if not ok or f==nil then
-		api.print('syntax error', nil, nil, 14)
-		api.print(api.sub(e,20), nil, nil, 6)
-		return false
-	else
-		local result
-		setfenv(f,pico8.cart)
-		ok,e = pcall(f)
-		if not ok then
-			api.print('runtime error', nil, nil, 14)
-			api.print(api.sub(e,20), nil, nil, 6)
-		end
-	end
-	return true
-end
-
 log = print
 --log = function() end
 
@@ -386,7 +366,6 @@ function new_sandbox()
 		ipairs=ipairs,
 		warning=warning,
 		setfps=setfps,
-		_call=_call,
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,

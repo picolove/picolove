@@ -39,6 +39,26 @@ function api._getcursory()
 	return pico8.cursor[2]
 end
 
+function api._call(code)
+	code = patch_lua(code)
+
+	local ok,f,e = pcall(load,code,'repl')
+	if not ok or f==nil then
+		api.print('syntax error', nil, nil, 14)
+		api.print(api.sub(e,20), nil, nil, 6)
+		return false
+	else
+		local result
+		setfenv(f,pico8.cart)
+		ok,e = pcall(f)
+		if not ok then
+			api.print('runtime error', nil, nil, 14)
+			api.print(api.sub(e,20), nil, nil, 6)
+		end
+	end
+	return true
+end
+
 --------------------------------------------------------------------------------
 -- PICO-8 API
 

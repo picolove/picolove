@@ -1040,9 +1040,7 @@ function api.shutdown()
 	love.event.quit()
 end
 
-function api.exit()
-	love.event.quit()
-end
+api.exit = api.shutdown
 
 function api.info()
 	-- TODO: implement this

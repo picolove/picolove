@@ -75,6 +75,7 @@ pico8 = {
 	camera_x = 0,
 	camera_y = 0,
 	can_pause = true,
+	can_shutdown = false,
 	draw_palette = {},
 	display_palette = {},
 	pal_transparent = {},
@@ -115,6 +116,13 @@ local function _allow_pause(value)
 		value = true
 	end
 	pico8.can_pause = value
+end
+
+local function _allow_shutdown(value)
+	if type(value) ~= "boolean" then
+		value = true
+	end
+	pico8.can_shutdown = value
 end
 
 log = print
@@ -374,6 +382,7 @@ function new_sandbox()
 		_textinput=nil,
 		-- used for repl
 		_allow_pause=_allow_pause,
+		_allow_shutdown=_allow_shutdown
 	}
 	for k, v in pairs(picolove_functions) do
 		cart_env[k]=v

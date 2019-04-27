@@ -995,6 +995,7 @@ function api.run()
 	pico8.cart = new_sandbox()
 
 	pico8.can_pause = true
+	pico8.can_shutdown = false
 
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then
@@ -1039,7 +1040,9 @@ function api.reboot()
 end
 
 function api.shutdown()
-	love.event.quit()
+	if pico8.can_shutdown then
+		love.event.quit()
+	end
 end
 
 api.exit = api.shutdown

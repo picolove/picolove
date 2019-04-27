@@ -3,6 +3,7 @@ version 4
 __lua__
 function _init()
 	_allow_pause(false)
+	_allow_shutdown(true)
 	pencolor = 6
 	t=0
 	isctrldown = false

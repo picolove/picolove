@@ -110,8 +110,11 @@ local bits = 16
 currentDirectory = "/"
 local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
-local function _disable_pause()
-	pico8.can_pause = false
+local function _allow_pause(value)
+	if type(value) ~= "boolean" then
+		value = true
+	end
+	pico8.can_pause = value
 end
 
 log = print
@@ -369,7 +372,8 @@ function new_sandbox()
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
-		_disable_pause=_disable_pause,
+		-- used for repl
+		_allow_pause=_allow_pause,
 	}
 	for k, v in pairs(picolove_functions) do
 		cart_env[k]=v

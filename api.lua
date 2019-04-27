@@ -994,6 +994,8 @@ function api.run()
 	api.clip()
 	pico8.cart = new_sandbox()
 
+	pico8.can_pause = true
+
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then
 		log('=======8<========')

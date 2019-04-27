@@ -1170,15 +1170,6 @@ function api.dset(index, value)
 	-- TODO: implement this
 end
 
-api.rawset = rawset
-api.rawget = rawget
-
-function api.rawlen(table)
-	-- TODO: implement this
-end
-
-api.rawequal = rawequal
-
 local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)
 	-- TODO: implement this
@@ -1244,6 +1235,12 @@ api.coresume = coroutine.resume
 api.yield = coroutine.yield
 api.costatus = coroutine.status
 api.trace = debug.traceback
+api.rawset = rawset
+api.rawget = rawget
+function api.rawlen(table)
+	-- TODO: implement this
+end
+api.rawequal = rawequal
 
 function api.all(a)
 	local i = 0

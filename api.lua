@@ -1170,21 +1170,14 @@ function api.dset(index, value)
 	-- TODO: implement this
 end
 
-function api.rawset(table, key, value)
-	-- TODO: implement this
-end
-
-function api.rawget(table, key)
-	-- TODO: implement this
-end
+api.rawset = rawset
+api.rawget = rawget
 
 function api.rawlen(table)
 	-- TODO: implement this
 end
 
-function api.rawequal(table1, table2)
-	-- TODO: implement this
-end
+api.rawequal = rawequal
 
 local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)

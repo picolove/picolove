@@ -245,24 +245,16 @@ function cart.load_p8(filename)
 
 		if gfxdata then
 			local row = 0
-			local next_line = 1
-			while next_line do
-				local end_of_line = gfxdata:find("\n",next_line)
-				if end_of_line == nil then break end
-				end_of_line = end_of_line - 1
-				local line = gfxdata:sub(next_line,end_of_line)
-				for i=1,#line do
-					local v = line:sub(i,i)
-					v = tonumber(v,16)
-					pico8.spritesheet_data:setPixel(col,row,v*16,v*16,v*16,255)
+
+			for line in gfxdata:gmatch("(.-)\n") do
+				local col = 0
+				for v in line:gmatch(".") do
+					v = tonumber(v, 16)
+					pico8.spritesheet_data:setPixel(col, row, v*16, v*16, v*16, 255)
 
 					col = col + 1
-					if col == 128 then
-						col = 0
-						row = row + 1
-					end
 				end
-				next_line = gfxdata:find("\n",end_of_line)+1
+				row = row + 1
 			end
 
 			if version > 3 then
@@ -282,7 +274,8 @@ function cart.load_p8(filename)
 						end
 					end
 				end
-				assert(shared == 128 * 32,shared)
+
+				assert(shared == 128 * 32, shared)
 			end
 
 			for y=0,15 do
@@ -292,7 +285,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-			assert(sprite == 256,sprite)
+			assert(sprite == 256, sprite)
 		end
 
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)

@@ -302,32 +302,21 @@ function cart.load_p8(filename)
 
 		if gffdata then
 			local sprite = 0
+			local gffpat = (version <= 2 and "." or "..")
 
-			local next_line = 1
-			while next_line do
-				local end_of_line = gffdata:find("\n",next_line)
-				if end_of_line == nil then break end
-				end_of_line = end_of_line - 1
-				local line = gffdata:sub(next_line,end_of_line)
-				if version <= 2 then
-					for i=1,#line do
-						local v = line:sub(i)
-						v = tonumber(v,16)
-						pico8.spriteflags[sprite] = v
-						sprite = sprite + 1
-					end
-				else
-					for i=1,#line,2 do
-						local v = line:sub(i,i+1)
-						v = tonumber(v,16)
-						pico8.spriteflags[sprite] = v
-						sprite = sprite + 1
-					end
+			for line in gffdata:gmatch("(.-)\n") do
+				local col = 0
+
+				for v in line:gmatch(gffpat) do
+					v = tonumber(v, 16)
+					pico8.spriteflags[sprite + col] = v
+					col = col + 1
 				end
-				next_line = gffdata:find("\n",end_of_line)+1
+
+				sprite = sprite + 128
 			end
 
-			assert(sprite == 256,"wrong number of spriteflags:"..sprite)
+			assert(sprite == 256,"wrong number of spriteflags:" .. sprite)
 		end
 
 		-- convert the tile data to a table
@@ -339,6 +328,7 @@ function cart.load_p8(filename)
 
 			for line in mapdata:gmatch("(.-)\n") do
 				local col = 0
+
 				for v in line:gmatch("..") do
 					v = tonumber(v, 16)
 					pico8.map[row][col] = v

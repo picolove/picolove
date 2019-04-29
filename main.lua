@@ -823,7 +823,7 @@ function love.run()
 end
 
 function patch_lua(lua)
-	-- patch the lua
+	-- patch lua code
 	lua = lua:gsub("!=","~=")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)

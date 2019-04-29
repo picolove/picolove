@@ -8,7 +8,7 @@ local function color(c)
 	setColor(c)
 end
 
-function warning(msg)
+local function warning(msg)
 	log(debug.traceback("WARNING: "..msg, 3))
 end
 
@@ -31,6 +31,8 @@ local function scroll(pixels)
 end
 
 -- extra functions provided by picolove
+api.warning = warning
+
 function api._getcursorx()
 	return pico8.cursor[1]
 end

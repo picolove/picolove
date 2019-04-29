@@ -95,7 +95,6 @@ loaded_code = nil
 
 local __audio_buffer_size = 1024
 
-
 local video_frames = nil
 local osc
 host_time = 0
@@ -375,7 +374,6 @@ function new_sandbox()
 		error=error,
 		log=log,
 		ipairs=ipairs,
-		warning=warning,
 		setfps=setfps,
 		_keydown=nil,
 		_keyup=nil,

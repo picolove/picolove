@@ -376,6 +376,8 @@ function cart.load_p8(filename)
 				}
 				_music = _music + 1
 			end
+
+			assert(_music == 64)
 		end
 	end
 

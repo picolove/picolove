@@ -6,7 +6,6 @@ for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gm
 end
 
 local function decompress(code)
-	-- decompress code
 	local lua = ""
 	local mode = 0
 	local copy = nil
@@ -65,6 +64,7 @@ function cart.load_p8(filename)
 	pico8.sfx = {}
 	for i=0,63 do
 		pico8.sfx[i] = {
+			editor_mode = 0,
 			speed=16,
 			loop_start=0,
 			loop_end=0
@@ -237,9 +237,6 @@ function cart.load_p8(filename)
 		-- generate a quad for each sprite index
 		local gfxdata = data:match("\n__gfx__.-\n(.-\n)\n-__")
 
-		local tile_row = 32
-		local tile_col = 0
-		local col = 0
 		local sprite = 0
 		local shared = 0
 
@@ -341,7 +338,7 @@ function cart.load_p8(filename)
 			local _sfx = 0
 
 			for line in sfxdata:gmatch("(.-)\n") do
-				local editor_mode = tonumber(line:sub(1,2),16)
+				pico8.sfx[_sfx].editor_mode = tonumber(line:sub(1, 2), 16)
 				pico8.sfx[_sfx].speed = tonumber(line:sub(3,4),16)
 				pico8.sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
 				pico8.sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)

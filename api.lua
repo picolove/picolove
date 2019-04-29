@@ -30,8 +30,17 @@ local function scroll(pixels)
 	api.memcpy(base, delta, basehigh-delta)
 end
 
+local function setfps(fps)
+	pico8.fps = flr(fps)
+	if pico8.fps <= 0 then
+		pico8.fps = 30
+	end
+	pico8.frametime = 1 / pico8.fps
+end
+
 -- extra functions provided by picolove
 api.warning = warning
+api.setfps = setfps
 
 function api._getcursorx()
 	return pico8.cursor[1]

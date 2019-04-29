@@ -374,7 +374,6 @@ function new_sandbox()
 		error=error,
 		log=log,
 		ipairs=ipairs,
-		setfps=setfps,
 		_keydown=nil,
 		_keyup=nil,
 		_textinput=nil,
@@ -729,14 +728,6 @@ end
 
 function love.graphics.point(x,y)
 	love.graphics.rectangle('fill',x,y,1,1)
-end
-
-function setfps(fps)
-	pico8.fps = flr(fps)
-	if pico8.fps <= 0 then
-		pico8.fps = 30
-	end
-	pico8.frametime = 1 / pico8.fps
 end
 
 function getmousex()

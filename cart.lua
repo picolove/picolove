@@ -172,6 +172,8 @@ function cart.load_p8(filename)
 							bit.rshift(bit.band(note, 0xe00),9),
 							bit.rshift(bit.band(note,0x7000),12)
 						}
+					elseif step == 64 then
+						pico8.sfx[_sfx].editor_mode = byte
 					elseif step == 65 then
 						pico8.sfx[_sfx].speed = byte
 					elseif step == 66 then

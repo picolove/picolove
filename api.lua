@@ -771,8 +771,22 @@ function api.peek(addr)
 	addr = flr(tonumber(addr) or 0)
 	if addr < 0 then
 		return 0
-	elseif addr < 0x5f80 then
-		-- TODO: Hardware state
+	elseif addr < 0x2000 then
+		-- TODO: spritesheet data
+	elseif addr < 0x3000 then
+		-- TODO: map data
+	elseif addr < 0x3100 then
+		-- TODO: spriteflags data
+	elseif addr < 0x3200 then
+		-- TODO: music data
+	elseif addr < 0x4300 then
+		-- TODO: sfx data
+	elseif addr < 0x5e00 then
+		-- TODO: user memory
+	elseif addr < 0x5f00 then
+		-- TODO: card data
+	elseif addr < 0x5f40 then
+		-- TODO: draw state
 		if addr == 0x5f20 then
 			return pico8.clip[1]
 		elseif addr == 0x5f21 then
@@ -796,11 +810,12 @@ function api.peek(addr)
 		elseif addr == 0x5f2b then
 			return flr(pico8.camera_y / 256)
 		end
-	elseif addr<0x5fc0 then
-		-- FIXME: Persistence data
+	elseif addr < 0x5f80 then
+		-- TODO: hardware state
 	elseif addr < 0x6000 then
-		-- TODO: implement for non screen space
+		-- TODO: gpio pins
 	elseif addr < 0x8000 then
+		-- screen data
 		local dx = (addr - 0x6000) % 64
 		local dy = flr((addr - 0x6000) / 64)
 		local low = api.pget(dx, dy)
@@ -817,8 +832,22 @@ function api.poke(addr, val)
 	addr, val = flr(tonumber(addr) or 0), flr(val)%256
 	if addr < 0 or addr >= 0x8000 then
 		error("bad memory access")
-	elseif addr  < 0x5f80 then
-		-- FIXME: Draw state
+	elseif addr < 0x2000 then
+		-- TODO: spritesheet data
+	elseif addr < 0x3000 then
+		-- TODO: map data
+	elseif addr < 0x3100 then
+		-- TODO: spriteflags data
+	elseif addr < 0x3200 then
+		-- TODO: music data
+	elseif addr < 0x4300 then
+		-- TODO: sfx data
+	elseif addr < 0x5e00 then
+		-- TODO: user memory
+	elseif addr < 0x5f00 then
+		-- TODO: cart data
+	elseif addr  < 0x5f40 then
+		-- TODO: draw state
 		if addr == 0x5f26 then
 			pico8.cursor[1] = val
 		elseif addr == 0x5f27 then
@@ -832,10 +861,10 @@ function api.poke(addr, val)
 		elseif addr == 0x5f2b then
 			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
 		end
-	elseif addr<0x5fc0 then
-		-- FIXME: Persistence data
+	elseif addr  < 0x5f80 then
+		-- TODO: hardware state
 	elseif addr < 0x6000 then
-		-- TODO: implement for non screen space
+		-- TODO: gpio pins
 	elseif addr < 0x8000 then
 		addr = addr - 0x6000
 		local dx = addr%64*2

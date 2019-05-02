@@ -5,7 +5,7 @@ function _init()
 	_allow_pause(false)
 	_allow_shutdown(true)
 	pencolor = 6
-	t=0
+	tc = 0
 	isctrldown = false
 	linebuffer = ""
 	line = 0
@@ -28,7 +28,7 @@ function _init()
 end
 
 function _update()
-	t+=1
+	tc += 1
 end
 
 function _keydown(key)
@@ -185,7 +185,7 @@ function _draw()
 	-- render text
 	print("> "..linebuffer,0,_getcursory(),7)
 	-- render carret
-	if t % 16 < 8 then
+	if tc % 16 < 8 then
 		rectfill((cursorx+2)*4,_getcursory(),(cursorx+2)*4+3,_getcursory()+4,8)
 	end
 end

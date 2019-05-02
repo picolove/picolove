@@ -1282,6 +1282,7 @@ function api.rawlen(table)
 	-- TODO: implement this
 end
 api.rawequal = rawequal
+api.next = next
 
 function api.all(a)
 	local i = 0

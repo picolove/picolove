@@ -1330,6 +1330,10 @@ function api.del(a,dv)
 	end
 end
 
+function api.serial(channel, address, length)
+  -- TODO: implement this
+end
+
 -- tests
 assert(api.min(1, 2) == 1)
 assert(api.min(2, 1) == 1)

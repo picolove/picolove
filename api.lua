@@ -462,7 +462,7 @@ function api.circfill(cx, cy, r, col)
 	end
 end
 
-function api.line(x0,y0,x1,y1,col)
+function api.line(x0, y0, x1, y1, col)
 	if col then
 		color(col)
 	end
@@ -541,7 +541,7 @@ end
 
 local __palette_modified = true
 
-function api.pal(c0,c1,p)
+function api.pal(c0, c1, p)
 	if type(c0) ~= "number" then
 		if __palette_modified == false then return end
 		for i=1,16 do
@@ -577,7 +577,7 @@ function api.pal(c0,c1,p)
 	end
 end
 
-function api.palt(c,t)
+function api.palt(c, t)
 	if type(c) ~= "number" then
 		for i=1,16 do
 			pico8.pal_transparent[i] = i == 1 and 0 or 1
@@ -597,7 +597,7 @@ function api.fillp(p)
 	-- TODO: implement this
 end
 
-function api.map(cel_x,cel_y,sx,sy,cel_w,cel_h,bitmask)
+function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	love.graphics.setShader(pico8.sprite_shader)
 	love.graphics.setColor(255,255,255,255)
 	cel_x = flr(cel_x or 0)
@@ -648,7 +648,7 @@ function api.mset(x, y, v)
 	end
 end
 
-function api.fget(n,f)
+function api.fget(n, f)
 	if n == nil then return nil end
 	if f ~= nil then
 		-- return just that bit as a boolean
@@ -661,7 +661,7 @@ function api.fget(n,f)
 	return pico8.spriteflags[flr(n)] or 0
 end
 
-function api.fset(n,f,v)
+function api.fset(n, f, v)
 	-- fset n [f] v
 	-- f is the flag index 0..7
 	-- v is boolean
@@ -681,7 +681,7 @@ function api.fset(n,f,v)
 	end
 end
 
-function api.sget(x,y)
+function api.sget(x, y)
 	-- return the color from the spritesheet
 	x = flr(tonumber(x) or 0)
 	y = flr(tonumber(y) or 0)
@@ -693,7 +693,7 @@ function api.sget(x,y)
 	return 0
 end
 
-function api.sset(x,y,c)
+function api.sset(x, y, c)
 	x = flr(tonumber(x) or 0)
 	y = flr(tonumber(y) or 0)
 	c = flr(tonumber(c) or 0)
@@ -701,7 +701,7 @@ function api.sset(x,y,c)
 	pico8.spritesheet:refresh()
 end
 
-function api.music(n,fade_len,channel_mask)
+function api.music(n, fade_len, channel_mask)
 	if n == -1 then
 		for i=0,3 do
 			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then
@@ -740,7 +740,7 @@ function api.music(n,fade_len,channel_mask)
 	end
 end
 
-function api.sfx(n,channel,offset)
+function api.sfx(n, channel, offset)
 	-- n = -1 stop sound on channel
 	-- n = -2 to stop looping on channel
 	channel = channel or -1
@@ -899,7 +899,7 @@ function api.poke4(addr, val)
 	api.poke(addr+3, bit.rshift(bit.band(val, 0xFF000000), 24))
 end
 
-function api.memcpy(dest_addr,source_addr,len)
+function api.memcpy(dest_addr, source_addr, len)
 	if len < 1 or dest_addr == source_addr then
 		return
 	end
@@ -934,7 +934,7 @@ function api.memcpy(dest_addr,source_addr,len)
 	end
 end
 
-function api.memset(dest_addr,val,len)
+function api.memset(dest_addr, val, len)
 	if len < 1 then
 		return
 	end
@@ -944,7 +944,7 @@ function api.memset(dest_addr,val,len)
 	end
 end
 
-function api.reload(dest_addr,source_addr,len)
+function api.reload(dest_addr, source_addr, len)
 	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
 	_load(cartname)
 end
@@ -973,19 +973,19 @@ end
 
 api.abs = math.abs
 
-function api.min(a,b)
+function api.min(a, b)
 	local a = tonumber(a) or 0
 	local b = tonumber(b) or 0
 	return a < b and a or b
 end
 
-function api.max(a,b)
+function api.max(a, b)
 	local a = tonumber(a) or 0
 	local b = tonumber(b) or 0
 	return a > b and a or b
 end
 
-function api.mid(x,y,z)
+function api.mid(x, y, z)
 	x, y, z = x or 0, y or 0, z or 0
 	if x > y then
 		x, y = y, x
@@ -1003,7 +1003,7 @@ end
 
 api.sqrt = math.sqrt
 
-function api.atan2(x,y)
+function api.atan2(x, y)
 	return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0
 end
 
@@ -1148,7 +1148,7 @@ function api.radio()
 	return nil, 0
 end
 
-function api.btn(i,p)
+function api.btn(i, p)
 	if type(i) == "number" then
 		p = p or 0
 		if pico8.keymap[p] and pico8.keymap[p][i] then
@@ -1172,7 +1172,7 @@ function api.btn(i,p)
 	end
 end
 
-function api.btnp(i,p)
+function api.btnp(i, p)
 	if type(i) == "number" then
 		p = p or 0
 		if pico8.keymap[p] and pico8.keymap[p][i] then
@@ -1295,7 +1295,7 @@ function api.all(a)
 	end
 end
 
-function api.foreach(a,f)
+function api.foreach(a, f)
 	if not a then
 		warning("foreach got a nil value")
 		return
@@ -1310,15 +1310,15 @@ function api.count(a)
 	return #a
 end
 
-function api.add(a,v)
+function api.add(a, v)
 	if a == nil then
 		warning("add to nil")
 		return
 	end
-	table.insert(a,v)
+	table.insert(a, v)
 end
 
-function api.del(a,dv)
+function api.del(a, dv)
 	if a == nil then
 		warning("del from nil")
 		return

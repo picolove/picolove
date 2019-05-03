@@ -782,7 +782,7 @@ function api.peek(addr)
 	elseif addr < 0x4300 then
 		-- TODO: sfx data
 	elseif addr < 0x5e00 then
-		-- TODO: user memory
+		return pico8.usermemory[addr - 0x4300]
 	elseif addr < 0x5f00 then
 		-- TODO: card data
 	elseif addr < 0x5f40 then
@@ -843,7 +843,7 @@ function api.poke(addr, val)
 	elseif addr < 0x4300 then
 		-- TODO: sfx data
 	elseif addr < 0x5e00 then
-		-- TODO: user memory
+		pico8.usermemory[addr - 0x4300] = val
 	elseif addr < 0x5f00 then
 		-- TODO: cart data
 	elseif addr  < 0x5f40 then
@@ -1036,6 +1036,10 @@ function api.run()
 
 	pico8.can_pause = true
 	pico8.can_shutdown = false
+
+	for addr = 0x4300, 0x5e00 - 1 do
+		pico8.usermemory[addr - 0x4300] = 0
+	end
 
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then

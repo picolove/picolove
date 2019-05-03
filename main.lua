@@ -42,6 +42,7 @@ pico8 = {
 	sfx = {},
 	music = {},
 	current_music = nil,
+	usermemory = {},
 	cart = nil,
 	clipboard = "",
 	keypressed = {

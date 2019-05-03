@@ -891,7 +891,8 @@ function api.peek4(addr)
 end
 
 function api.poke2(addr, val)
-	-- TODO: implement this
+	api.poke(addr+0, bit.rshift(bit.band(val, 0x00FF),  0))
+	api.poke(addr+1, bit.rshift(bit.band(val, 0xFF00),  8))
 end
 
 function api.poke4(addr, val)

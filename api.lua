@@ -628,7 +628,7 @@ function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	love.graphics.setShader(pico8.draw_shader)
 end
 -- deprecated pico-8 function
-api.mapdraw=api.map
+api.mapdraw = api.map
 
 function api.mget(x, y)
 	x = flr(x or 0)
@@ -653,10 +653,10 @@ function api.fget(n, f)
 	if f ~= nil then
 		-- return just that bit as a boolean
 		if not pico8.spriteflags[flr(n)] then
-			warning(string.format('fget(%d,%d)',n,f))
+			warning(string.format('fget(%d, %d)', n, f))
 			return false
 		end
-		return bit.band(pico8.spriteflags[flr(n)],bit.lshift(1,flr(f))) ~= 0
+		return bit.band(pico8.spriteflags[flr(n)], bit.lshift(1, flr(f))) ~= 0
 	end
 	return pico8.spriteflags[flr(n)] or 0
 end
@@ -666,7 +666,7 @@ function api.fset(n, f, v)
 	-- f is the flag index 0..7
 	-- v is boolean
 	if v == nil then
-		v,f = f,nil
+		v, f = f, nil
 	end
 	if f then
 		-- set specific bit to v (true or false)
@@ -697,7 +697,7 @@ function api.sset(x, y, c)
 	x = flr(tonumber(x) or 0)
 	y = flr(tonumber(y) or 0)
 	c = flr(tonumber(c) or 0)
-	pico8.spritesheet_data:setPixel(x,y,c*16,0,0,255)
+	pico8.spritesheet_data:setPixel(x, y, c * 16, 0, 0, 255)
 	pico8.spritesheet:refresh()
 end
 

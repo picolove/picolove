@@ -774,7 +774,8 @@ function api.peek(addr)
 	elseif addr < 0x2000 then
 		-- TODO: spritesheet data
 	elseif addr < 0x3000 then
-		-- TODO: map data
+		addr = addr - 0x2000
+		return pico8.map[flr(addr / 128)][addr % 128]
 	elseif addr < 0x3100 then
 		-- TODO: spriteflags data
 	elseif addr < 0x3200 then
@@ -835,7 +836,8 @@ function api.poke(addr, val)
 	elseif addr < 0x2000 then
 		-- TODO: spritesheet data
 	elseif addr < 0x3000 then
-		-- TODO: map data
+		addr = addr - 0x2000
+		pico8.map[flr(addr / 128)][addr % 128] = val
 	elseif addr < 0x3100 then
 		-- TODO: spriteflags data
 	elseif addr < 0x3200 then

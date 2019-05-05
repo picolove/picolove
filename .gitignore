@@ -1,1 +1,3 @@
 .DS_Store
+luacov.report.out
+luacov.stats.out

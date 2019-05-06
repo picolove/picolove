@@ -1047,6 +1047,10 @@ function api.run()
 		pico8.usermemory[addr - 0x4300] = 0
 	end
 
+	for i = 0, 63 do
+		pico8.cartdata[i] = 0
+	end
+
 	local ok,f,e = pcall(load,loaded_code,cartname)
 	if not ok or f==nil then
 		log('=======8<========')
@@ -1210,15 +1214,45 @@ function api.btnp(i, p)
 end
 
 function api.cartdata(id)
-	-- TODO: implement this
+    -- TODO: handle global cartdata properly
+	-- TODO: handle cartdata() from console should not work
+	pico8.can_cartdata = true
+	-- if cartdata exists
+	-- return true
+	return false
 end
 
 function api.dget(index)
-	-- TODO: implement this
+    -- TODO: handle global cartdata properly
+	-- TODO: handle missing cartdata(id) call
+	index = flr(index)
+	if not pico8.can_cartdata then
+		api.print('** dget called before cartdata()', nil, nil, 6)
+		return ""
+	end
+	if index < 0 or index > 63 then
+		warning('cartdata index out of range')
+		return 0
+	end
+	return pico8.cartdata[index]
 end
 
 function api.dset(index, value)
-	-- TODO: implement this
+    -- TODO: handle global cartdata properly
+	-- TODO: handle missing cartdata(id) call
+	index = flr(index)
+	if not pico8.can_cartdata then
+		api.print('** dget called before cartdata()', nil, nil, 6)
+		return ""
+	end
+	if value >= 0x8000 or value < -0x8000 then
+		value = -0x8000
+	end
+	if index < 0 or index > 63 then
+		warning('cartdata index out of range')
+		return
+	end
+	pico8.cartdata[index] = value
 end
 
 local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}

@@ -430,12 +430,12 @@ end
 
 function restore_camera()
 	love.graphics.origin()
-	love.graphics.translate(-pico8.camera_x,-pico8.camera_y)
+	love.graphics.translate(-pico8.camera_x, -pico8.camera_y)
 end
 
 function flip_screen()
 	love.graphics.setShader(pico8.display_shader)
-	pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
+	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 	love.graphics.setCanvas()
 	love.graphics.origin()
 	love.graphics.setScissor()
@@ -469,7 +469,7 @@ function love.focus(f)
 	focus = f
 end
 
-local function lowpass(y0,y1, cutoff)
+local function lowpass(y0, y1, cutoff)
 	local RC = 1.0/(cutoff*2*3.14)
 	local dt = 1.0/__sample_rate
 	local alpha = dt/(RC+dt)
@@ -492,9 +492,9 @@ local note_map = {
 }
 
 local function note_to_string(note)
-	local octave = flr(note/12)
-	local note = flr(note%12)
-	return string.format("%s%d",note_map[note],octave)
+	local octave = flr(note / 12)
+	local note = flr(note % 12)
+	return string.format("%s%d", note_map[note], octave)
 end
 
 local function oldosc(osc)
@@ -513,9 +513,9 @@ local function update_audio(time)
 	-- check what sfx should be playing
 	local samples = flr(time*__sample_rate)
 
-	for _=0,samples-1 do
+	for _ = 0, samples - 1 do
 		if pico8.current_music then
-			pico8.current_music.offset = pico8.current_music.offset + 7350/(61*pico8.current_music.speed*__sample_rate)
+			pico8.current_music.offset = pico8.current_music.offset + 7350 / (61 * pico8.current_music.speed * __sample_rate)
 			if pico8.current_music.offset >= 32 then
 				local next_track = pico8.current_music.music
 				if pico8.music[next_track].loop == 2 then
@@ -538,11 +538,11 @@ local function update_audio(time)
 		end
 		local music = pico8.current_music and pico8.music[pico8.current_music.music] or nil
 
-		for channel=0,3 do
+		for channel = 0, 3 do
 			local ch = pico8.audio_channels[channel]
 			local tick = 0
-			local tickrate = 60*16
-			local note,instr,vol,fx
+			local tickrate = 60 * 16
+			local note, instr, vol, fx
 			local freq
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
@@ -551,7 +551,7 @@ local function update_audio(time)
 			end
 			if ch.sfx and pico8.sfx[ch.sfx] then
 				local sfx = pico8.sfx[ch.sfx]
-				ch.offset = ch.offset + 7350/(61*sfx.speed*__sample_rate)
+				ch.offset = ch.offset + 7350 / (61 * sfx.speed * __sample_rate)
 				if sfx.loop_end ~= 0 and ch.offset >= sfx.loop_end then
 					if ch.loop then
 						ch.last_step = -1
@@ -568,7 +568,7 @@ local function update_audio(time)
 				-- when we pass a new step
 				if flr(ch.offset) > ch.last_step then
 					ch.lastnote = ch.note
-					ch.note,ch.instr,ch.vol,ch.fx = unpack(sfx[flr(ch.offset)])
+					ch.note, ch.instr, ch.vol, ch.fx = unpack(sfx[flr(ch.offset)])
 					if ch.instr ~= 6 then
 						ch.osc = osc[ch.instr]
 					else

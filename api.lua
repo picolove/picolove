@@ -686,7 +686,7 @@ function api.sget(x, y)
 	x = flr(tonumber(x) or 0)
 	y = flr(tonumber(y) or 0)
 
-	if x >= 0 and x < 128 and y >=0 and y < 128 then
+	if x >= 0 and x < 128 and y >= 0 and y < 128 then
 		local c = pico8.spritesheet_data:getPixel(x, y)
 		return flr(c / 16)
 	end
@@ -759,12 +759,14 @@ function api.sfx(n, channel, offset)
 			end
 		end
 	end
-	if channel == -1 then return end
+	if channel == -1 then
+		return
+	end
 	local ch = pico8.audio_channels[channel]
-	ch.sfx=n
-	ch.offset=offset
-	ch.last_step=offset-1
-	ch.loop=true
+	ch.sfx = n
+	ch.offset = offset
+	ch.last_step = offset-1
+	ch.loop = true
 end
 
 function api.peek(addr)

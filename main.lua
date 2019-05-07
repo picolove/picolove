@@ -92,7 +92,6 @@ pico8 = {
 
 local flr, abs = math.floor, math.abs
 
-local __accum = 0
 loaded_code = nil
 
 local __audio_buffer_size = 1024

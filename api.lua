@@ -59,7 +59,6 @@ function api._call(code)
 		api.print(api.sub(e,20), nil, nil, 6)
 		return false
 	else
-		local result
 		setfenv(f,pico8.cart)
 		ok,e = pcall(f)
 		if not ok then
@@ -1060,15 +1059,14 @@ function api.run()
 		log('=======>8========')
 		error('Error loading lua: '..tostring(e))
 	else
-		local result
 		setfenv(f,pico8.cart)
 		love.graphics.setShader(pico8.draw_shader)
 		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
 		restore_clip()
-		ok,result = pcall(f)
+		ok,e = pcall(f)
 		if not ok then
-			error('Error running lua: '..tostring(result))
+			error('Error running lua: '..tostring(e))
 		else
 			log('lua completed')
 		end

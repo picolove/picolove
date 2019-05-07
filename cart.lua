@@ -2,7 +2,7 @@ local api=require("api")
 
 local compression_map = {}
 for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(".") do
-	table.insert(compression_map,entry)
+	table.insert(compression_map, entry)
 end
 
 local function decompress(code)
@@ -10,23 +10,23 @@ local function decompress(code)
 	local mode = 0
 	local copy = nil
 	local i = 8
-	local codelen = bit.lshift(code:byte(5,5),8) + code:byte(6,6)
-	log('codelen',codelen)
+	local codelen = bit.lshift(code:byte(5, 5), 8) + code:byte(6, 6)
+	log('codelen', codelen)
 	while #lua < codelen do
 		i = i + 1
-		local byte = string.byte(code,i,i)
+		local byte = string.byte(code, i, i)
 		if byte == nil then
 			error('reached end of code')
 		else
 			if mode == 1 then
-				lua = lua .. code:sub(i,i)
+				lua = lua .. code:sub(i, i)
 				mode = 0
 			elseif mode == 2 then
 				-- copy from buffer
-				local offset = (copy - 0x3c) * 16 + bit.band(byte,0xf)
-				local length = bit.rshift(byte,4) + 2
+				local offset = (copy - 0x3c) * 16 + bit.band(byte, 0xf)
+				local length = bit.rshift(byte, 4) + 2
 				local offset = #lua - offset
-				local buffer = lua:sub(offset+1,offset+length)
+				local buffer = lua:sub(offset + 1, offset+length)
 				lua = lua .. buffer
 				mode = 0
 			elseif byte == 0x00 then
@@ -48,33 +48,33 @@ end
 local cart={}
 
 function cart.load_p8(filename)
-	log("Loading",filename)
+	log("Loading", filename)
 
 	local lua = ""
 	pico8.quads = {}
-	pico8.spritesheet_data = love.image.newImageData(128,128)
+	pico8.spritesheet_data = love.image.newImageData(128, 128)
 	pico8.map = {}
-	for y=0,63 do
+	for y=0, 63 do
 		pico8.map[y] = {}
-		for x=0,127 do
+		for x=0, 127 do
 			pico8.map[y][x] = 0
 		end
 	end
 	pico8.spriteflags = {}
 	pico8.sfx = {}
-	for i=0,63 do
+	for i=0, 63 do
 		pico8.sfx[i] = {
 			editor_mode = 0,
 			speed=16,
 			loop_start=0,
 			loop_end=0
 		}
-		for j=0,31 do
-			pico8.sfx[i][j] = {0,0,0,0}
+		for j=0, 31 do
+			pico8.sfx[i][j] = {0, 0, 0, 0}
 		end
 	end
 	pico8.music = {}
-	for i=0,63 do
+	for i=0, 63 do
 		pico8.music[i] = {
 			loop = 0,
 			[0] = 1,
@@ -196,7 +196,7 @@ function cart.load_p8(filename)
 		end
 
 		-- decompress code
-		log('version',version)
+		log('version', version)
 		if version>8 then
 			error(string.format('unknown file version %d',version))
 		end
@@ -206,11 +206,10 @@ function cart.load_p8(filename)
 		else
 			lua = lua:match("(.-)%f[%z]")
 		end
-
 	else
 		local data,size = love.filesystem.read(filename)
 		if not data or size == 0 then
-			error(string.format("Unable to open: %s",filename))
+			error(string.format("Unable to open: %s", filename))
 		end
 
 		-- strip carriage returns pico-8 style
@@ -228,9 +227,9 @@ function cart.load_p8(filename)
 			error("invalid cart")
 		end
 		local next_line = data:find("\n",start+#header)
-		local version_str = data:sub(start+#header,next_line-1)
+		local version_str = data:sub(start+#header, next_line-1)
 		local version = tonumber(version_str)
-		log("version",version)
+		log("version", version)
 
 		-- extract the lua
 		lua = data:match("\n__lua__.-\n(.-)\n__") or ""

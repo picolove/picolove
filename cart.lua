@@ -238,7 +238,6 @@ function cart.load_p8(filename)
 		-- generate a quad for each sprite index
 		local gfxdata = data:match("\n__gfx__.-\n(.-\n)\n-__")
 
-		local sprite = 0
 		local shared = 0
 
 		if gfxdata then
@@ -254,37 +253,38 @@ function cart.load_p8(filename)
 				end
 				row = row + 1
 			end
+		end
 
-			if version > 3 then
-				local tx,ty = 0,32
-				for sy=64,127 do
-					for sx=0,127,2 do
-						-- get the two pixel values and merge them
-						local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
-						local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
-						local v = api.bor(api.shl(hi,4),lo)
-						pico8.map[ty][tx] = v
-						shared = shared + 1
-						tx = tx + 1
-						if tx == 128 then
-							tx = 0
-							ty = ty + 1
-						end
+		if version > 3 then
+			local tx, ty = 0, 32
+			for sy = 64, 127 do
+				for sx = 0, 127, 2 do
+					-- get the two pixel values and merge them
+					local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
+					local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
+					local v = api.bor(api.shl(hi, 4), lo)
+					pico8.map[ty][tx] = v
+					shared = shared + 1
+					tx = tx + 1
+					if tx == 128 then
+						tx = 0
+						ty = ty + 1
 					end
 				end
-
-				assert(shared == 128 * 32, shared)
 			end
 
-			for y=0,15 do
-				for x=0,15 do
-					pico8.quads[sprite] = love.graphics.newQuad(8*x,8*y,8,8,128,128)
-					sprite = sprite + 1
-				end
-			end
-
-			assert(sprite == 256, sprite)
+			assert(shared == 128 * 32, shared)
 		end
+
+		local sprite = 0
+		for y=0, 15 do
+			for x=0, 15 do
+				pico8.quads[sprite] = love.graphics.newQuad(8*x, 8*y, 8, 8, 128, 128)
+				sprite = sprite + 1
+			end
+		end
+
+		assert(sprite == 256, sprite)
 
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 

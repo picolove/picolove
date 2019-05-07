@@ -272,7 +272,7 @@ function love.load(argv)
 		__audio_channels[i]:play()
 	end
 
-	for i=0,3 do
+	for i=0, 3 do
 		pico8.audio_channels[i]={
 			oscpos=0,
 			noise=osc[6](),
@@ -280,13 +280,13 @@ function love.load(argv)
 	end
 
 	love.graphics.clear()
-	love.graphics.setDefaultFilter('nearest','nearest')
-	pico8.screen = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
-	pico8.screen:setFilter("linear","nearest")
+	love.graphics.setDefaultFilter('nearest', 'nearest')
+	pico8.screen = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
+	pico8.screen:setFilter("linear", "nearest")
 
 	local font = love.graphics.newImageFont("font.png", glyphs, 1)
 	love.graphics.setFont(font)
-	font:setFilter('nearest','nearest')
+	font:setFilter('nearest', 'nearest')
 
 	love.mouse.setVisible(false)
 	love.keyboard.setKeyRepeat(true)
@@ -728,8 +728,8 @@ function love.wheelmoved(x, y)
 	pico8.mwheel = pico8.mwheel + y
 end
 
-function love.graphics.point(x,y)
-	love.graphics.rectangle('fill',x,y,1,1)
+function love.graphics.point(x, y)
+	love.graphics.rectangle('fill', x, y, 1, 1)
 end
 
 function getmousex()

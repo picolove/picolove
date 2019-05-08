@@ -54,7 +54,6 @@ Extra features:
 
  * `ipairs()` standard lua function
  * `log(...)` function prints to console for debugging
- * `assert(expr,message)` if expr is not true then errors with message
  * `error(message)` bluescreens with an error message
  * `warning(message)` prints warning and stacktrace to console
  * `setfps(fps)` changes the consoles framerate

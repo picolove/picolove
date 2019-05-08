@@ -1,7 +1,7 @@
 PICOLOVE
 --------
 
-Implementation of PICO-8's API for LÖVE
+Run PICO-8 games and computer programs with free and open-source software.
 
 On github at: https://github.com/picolove/picolove
 
@@ -23,13 +23,13 @@ Why:
 
  * For a fun challenge!
  * Allow standalone publishing of PICO-8 games on other platforms
-  * should work on mobile devices [*](#android-packaging)
+  * Should work on mobile devices [*](#android-packaging)
  * Configurable controls
  * Extendable
  * No arbitrary cpu or memory limitations
  * No arbitrary code size limitations
  * Better debugging tools available
- * Open source
+ * Free and open-source software
 
 What it isn't:
 

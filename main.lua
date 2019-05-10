@@ -723,7 +723,7 @@ function love.textinput(text)
 	end
 end
 
-function love.wheelmoved(x, y)
+function love.wheelmoved(_, y)
 	pico8.mwheel = pico8.mwheel + y
 end
 
@@ -794,6 +794,7 @@ function love.run()
 				host_time = host_time - 65536
 			end
 			if paused or not focus then
+				-- nop
 			else
 				-- will pass 0 if love.timer is disabled
 				if love.update then

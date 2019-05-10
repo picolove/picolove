@@ -25,7 +25,7 @@ local function decompress(code)
 				-- copy from buffer
 				local offset = (copy - 0x3c) * 16 + bit.band(byte, 0xf)
 				local length = bit.rshift(byte, 4) + 2
-				local offset = #lua - offset
+				offset = #lua - offset
 				local buffer = lua:sub(offset + 1, offset+length)
 				lua = lua .. buffer
 				mode = 0
@@ -132,11 +132,11 @@ function cart.load_p8(filename)
 						if outY == 128 then
 							-- end of spritesheet, generate quads
 							pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
-							local sprite = 0
+							local spriteCounter = 0
 							for yy=0,15 do
 								for xx=0,15 do
-									pico8.quads[sprite] = love.graphics.newQuad(xx*8,yy*8,8,8,pico8.spritesheet:getDimensions())
-									sprite = sprite + 1
+									pico8.quads[spriteCounter] = love.graphics.newQuad(xx*8,yy*8,8,8,pico8.spritesheet:getDimensions())
+									spriteCounter = spriteCounter + 1
 								end
 							end
 							mapY = 0
@@ -328,7 +328,7 @@ function cart.load_p8(filename)
 				end
 				row = row + 1
 			end
-			
+
 			assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
 		end
 

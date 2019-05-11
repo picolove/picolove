@@ -389,6 +389,10 @@ function new_sandbox()
 	return cart_env;
 end
 
+local function inside(x, y, x0, y0, w, h)
+	return (x>=x0 and x<x0+w and y>=y0 and y<y0+h)
+end
+
 local function update_buttons()
 	for p=0,1 do
 		for i=0,#pico8.keymap[p] do

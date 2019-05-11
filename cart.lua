@@ -61,6 +61,9 @@ function cart.load_p8(filename)
 		end
 	end
 	pico8.spriteflags = {}
+	for i = 0, 255 do
+		pico8.spriteflags[i] = 0
+	end
 	pico8.sfx = {}
 	for i=0, 63 do
 		pico8.sfx[i] = {

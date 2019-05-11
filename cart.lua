@@ -279,15 +279,11 @@ function cart.load_p8(filename)
 			assert(shared == 128 * 32, shared)
 		end
 
-		local sprite = 0
 		for y=0, 15 do
 			for x=0, 15 do
-				pico8.quads[sprite] = love.graphics.newQuad(8*x, 8*y, 8, 8, 128, 128)
-				sprite = sprite + 1
+				pico8.quads[y*16+x] = love.graphics.newQuad(8*x, 8*y, 8, 8, 128, 128)
 			end
 		end
-
-		assert(sprite == 256, sprite)
 
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 

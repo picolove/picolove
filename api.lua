@@ -592,7 +592,7 @@ function api.palt(c, t)
 	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
 end
 
-function api.fillp(p)
+function api.fillp(_)
 	-- TODO: implement this
 end
 
@@ -1154,7 +1154,7 @@ function api.scoresub()
 	return nil, 0
 end
 
-function api.extcmd(x)
+function api.extcmd(_)
 	-- TODO: Implement this?
 end
 

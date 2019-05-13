@@ -265,7 +265,7 @@ function cart.load_p8(filename)
 					-- get the two pixel values and merge them
 					local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
 					local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
-					local v = api.bor(api.shl(hi, 4), lo)
+					local v = bit.bor(bit.lshift(hi, 4), lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
 					tx = tx + 1

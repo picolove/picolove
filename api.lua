@@ -981,14 +981,14 @@ end
 api.abs = math.abs
 
 function api.min(a, b)
-	local a = tonumber(a) or 0
-	local b = tonumber(b) or 0
+	a = tonumber(a) or 0
+	b = tonumber(b) or 0
 	return a < b and a or b
 end
 
 function api.max(a, b)
-	local a = tonumber(a) or 0
-	local b = tonumber(b) or 0
+	a = tonumber(a) or 0
+	b = tonumber(b) or 0
 	return a > b and a or b
 end
 
@@ -1172,14 +1172,14 @@ function api.btn(i, p)
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
-		for i=0,7 do
-			if pico8.keypressed[0][i] then
-				bitfield = bitfield + bit.lshift(1,i)
+		for j=0,7 do
+			if pico8.keypressed[0][j] then
+				bitfield = bitfield + bit.lshift(1,j)
 			end
 		end
-		for i=0,7 do
-			if pico8.keypressed[1][i] then
-				bitfield = bitfield + bit.lshift(1,i+8)
+		for j=0,7 do
+			if pico8.keypressed[1][j] then
+				bitfield = bitfield + bit.lshift(1,j+8)
 			end
 		end
 		return bitfield
@@ -1199,14 +1199,14 @@ function api.btnp(i, p)
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
-		for i=0,7 do
-			if pico8.keypressed[0][i] then
-				bitfield = bitfield + bit.lshift(1,i)
+		for j=0,7 do
+			if pico8.keypressed[0][j] then
+				bitfield = bitfield + bit.lshift(1,j)
 			end
 		end
-		for i=0,7 do
-			if pico8.keypressed[1][i] then
-				bitfield = bitfield + bit.lshift(1,i+8)
+		for j=0,7 do
+			if pico8.keypressed[1][j] then
+				bitfield = bitfield + bit.lshift(1,j+8)
 			end
 		end
 		return bitfield

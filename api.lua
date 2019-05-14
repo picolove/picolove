@@ -39,11 +39,11 @@ local function setfps(fps)
 end
 
 
-function getmousex()
+local function getmousex()
 	return math.floor((love.mouse.getX() - xpadding) / scale)
 end
 
-function getmousey()
+local function getmousey()
 	return math.floor((love.mouse.getY() - ypadding) / scale)
 end
 

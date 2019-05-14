@@ -38,6 +38,15 @@ local function setfps(fps)
 	pico8.frametime = 1 / pico8.fps
 end
 
+
+function getmousex()
+	return math.floor((love.mouse.getX() - xpadding) / scale)
+end
+
+function getmousey()
+	return math.floor((love.mouse.getY() - ypadding) / scale)
+end
+
 -- extra functions provided by picolove
 api.warning = warning
 api.setfps = setfps

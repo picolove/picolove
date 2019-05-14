@@ -735,14 +735,6 @@ function love.graphics.point(x, y)
 	love.graphics.rectangle('fill', x, y, 1, 1)
 end
 
-function getmousex()
-	return math.floor((love.mouse.getX() - xpadding) / scale)
-end
-
-function getmousey()
-	return math.floor((love.mouse.getY() - ypadding) / scale)
-end
-
 function love.run()
 	if love.math then
 		love.math.setRandomSeed(os.time())

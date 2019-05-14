@@ -500,11 +500,11 @@ local function note_to_string(note)
 	return string.format("%s%d", note_map[note], octave)
 end
 
-local function oldosc(osc)
+local function oldosc(oscfn)
 	local x=0
 	return function(freq)
 		x=x+freq/__sample_rate
-		return osc(x)
+		return oscfn(x)
 	end
 end
 

@@ -40,11 +40,11 @@ end
 
 
 local function getmousex()
-	return math.floor((love.mouse.getX() - xpadding) / scale)
+	return flr((love.mouse.getX() - xpadding) / scale)
 end
 
 local function getmousey()
-	return math.floor((love.mouse.getY() - ypadding) / scale)
+	return flr((love.mouse.getY() - ypadding) / scale)
 end
 
 -- extra functions provided by picolove

@@ -408,7 +408,7 @@ local function update_buttons()
 	end
 end
 
-function love.update(dt)
+function love.update(_)
 	update_buttons()
 	if pico8.cart._update60 then
 		pico8.cart._update60()

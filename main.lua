@@ -543,10 +543,7 @@ local function update_audio(time)
 
 		for channel = 0, 3 do
 			local ch = pico8.audio_channels[channel]
-			local tick = 0
-			local tickrate = 60 * 16
-			local note, instr, vol, fx
-			local freq
+
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
 				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)

@@ -160,8 +160,7 @@ end
 api.dir = api.ls
 
 function api.cd(name)
-	local output = ""
-	local count
+	local output, count
 
 	name = name .. "/"
 

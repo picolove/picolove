@@ -841,5 +841,35 @@ function patch_lua(lua)
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
 	-- rewrite inspect operator "?"
 	lua = lua:gsub("(%s*)?([^\n\r]*)","%1print(%2)")
+
+	-- strip unmatched closing brackets
+	local bcnt = 0
+	local inString = ""
+	local stringStream = "" -- TODO replace with StringStream?
+	for i = 1, #lua do
+		-- loop over individual chars
+		local c = lua:sub(i,i)
+		if c == '"' or c == "'" then
+			if inString == c then
+				inString = ""
+			elseif inString == "" then
+				inString = c
+			end
+		elseif inString ~= "" then
+			-- skip bracket counting when in string
+			goto instring
+		elseif c == '(' then
+			bcnt = bcnt + 1
+		elseif c == ')' then
+			-- skip unmatched closing bracket
+			if bcnt == 0 then goto continue end
+			bcnt = bcnt - 1
+		end
+		::instring::
+		stringStream = stringStream .. c
+		::continue::
+	end
+	lua = stringStream
+
 	return lua
 end

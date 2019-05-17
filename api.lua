@@ -290,7 +290,7 @@ function api.print(str, x, y, col)
 	love.graphics.print(tostring(str), flr(x), flr(y))
 end
 
-api.printh=print
+api.printh = print
 
 function api.cursor(x, y, col)
 	if col then
@@ -306,12 +306,12 @@ function api.tonum(val)
 end
 
 function api.tostr(val, hex)
-	local kind=type(val)
+	local kind = type(val)
 	if kind == "string" then
 		return val
 	elseif kind == "number" then
 		if hex then
-			val=val*0x10000
+			val = val * 0x10000
 			local part1 = bit.rshift(bit.band(val, 0xFFFF0000), 16)
 			local part2 = bit.band(val, 0xFFFF)
 			return string.format("0x%04x.%04x", part1, part2)
@@ -393,10 +393,10 @@ function api.rectfill(x0, y0, x1, y1, col)
 		color(col)
 	end
 	if x1 < x0 then
-		x0, x1=x1, x0
+		x0, x1 = x1, x0
 	end
 	if y1 < y0 then
-		y0, y1=y1, y0
+		y0, y1 = y1, y0
 	end
 	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1-x0)+1, flr(y1-y0)+1)
 end
@@ -1263,7 +1263,7 @@ function api.dset(index, value)
 	pico8.cartdata[index] = value
 end
 
-local tfield = {[0]="year", "month", "day", "hour", "min", "sec"}
+local tfield = {[0] = "year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)
 	-- TODO: implement this
 	if x == 4 then

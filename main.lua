@@ -819,6 +819,8 @@ end
 
 function patch_lua(lua)
 	-- patch lua code
+	lua = lua:gsub("0b1000","8")
+	lua = lua:gsub("0b","")
 	lua = lua:gsub("!=","~=")
 	lua = lua:gsub("//","--")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2

@@ -550,7 +550,9 @@ local __palette_modified = true
 
 function api.pal(c0, c1, p)
 	if type(c0) ~= "number" then
-		if __palette_modified == false then return end
+		if __palette_modified == false then
+			return
+		end
 		for i=1,16 do
 			pico8.draw_palette[i] = i
 			pico8.display_palette[i] = pico8.palette[i]
@@ -878,7 +880,7 @@ function api.poke(addr, val)
 		-- TODO: gpio pins
 	elseif addr < 0x8000 then
 		addr = addr - 0x6000
-		local dx = addr%64*2
+		local dx = addr % 64 * 2
 		local dy = flr(addr/64)
 		api.pset(dx, dy, bit.band(val, 15))
 		api.pset(dx + 1, dy, bit.rshift(val, 4))
@@ -887,17 +889,17 @@ end
 
 function api.peek2(addr)
 	local val = 0
-	val = val + api.peek(addr+0)
-	val = val + api.peek(addr+1)*0x100
+	val = val + api.peek(addr + 0)
+	val = val + api.peek(addr + 1) * 0x100
 	return val
 end
 
 function api.peek4(addr)
 	local val = 0
-	val = val + api.peek(addr+0)/0x10000
-	val = val + api.peek(addr+1)/0x100
-	val = val + api.peek(addr+2)
-	val = val + api.peek(addr+3)*0x100
+	val = val + api.peek(addr + 0) / 0x10000
+	val = val + api.peek(addr + 1) / 0x100
+	val = val + api.peek(addr + 2)
+	val = val + api.peek(addr + 3) * 0x100
 	return val
 end
 
@@ -907,11 +909,11 @@ function api.poke2(addr, val)
 end
 
 function api.poke4(addr, val)
-	val=val*0x10000
-	api.poke(addr+0, bit.rshift(bit.band(val, 0x000000FF),  0))
-	api.poke(addr+1, bit.rshift(bit.band(val, 0x0000FF00),  8))
-	api.poke(addr+2, bit.rshift(bit.band(val, 0x00FF0000), 16))
-	api.poke(addr+3, bit.rshift(bit.band(val, 0xFF000000), 24))
+	val = val * 0x10000
+	api.poke(addr + 0, bit.rshift(bit.band(val, 0x000000FF),  0))
+	api.poke(addr + 1, bit.rshift(bit.band(val, 0x0000FF00),  8))
+	api.poke(addr + 2, bit.rshift(bit.band(val, 0x00FF0000), 16))
+	api.poke(addr + 3, bit.rshift(bit.band(val, 0xFF000000), 24))
 end
 
 function api.memcpy(dest_addr, source_addr, len)
@@ -929,12 +931,12 @@ function api.memcpy(dest_addr, source_addr, len)
 	love.graphics.setCanvas()
 	local img = pico8.screen:newImageData()
 	love.graphics.setCanvas(pico8.screen)
-	for i=0,len-1 do
-		local x = flr(source_addr-0x6000+i)%64*2
-		local y = flr((source_addr-0x6000+i)/64)
+	for i = 0, len - 1 do
+		local x = flr(source_addr - 0x6000 + i) % 64 * 2
+		local y = flr((source_addr - 0x6000 + i) / 64)
 		--TODO: why are colors broken?
-		local c = api.ceil(img:getPixel(x,y)/16)
-		local d = api.ceil(img:getPixel(x+1,y)/16)
+		local c = api.ceil(img:getPixel(x, y) / 16)
+		local d = api.ceil(img:getPixel(x + 1, y) / 16)
 		if c ~= 0 then
 			c = c - 1
 		end
@@ -942,10 +944,10 @@ function api.memcpy(dest_addr, source_addr, len)
 			d = d - 1
 		end
 
-		local dx = flr(dest_addr-0x6000+i)%64*2
-		local dy = flr((dest_addr-0x6000+i)/64)
-		api.pset(dx,dy,c)
-		api.pset(dx+1,dy,d)
+		local dx = flr(dest_addr - 0x6000 + i) % 64 * 2
+		local dy = flr((dest_addr - 0x6000 + i) / 64)
+		api.pset(dx, dy, c)
+		api.pset(dx + 1, dy, d)
 	end
 end
 
@@ -969,14 +971,14 @@ function api.cstore(dest_addr, source_addr, len)
 end
 
 function api.rnd(x)
-	return love.math.random()*(x or 1)
+	return love.math.random() * (x or 1)
 end
 
 function api.srand(seed)
 	if seed == 0 then
 		seed = 1
 	end
-	return love.math.setRandomSeed(flr(seed*32768))
+	return love.math.setRandomSeed(flr(seed * 32768))
 end
 
 api.flr = math.floor
@@ -1060,8 +1062,8 @@ function api.run()
 		pico8.cartdata[i] = 0
 	end
 
-	local ok,f,e = pcall(load,loaded_code,cartname)
-	if not ok or f==nil then
+	local ok,f,e = pcall(load, loaded_code, cartname)
+	if not ok or f == nil then
 		log('=======8<========')
 		log(loaded_code)
 		log('=======>8========')
@@ -1072,7 +1074,7 @@ function api.run()
 		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
 		restore_clip()
-		ok,e = pcall(f)
+		ok, e = pcall(f)
 		if not ok then
 			error('Error running lua: '..tostring(e))
 		else
@@ -1376,7 +1378,7 @@ function api.del(a, dv)
 		return
 	end
 	for i,v in ipairs(a) do
-		if v==dv then
+		if v == dv then
 			table.remove(a,i)
 		end
 	end

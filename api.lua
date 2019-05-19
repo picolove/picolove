@@ -62,13 +62,13 @@ end
 function api._call(code)
 	code = patch_lua(code)
 
-	local ok,f,e = pcall(load,code,'repl')
-	if not ok or f==nil then
+	local ok, f, e = pcall(load, code, 'repl')
+	if not ok or f == nil then
 		api.print('syntax error', nil, nil, 14)
 		api.print(api.sub(e,20), nil, nil, 6)
 		return false
 	else
-		setfenv(f,pico8.cart)
+		setfenv(f, pico8.cart)
 		ok,e = pcall(f)
 		if not ok then
 			api.print('runtime error', nil, nil, 14)
@@ -118,15 +118,15 @@ end
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-	api.print("directory: "..currentDirectory, nil, nil, 12)
+	api.print("directory: " .. currentDirectory, nil, nil, 12)
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
-			output[#output+1] = {name=file:lower(), color=14}
+			output[#output + 1] = {name=file:lower(), color=14}
 		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
-			output[#output+1] = {name=file:lower(), color=6}
+			output[#output + 1] = {name=file:lower(), color=6}
 		else
-			output[#output+1] = {name=file:lower(), color=5}
+			output[#output + 1] = {name=file:lower(), color=5}
 		end
 	end
 	local count = 0
@@ -142,7 +142,7 @@ function api.ls()
 				flip_screen()
 				local y = api._getcursory() - 6
 				api.cursor(0, y)
-				api.rectfill(0, y, 127, y+6, 0)
+				api.rectfill(0, y, 127, y + 6, 0)
 				api.color(item.color)
 				while true do
 					local e = love.event.wait()
@@ -167,7 +167,7 @@ function api.cd(name)
 	-- filter /TEXT//$ -> /
 	count = 1
 	while count > 0 do
-		name, count = name:gsub("//","/")
+		name, count = name:gsub("//", "/")
 	end
 
 	local newDirectory = currentDirectory .. name
@@ -192,7 +192,7 @@ function api.cd(name)
 	failed = failed or newDirectory:find("/[ ]+/") ~= nil
 
 	if #name == 0 then
-		output = "directory: "..currentDirectory
+		output = "directory: " .. currentDirectory
 	elseif failed then
 		if newDirectory == "/../" then
 			output = "cd: failed"
@@ -209,8 +209,8 @@ function api.cd(name)
 
 	if not failed then
 		api.color(12)
-		for i=1,#output,32 do
-			api.print(output:sub(i,i+32))
+		for i = 1, #output, 32 do
+			api.print(output:sub(i, i + 32))
 		end
 	else
 		api.color(7)
@@ -223,7 +223,7 @@ function api.mkdir(name)
 		api.color(6)
 		api.print("mkdir [name]")
 	else
-		love.filesystem.createDirectory(currentDirectory..name)
+		love.filesystem.createDirectory(currentDirectory .. name)
 	end
 end
 
@@ -255,7 +255,7 @@ function api.pget(x, y)
 		love.graphics.setCanvas()
 		local __screen_img = pico8.screen:newImageData()
 		love.graphics.setCanvas(pico8.screen)
-		local r,g,b,a = __screen_img:getPixel(flr(x), flr(y))
+		local r, g, b, a = __screen_img:getPixel(flr(x), flr(y))
 		return flr(r / 17.0)
 	end
 	warning(string.format("pget out of screen %d,%d", x, y))
@@ -275,16 +275,16 @@ function api.print(str, x, y, col)
 		y = pico8.cursor[2]
 		pico8.cursor[2] = pico8.cursor[2] + 6
 	end
-	if x==nil then
+	if x == nil then
 		x = pico8.cursor[1]
 	end
 	if canscroll and y > 121 then
 		local c = col or pico8.color
 		scroll(6)
 		y = 120
-		api.rectfill(0,y,127,y+6,0)
+		api.rectfill(0, y, 127, y + 6, 0)
 		api.color(c)
-		api.cursor(0, y+6)
+		api.cursor(0, y + 6)
 	end
 	love.graphics.setShader(pico8.text_shader)
 	love.graphics.print(tostring(str), flr(x), flr(y))
@@ -343,7 +343,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 		if pico8.quads[id] then
 			q = pico8.quads[id]
 		else
-			q = love.graphics.newQuad(flr(n%16)*8, flr(n/16)*8, 8*w, 8*h, 128, 128)
+			q = love.graphics.newQuad(flr(n % 16) * 8, flr(n / 16) * 8, 8 * w, 8 * h, 128, 128)
 			pico8.quads[id] = q
 		end
 	end
@@ -351,8 +351,8 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 		log('missing quad', n)
 	end
 	love.graphics.draw(pico8.spritesheet, q,
-		flr(x)+(w*8*(flip_x and 1 or 0)),
-		flr(y)+(h*8*(flip_y and 1 or 0)),
+		flr(x) + (w * 8 * (flip_x and 1 or 0)),
+		flr(y) + (h * 8 * (flip_y and 1 or 0)),
 		0,
 		flip_x and -1 or 1,
 		flip_y and -1 or 1)
@@ -398,7 +398,7 @@ function api.rectfill(x0, y0, x1, y1, col)
 	if y1 < y0 then
 		y0, y1 = y1, y0
 	end
-	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1-x0)+1, flr(y1-y0)+1)
+	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1 - x0) + 1, flr(y1 - y0) + 1)
 end
 
 function api.circ(ox, oy, r, col)
@@ -414,15 +414,15 @@ function api.circ(ox, oy, r, col)
 	local decisionOver2 = 1 - x
 
 	while y <= x do
-		table.insert(points, {ox+x, oy+y})
-		table.insert(points, {ox+y, oy+x})
-		table.insert(points, {ox-x, oy+y})
-		table.insert(points, {ox-y, oy+x})
+		table.insert(points, {ox + x, oy + y})
+		table.insert(points, {ox + y, oy + x})
+		table.insert(points, {ox - x, oy + y})
+		table.insert(points, {ox - y, oy + x})
 
-		table.insert(points, {ox-x, oy-y})
-		table.insert(points, {ox-y, oy-x})
-		table.insert(points, {ox+x, oy-y})
-		table.insert(points, {ox+y, oy-x})
+		table.insert(points, {ox - x, oy - y})
+		table.insert(points, {ox - y, oy - x})
+		table.insert(points, {ox + x, oy - y})
+		table.insert(points, {ox + y, oy - x})
 		y = y + 1
 		if decisionOver2 < 0 then
 			decisionOver2 = decisionOver2 + 2 * y + 1
@@ -463,7 +463,7 @@ function api.circfill(cx, cy, r, col)
 		y = y + 1
 	end
 	if #lines > 0 then
-		for i=1, #lines do
+		for i = 1, #lines do
 			love.graphics.line(lines[i])
 		end
 	end
@@ -488,21 +488,23 @@ function api.line(x0, y0, x1, y1, col)
 	local dy = y1 - y0
 	local stepx, stepy
 
-	local points = {{x0,y0}}
+	local points = {{x0, y0}}
 
 	if dx == 0 then
 		-- simple case draw a vertical line
 		points = {}
-		if y0 > y1 then y0,y1 = y1,y0 end
-		for y=y0,y1 do
-			table.insert(points,{x0,y})
+		if y0 > y1 then
+			y0, y1 = y1, y0
+		end
+		for y = y0, y1 do
+			table.insert(points, {x0, y})
 		end
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
 		points = {}
 		if x0 > x1 then x0,x1 = x1,x0 end
-		for x=x0,x1 do
-			table.insert(points,{x,y0})
+		for x = x0, x1 do
+			table.insert(points, {x, y0})
 		end
 	else
 		if dy < 0 then
@@ -528,7 +530,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				x0 = x0 + stepx
 				fraction = fraction + dy
-				table.insert(points,{flr(x0),flr(y0)})
+				table.insert(points,{flr(x0), flr(y0)})
 			end
 		else
 			local fraction = dx - bit.rshift(dy, 1)
@@ -539,7 +541,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				y0 = y0 + stepy
 				fraction = fraction + dx
-				table.insert(points,{flr(x0),flr(y0)})
+				table.insert(points,{flr(x0), flr(y0)})
 			end
 		end
 	end
@@ -568,16 +570,16 @@ function api.pal(c0, c1, p)
 	elseif p == 1 and c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
+		c1 = c1 + 1
+		c0 = c0 + 1
 		pico8.display_palette[c0] = pico8.palette[c1]
 		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
 		c0 = flr(c0)%16
 		c1 = flr(c1)%16
-		c1 = c1+1
-		c0 = c0+1
+		c1 = c1 + 1
+		c0 = c0 + 1
 		pico8.draw_palette[c0] = c1
 		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
 		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
@@ -588,15 +590,15 @@ end
 
 function api.palt(c, t)
 	if type(c) ~= "number" then
-		for i=1,16 do
+		for i = 1, 16 do
 			pico8.pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
 		c = flr(c)%16
 		if t == false then
-			pico8.pal_transparent[c+1] = 1
+			pico8.pal_transparent[c + 1] = 1
 		elseif t == true then
-			pico8.pal_transparent[c+1] = 0
+			pico8.pal_transparent[c + 1] = 0
 		end
 	end
 	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
@@ -608,7 +610,7 @@ end
 
 function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	love.graphics.setShader(pico8.sprite_shader)
-	love.graphics.setColor(255,255,255,255)
+	love.graphics.setColor(255, 255, 255, 255)
 	cel_x = flr(cel_x or 0)
 	cel_y = flr(cel_y or 0)
 	sx = flr(sx or 0)
@@ -622,11 +624,10 @@ function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 					local v = pico8.map[flr(cel_y+y)][flr(cel_x+x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
-							love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
+							love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
 						else
-							if bit.band(pico8.spriteflags[v],bitmask) ~= 0 then
-								love.graphics.draw(pico8.spritesheet,pico8.quads[v],sx+8*x,sy+8*y)
-							else
+							if bit.band(pico8.spriteflags[v], bitmask) ~= 0 then
+								love.graphics.draw(pico8.spritesheet,pico8.quads[v], sx + 8 * x, sy + 8 * y)
 							end
 						end
 					end
@@ -881,7 +882,7 @@ function api.poke(addr, val)
 	elseif addr < 0x8000 then
 		addr = addr - 0x6000
 		local dx = addr % 64 * 2
-		local dy = flr(addr/64)
+		local dy = flr(addr / 64)
 		api.pset(dx, dy, bit.band(val, 15))
 		api.pset(dx + 1, dy, bit.rshift(val, 4))
 	end
@@ -1062,14 +1063,14 @@ function api.run()
 		pico8.cartdata[i] = 0
 	end
 
-	local ok,f,e = pcall(load, loaded_code, cartname)
+	local ok, f, e = pcall(load, loaded_code, cartname)
 	if not ok or f == nil then
 		log('=======8<========')
 		log(loaded_code)
 		log('=======>8========')
 		error('Error loading lua: '..tostring(e))
 	else
-		setfenv(f,pico8.cart)
+		setfenv(f, pico8.cart)
 		love.graphics.setShader(pico8.draw_shader)
 		love.graphics.setCanvas(pico8.screen)
 		love.graphics.origin()
@@ -1182,14 +1183,14 @@ function api.btn(i, p)
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
-		for j=0,7 do
+		for j = 0, 7 do
 			if pico8.keypressed[0][j] then
-				bitfield = bitfield + bit.lshift(1,j)
+				bitfield = bitfield + bit.lshift(1, j)
 			end
 		end
 		for j=0,7 do
 			if pico8.keypressed[1][j] then
-				bitfield = bitfield + bit.lshift(1,j+8)
+				bitfield = bitfield + bit.lshift(1, j + 8)
 			end
 		end
 		return bitfield
@@ -1209,14 +1210,14 @@ function api.btnp(i, p)
 	else
 		-- return bitfield of buttons
 		local bitfield = 0
-		for j=0,7 do
+		for j = 0, 7 do
 			if pico8.keypressed[0][j] then
-				bitfield = bitfield + bit.lshift(1,j)
+				bitfield = bitfield + bit.lshift(1, j)
 			end
 		end
-		for j=0,7 do
+		for j = 0, 7 do
 			if pico8.keypressed[1][j] then
-				bitfield = bitfield + bit.lshift(1,j+8)
+				bitfield = bitfield + bit.lshift(1, j + 8)
 			end
 		end
 		return bitfield
@@ -1354,7 +1355,7 @@ function api.foreach(a, f)
 		warning("foreach got a nil value")
 		return
 	end
-	for _,v in ipairs(a) do
+	for _, v in ipairs(a) do
 		f(v)
 	end
 end
@@ -1377,7 +1378,7 @@ function api.del(a, dv)
 		warning("del from nil")
 		return
 	end
-	for i,v in ipairs(a) do
+	for i, v in ipairs(a) do
 		if v == dv then
 			table.remove(a,i)
 		end

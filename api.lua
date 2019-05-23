@@ -1004,7 +1004,9 @@ function api.max(a, b)
 end
 
 function api.mid(x, y, z)
-	x, y, z = x or 0, y or 0, z or 0
+	x = tonumber(x) or 0
+	y = tonumber(y) or 0
+	z = tonumber(z) or 0
 	if x > y then
 		x, y = y, x
 	end

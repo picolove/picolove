@@ -1227,7 +1227,7 @@ function api.btnp(i, p)
 end
 
 function api.cartdata(id)
-    -- TODO: handle global cartdata properly
+	-- TODO: handle global cartdata properly
 	-- TODO: handle cartdata() from console should not work
 	pico8.can_cartdata = true
 	-- if cartdata exists
@@ -1236,7 +1236,7 @@ function api.cartdata(id)
 end
 
 function api.dget(index)
-    -- TODO: handle global cartdata properly
+	-- TODO: handle global cartdata properly
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then
@@ -1251,7 +1251,7 @@ function api.dget(index)
 end
 
 function api.dset(index, value)
-    -- TODO: handle global cartdata properly
+	-- TODO: handle global cartdata properly
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then

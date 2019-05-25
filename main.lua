@@ -395,8 +395,8 @@ end
 
 local function update_buttons()
 	for p=0,1 do
-		for i=0,#pico8.keymap[p] do
-			for _,_ in pairs(pico8.keymap[p][i]) do
+		for i = 0, #pico8.keymap[p] do
+			for _, _ in pairs(pico8.keymap[p][i]) do
 				local v = pico8.keypressed[p][i]
 				if v then
 					v = v + 1
@@ -544,7 +544,6 @@ local function update_audio(time)
 		for channel = 0, 3 do
 			local ch = pico8.audio_channels[channel]
 
-
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
 				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
 				ch.bufferpos = 0
@@ -669,18 +668,18 @@ function love.keypressed(key)
 		video_frames = {}
 	elseif key == 'f4' or key == 'f9' then
 		-- stop recording and save
-		local basename = cartname..'-'..os.time()..'-'
+		local basename = cartname .. '-' .. os.time() .. '-'
 		for i,v in ipairs(video_frames) do
-			v:encode(string.format('%s%04d.png',basename,i))
+			v:encode(string.format('%s%04d.png', basename, i))
 		end
 		video_frames = nil
-		log('saved video to',basename)
+		log('saved video to', basename)
 	elseif key == 'return' and (love.keyboard.isDown('lalt') or love.keyboard.isDown('ralt')) then
 		love.window.setFullscreen(not love.window.getFullscreen(), 'desktop')
 	else
-		for p=0,1 do
-			for i=0,#pico8.keymap[p] do
-				for _,testkey in pairs(pico8.keymap[p][i]) do
+		for p = 0, 1 do
+			for i = 0, #pico8.keymap[p] do
+				for _, testkey in pairs(pico8.keymap[p][i]) do
 					if key == testkey then
 						pico8.keypressed[p][i] = -1 -- becomes 0 on the next frame
 						break
@@ -695,9 +694,9 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-	for p=0,1 do
-		for i=0,#pico8.keymap[p] do
-			for _,testkey in pairs(pico8.keymap[p][i]) do
+	for p = 0, 1 do
+		for i = 0, #pico8.keymap[p] do
+			for _, testkey in pairs(pico8.keymap[p][i]) do
 				if key == testkey then
 					pico8.keypressed[p][i] = nil
 					break
@@ -713,8 +712,8 @@ end
 function love.textinput(text)
 	text = text:lower()
 	local validchar = false
-	for i = 1,#glyphs do
-		if glyphs:sub(i,i) == text then
+	for i = 1, #glyphs do
+		if glyphs:sub(i, i) == text then
 			validchar = true
 			break
 		end
@@ -822,25 +821,25 @@ function patch_lua(lua)
 	lua = lua:gsub("!=","~=")
 	lua = lua:gsub("//","--")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n",function(a,b)
-		local nl = a:find('\n',nil,true)
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n", function(a, b)
+		local nl = a:find('\n', nil, true)
 		local th = b:find('%f[%w]then%f[%W]')
 		local an = b:find('%f[%w]and%f[%W]')
 		local o = b:find('%f[%w]or%f[%W]')
-		local ce = b:find('--',nil,true)
+		local ce = b:find('--', nil, true)
 		if not (nl or th or an or o) then
 			if ce then
-				local c,t = b:match("(.-)(%s-%-%-.*)")
-				return "if "..a:sub(2,-2).." then "..c.." end"..t.."\n"
+				local c, t = b:match("(.-)(%s-%-%-.*)")
+				return "if " .. a:sub(2,-2) .. " then " .. c .. " end" .. t .. "\n"
 			else
-				return "if "..a:sub(2,-2).." then "..b.." end\n"
+				return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
 			end
 		end
 	end)
 	-- rewrite assignment operators
-	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=","%1 = %1 %2 ")
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=", "%1 = %1 %2 ")
 	-- rewrite inspect operator "?"
-	lua = lua:gsub("^(%s*)?([^\n\r]*)","%1print(%2)")
+	lua = lua:gsub("^(%s*)?([^\n\r]*)", "%1print(%2)")
 	-- convert binary literals to hex literals
 	lua = lua:gsub("([^%w_])0[bB]([01.]+)", function(a, b)
 		local p1, p2 = b, ""

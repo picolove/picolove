@@ -52,22 +52,22 @@ pico8 = {
 	},
 	keymap = {
 		[0] = {
-			[0] = {'left','kp4'},
-			[1] = {'right','kp6'},
-			[2] = {'up','kp8'},
-			[3] = {'down','kp5'},
-			[4] = {'z','c','n','kp-','kp1','insert'},
-			[5] = {'x','v','m','8','kp2','delete'},
-			[6] = {'return','escape'},
+			[0] = {"left","kp4"},
+			[1] = {"right","kp6"},
+			[2] = {"up","kp8"},
+			[3] = {"down","kp5"},
+			[4] = {"z","c","n","kp-","kp1","insert"},
+			[5] = {"x","v","m","8","kp2","delete"},
+			[6] = {"return","escape"},
 			[7] = {},
 		},
 		[1] = {
-			[0] = {'s'},
-			[1] = {'f'},
-			[2] = {'e'},
-			[3] = {'d'},
-			[4] = {'tab','lshift','w'},
-			[5] = {'q','a'},
+			[0] = {"s"},
+			[1] = {"f"},
+			[2] = {"e"},
+			[3] = {"d"},
+			[4] = {"tab","lshift","w"},
+			[5] = {"q","a"},
 			[6] = {},
 			[7] = {},
 		}
@@ -279,17 +279,17 @@ function love.load(argv)
 	end
 
 	love.graphics.clear()
-	love.graphics.setDefaultFilter('nearest', 'nearest')
+	love.graphics.setDefaultFilter("nearest", "nearest")
 	pico8.screen = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
 	pico8.screen:setFilter("linear", "nearest")
 
 	local font = love.graphics.newImageFont("font.png", glyphs, 1)
 	love.graphics.setFont(font)
-	font:setFilter('nearest', 'nearest')
+	font:setFilter("nearest", "nearest")
 
 	love.mouse.setVisible(false)
 	love.keyboard.setKeyRepeat(true)
-	love.graphics.setLineStyle('rough')
+	love.graphics.setLineStyle("rough")
 	love.graphics.setPointSize(1)
 	love.graphics.setLineWidth(1)
 
@@ -314,7 +314,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
+	pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
 
 	pico8.sprite_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -325,8 +325,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
-	pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
+	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
 
 	pico8.text_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -340,7 +340,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the color in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
+	pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
 
 	pico8.display_shader = love.graphics.newShader([[
 
@@ -351,7 +351,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the color in the palette by index
 	return palette[index]/256.0;
 }]])
-	pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
+	pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
 
 	-- load the cart
 	api.clip()
@@ -359,7 +359,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.pal()
 	api.color(6)
 
-	_load(argv[2] or 'nocart.p8')
+	_load(argv[2] or "nocart.p8")
 	api.run()
 end
 
@@ -480,18 +480,18 @@ local function lowpass(y0, y1, cutoff)
 end
 
 local note_map = {
-	[0] = 'C-',
-	'C#',
-	'D-',
-	'D#',
-	'E-',
-	'F-',
-	'F#',
-	'G-',
-	'G#',
-	'A-',
-	'A#',
-	'B-',
+	[0] = "C-",
+	"C#",
+	"D-",
+	"D#",
+	"E-",
+	"F-",
+	"F#",
+	"G-",
+	"G#",
+	"A-",
+	"A#",
+	"B-",
 }
 
 local function note_to_string(note)
@@ -641,41 +641,41 @@ local function update_audio(time)
 end
 
 local function isCtrlOrGuiDown()
-	return (love.keyboard.isDown('lctrl') or
-		love.keyboard.isDown('lgui') or
-		love.keyboard.isDown('rctrl') or
-		love.keyboard.isDown('rgui'))
+	return (love.keyboard.isDown("lctrl") or
+		love.keyboard.isDown("lgui") or
+		love.keyboard.isDown("rctrl") or
+		love.keyboard.isDown("rgui"))
 end
 
 function love.keypressed(key)
-	if key == 'r' and isCtrlOrGuiDown() then
+	if key == "r" and isCtrlOrGuiDown() then
 		api.reload()
 		api.run()
-	elseif key == 'q' and isCtrlOrGuiDown() then
+	elseif key == "q" and isCtrlOrGuiDown() then
 		love.event.quit()
-	elseif key == 'v' and isCtrlOrGuiDown() then
+	elseif key == "v" and isCtrlOrGuiDown() then
 		pico8.clipboard = love.system.getClipboardText()
-	elseif pico8.can_pause and (key == 'pause' or key == 'p') then
+	elseif pico8.can_pause and (key == "pause" or key == "p") then
 		paused = not paused
-	elseif key == 'f1' or key == 'f6' then
+	elseif key == "f1" or key == "f6" then
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)
-		local filename = cartname..'-'..os.time()..'.png'
+		local filename = cartname.."-"..os.time()..".png"
 		screenshot:encode("png", filename)
-		log('saved screenshot to',filename)
-	elseif key == 'f3' or key=='f8' then
+		log("saved screenshot to",filename)
+	elseif key == "f3" or key=="f8" then
 		-- start recording
 		video_frames = {}
-	elseif key == 'f4' or key == 'f9' then
+	elseif key == "f4" or key == "f9" then
 		-- stop recording and save
-		local basename = cartname .. '-' .. os.time() .. '-'
+		local basename = cartname .. "-" .. os.time() .. "-"
 		for i,v in ipairs(video_frames) do
-			v:encode(string.format('%s%04d.png', basename, i))
+			v:encode(string.format("%s%04d.png", basename, i))
 		end
 		video_frames = nil
-		log('saved video to', basename)
-	elseif key == 'return' and (love.keyboard.isDown('lalt') or love.keyboard.isDown('ralt')) then
-		love.window.setFullscreen(not love.window.getFullscreen(), 'desktop')
+		log("saved video to", basename)
+	elseif key == "return" and (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) then
+		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 	else
 		for p = 0, 1 do
 			for i = 0, #pico8.keymap[p] do
@@ -728,7 +728,7 @@ function love.wheelmoved(_, y)
 end
 
 function love.graphics.point(x, y)
-	love.graphics.rectangle('fill', x, y, 1, 1)
+	love.graphics.rectangle("fill", x, y, 1, 1)
 end
 
 function love.run()
@@ -822,11 +822,11 @@ function patch_lua(lua)
 	lua = lua:gsub("//","--")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n", function(a, b)
-		local nl = a:find('\n', nil, true)
-		local th = b:find('%f[%w]then%f[%W]')
-		local an = b:find('%f[%w]and%f[%W]')
-		local o = b:find('%f[%w]or%f[%W]')
-		local ce = b:find('--', nil, true)
+		local nl = a:find("\n", nil, true)
+		local th = b:find("%f[%w]then%f[%W]")
+		local an = b:find("%f[%w]and%f[%W]")
+		local o = b:find("%f[%w]or%f[%W]")
+		local ce = b:find("--", nil, true)
 		if not (nl or th or an or o) then
 			if ce then
 				local c, t = b:match("(.-)(%s-%-%-.*)")

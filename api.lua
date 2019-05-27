@@ -62,16 +62,16 @@ end
 function api._call(code)
 	code = patch_lua(code)
 
-	local ok, f, e = pcall(load, code, 'repl')
+	local ok, f, e = pcall(load, code, "repl")
 	if not ok or f == nil then
-		api.print('syntax error', nil, nil, 14)
+		api.print("syntax error", nil, nil, 14)
 		api.print(api.sub(e,20), nil, nil, 6)
 		return false
 	else
 		setfenv(f, pico8.cart)
 		ok,e = pcall(f)
 		if not ok then
-			api.print('runtime error', nil, nil, 14)
+			api.print("runtime error", nil, nil, 14)
 			api.print(api.sub(e,20), nil, nil, 6)
 		end
 	end
@@ -335,7 +335,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 	if w == 1 and h == 1 then
 		q = pico8.quads[n]
 		if not q then
-			log('warning: sprite '..n..' is missing')
+			log("warning: sprite "..n.." is missing")
 			return
 		end
 	else
@@ -348,7 +348,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 		end
 	end
 	if not q then
-		log('missing quad', n)
+		log("missing quad", n)
 	end
 	love.graphics.draw(pico8.spritesheet, q,
 		flr(x) + (w * 8 * (flip_x and 1 or 0)),
@@ -559,10 +559,10 @@ function api.pal(c0, c1, p)
 			pico8.draw_palette[i] = i
 			pico8.display_palette[i] = pico8.palette[i]
 		end
-		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
+		pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
@@ -573,7 +573,7 @@ function api.pal(c0, c1, p)
 		c1 = c1 + 1
 		c0 = c0 + 1
 		pico8.display_palette[c0] = pico8.palette[c1]
-		pico8.display_shader:send('palette',shdr_unpack(pico8.display_palette))
+		pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
 		c0 = flr(c0)%16
@@ -581,9 +581,9 @@ function api.pal(c0, c1, p)
 		c1 = c1 + 1
 		c0 = c0 + 1
 		pico8.draw_palette[c0] = c1
-		pico8.draw_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		pico8.sprite_shader:send('palette',shdr_unpack(pico8.draw_palette))
-		pico8.text_shader:send('palette',shdr_unpack(pico8.draw_palette))
+		pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
 	end
 end
@@ -601,7 +601,7 @@ function api.palt(c, t)
 			pico8.pal_transparent[c + 1] = 0
 		end
 	end
-	pico8.sprite_shader:send('transparent',shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
 end
 
 function api.fillp(_)
@@ -663,7 +663,7 @@ function api.fget(n, f)
 	if f ~= nil then
 		-- return just that bit as a boolean
 		if not pico8.spriteflags[flr(n)] then
-			warning(string.format('fget(%d, %d)', n, f))
+			warning(string.format("fget(%d, %d)", n, f))
 			return false
 		end
 		return bit.band(pico8.spriteflags[flr(n)], bit.lshift(1, flr(f))) ~= 0
@@ -963,7 +963,7 @@ function api.memset(dest_addr, val, len)
 end
 
 function api.reload(dest_addr, source_addr, len)
-	-- FIXME: doesn't handle ranges, we should keep a 'cart rom'
+	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
 	_load(cartname)
 end
 
@@ -1067,10 +1067,10 @@ function api.run()
 
 	local ok, f, e = pcall(load, loaded_code, cartname)
 	if not ok or f == nil then
-		log('=======8<========')
+		log("=======8<========")
 		log(loaded_code)
-		log('=======>8========')
-		error('Error loading lua: '..tostring(e))
+		log("=======>8========")
+		error("Error loading lua: "..tostring(e))
 	else
 		setfenv(f, pico8.cart)
 		love.graphics.setShader(pico8.draw_shader)
@@ -1079,9 +1079,9 @@ function api.run()
 		restore_clip()
 		ok, e = pcall(f)
 		if not ok then
-			error('Error running lua: '..tostring(e))
+			error("Error running lua: "..tostring(e))
 		else
-			log('lua completed')
+			log("lua completed")
 		end
 	end
 
@@ -1240,11 +1240,11 @@ function api.dget(index)
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then
-		api.print('** dget called before cartdata()', nil, nil, 6)
+		api.print("** dget called before cartdata()", nil, nil, 6)
 		return ""
 	end
 	if index < 0 or index > 63 then
-		warning('cartdata index out of range')
+		warning("cartdata index out of range")
 		return 0
 	end
 	return pico8.cartdata[index]
@@ -1255,14 +1255,14 @@ function api.dset(index, value)
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then
-		api.print('** dget called before cartdata()', nil, nil, 6)
+		api.print("** dget called before cartdata()", nil, nil, 6)
 		return ""
 	end
 	if value >= 0x8000 or value < -0x8000 then
 		value = -0x8000
 	end
 	if index < 0 or index > 63 then
-		warning('cartdata index out of range')
+		warning("cartdata index out of range")
 		return
 	end
 	pico8.cartdata[index] = value

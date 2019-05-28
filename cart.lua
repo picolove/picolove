@@ -11,12 +11,12 @@ local function decompress(code)
 	local copy = nil
 	local i = 8
 	local codelen = bit.lshift(code:byte(5, 5), 8) + code:byte(6, 6)
-	log('codelen', codelen)
+	log("codelen", codelen)
 	while #lua < codelen do
 		i = i + 1
 		local byte = string.byte(code, i, i)
 		if byte == nil then
-			error('reached end of code')
+			error("reached end of code")
 		else
 			if mode == 1 then
 				lua = lua .. code:sub(i, i)
@@ -199,9 +199,9 @@ function cart.load_p8(filename)
 		end
 
 		-- decompress code
-		log('version', version)
+		log("version", version)
 		if version>8 then
-			api.print(string.format('unknown file version %d',version), nil, nil, 3)
+			api.print(string.format("unknown file version %d",version), nil, nil, 3)
 		end
 
 		if compressed then

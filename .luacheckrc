@@ -11,6 +11,7 @@ globals = {
   "xpadding",
   "ypadding",
   "loaded_code",
+  "love.graphics.point",
 
   -- functions
   "warning",
@@ -20,6 +21,9 @@ globals = {
   "patch_lua",
   "shdr_unpack",
   "restore_camera",
+  "flip_screen",
+  "_load",
+  "new_sandbox",
 }
 
 ignore = {

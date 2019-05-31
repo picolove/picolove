@@ -12,6 +12,8 @@ globals = {
   "ypadding",
   "loaded_code",
   "love.graphics.point",
+  "love.handlers",
+  "love.graphics.newScreenshot",
 
   -- functions
   "warning",

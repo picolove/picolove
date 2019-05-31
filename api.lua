@@ -783,16 +783,16 @@ function api.peek(addr)
 	addr = flr(tonumber(addr) or 0)
 	if addr < 0 then
 		return 0
-	elseif addr < 0x2000 then
+	elseif addr < 0x2000 then -- luacheck: ignore 542
 		-- TODO: spritesheet data
 	elseif addr < 0x3000 then
 		addr = addr - 0x2000
 		return pico8.map[flr(addr / 128)][addr % 128]
 	elseif addr < 0x3100 then
 		return pico8.spriteflags[addr - 0x3000]
-	elseif addr < 0x3200 then
+	elseif addr < 0x3200 then -- luacheck: ignore 542
 		-- TODO: music data
-	elseif addr < 0x4300 then
+	elseif addr < 0x4300 then -- luacheck: ignore 542
 		-- TODO: sfx data
 	elseif addr < 0x5e00 then
 		return pico8.usermemory[addr - 0x4300]
@@ -823,9 +823,9 @@ function api.peek(addr)
 		elseif addr == 0x5f2b then
 			return flr(pico8.camera_y / 256)
 		end
-	elseif addr < 0x5f80 then
+	elseif addr < 0x5f80 then -- luacheck: ignore 542
 		-- TODO: hardware state
-	elseif addr < 0x6000 then
+	elseif addr < 0x6000 then -- luacheck: ignore 542
 		-- TODO: gpio pins
 	elseif addr < 0x8000 then
 		-- screen data
@@ -845,22 +845,23 @@ function api.poke(addr, val)
 	addr, val = flr(tonumber(addr) or 0), flr(val)%256
 	if addr < 0 or addr >= 0x8000 then
 		error("bad memory access")
-	elseif addr < 0x2000 then
+	elseif addr < 0x1000 then -- luacheck: ignore 542
+	elseif addr < 0x2000 then -- luacheck: ignore 542
 		-- TODO: spritesheet data
 	elseif addr < 0x3000 then
 		addr = addr - 0x2000
 		pico8.map[flr(addr / 128)][addr % 128] = val
 	elseif addr < 0x3100 then
 		pico8.spriteflags[addr - 0x3000] = val
-	elseif addr < 0x3200 then
+	elseif addr < 0x3200 then -- luacheck: ignore 542
 		-- TODO: music data
-	elseif addr < 0x4300 then
+	elseif addr < 0x4300 then -- luacheck: ignore 542
 		-- TODO: sfx data
 	elseif addr < 0x5e00 then
 		pico8.usermemory[addr - 0x4300] = val
-	elseif addr < 0x5f00 then
+	elseif addr < 0x5f00 then -- luacheck: ignore 542
 		-- TODO: cart data
-	elseif addr  < 0x5f40 then
+	elseif addr  < 0x5f40 then -- luacheck: ignore 542
 		-- TODO: draw state
 		if addr == 0x5f26 then
 			pico8.cursor[1] = val
@@ -875,9 +876,9 @@ function api.poke(addr, val)
 		elseif addr == 0x5f2b then
 			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
 		end
-	elseif addr  < 0x5f80 then
+	elseif addr  < 0x5f80 then -- luacheck: ignore 542
 		-- TODO: hardware state
-	elseif addr < 0x6000 then
+	elseif addr < 0x6000 then -- luacheck: ignore 542
 		-- TODO: gpio pins
 	elseif addr < 0x8000 then
 		addr = addr - 0x6000

@@ -389,7 +389,7 @@ function new_sandbox()
 	return cart_env;
 end
 
-local function inside(x, y, x0, y0, w, h)
+local function inside(x, y, x0, y0, w, h) -- luacheck: no unused
 	return (x>=x0 and x<x0+w and y>=y0 and y<y0+h)
 end
 
@@ -472,7 +472,7 @@ function love.focus(f)
 	focus = f
 end
 
-local function lowpass(y0, y1, cutoff)
+local function lowpass(y0, y1, cutoff) -- luacheck: no unused
 	local RC = 1.0/(cutoff*2*3.14)
 	local dt = 1.0/__sample_rate
 	local alpha = dt/(RC+dt)
@@ -785,7 +785,7 @@ function love.run()
 			if host_time > 65536 then
 				host_time = host_time - 65536
 			end
-			if paused or not focus then
+			if paused or not focus then -- luacheck: ignore 542
 				-- nop
 			else
 				-- will pass 0 if love.timer is disabled

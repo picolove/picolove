@@ -255,7 +255,7 @@ function api.pget(x, y)
 		love.graphics.setCanvas()
 		local __screen_img = pico8.screen:newImageData()
 		love.graphics.setCanvas(pico8.screen)
-		local r, g, b, a = __screen_img:getPixel(flr(x), flr(y))
+		local r = __screen_img:getPixel(flr(x), flr(y))
 		return flr(r / 17.0)
 	end
 	warning(string.format("pget out of screen %d,%d", x, y))

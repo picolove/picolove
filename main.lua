@@ -496,7 +496,7 @@ local note_map = {
 
 local function note_to_string(note)
 	local octave = flr(note / 12)
-	local note = flr(note % 12)
+	note = flr(note % 12)
 	return string.format("%s%d", note_map[note], octave)
 end
 
@@ -539,7 +539,8 @@ local function update_audio(time)
 				end
 			end
 		end
-		local music = pico8.current_music and pico8.music[pico8.current_music.music] or nil
+		-- TODO: figure out what this was used for
+		--local music = pico8.current_music and pico8.music[pico8.current_music.music] or nil
 
 		for channel = 0, 3 do
 			local ch = pico8.audio_channels[channel]

@@ -711,7 +711,8 @@ function api.sset(x, y, c)
 	pico8.spritesheet:refresh()
 end
 
-function api.music(n, fade_len, channel_mask)
+function api.music(n, fade_len, channel_mask) -- luacheck: no unused
+	-- TODO: implement fade out
 	if n == -1 then
 		for i=0,3 do
 			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then
@@ -963,12 +964,12 @@ function api.memset(dest_addr, val, len)
 	end
 end
 
-function api.reload(dest_addr, source_addr, len)
+function api.reload(dest_addr, source_addr, len) -- luacheck: no unused
 	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
 	_load(cartname)
 end
 
-function api.cstore(dest_addr, source_addr, len)
+function api.cstore(dest_addr, source_addr, len) -- luacheck: no unused
 	-- TODO: implement this
 end
 
@@ -1227,7 +1228,7 @@ function api.btnp(i, p)
 	end
 end
 
-function api.cartdata(id)
+function api.cartdata(id) -- luacheck: no unused
 	-- TODO: handle global cartdata properly
 	-- TODO: handle cartdata() from console should not work
 	pico8.can_cartdata = true
@@ -1336,7 +1337,7 @@ api.costatus = coroutine.status
 api.trace = debug.traceback
 api.rawset = rawset
 api.rawget = rawget
-function api.rawlen(table)
+function api.rawlen(table) -- luacheck: no unused
 	-- TODO: implement this
 end
 api.rawequal = rawequal
@@ -1388,7 +1389,7 @@ function api.del(a, dv)
 	end
 end
 
-function api.serial(channel, address, length)
+function api.serial(channel, address, length) -- luacheck: no unused
   -- TODO: implement this
 end
 

@@ -840,6 +840,7 @@ function patch_lua(lua)
 	-- rewrite assignment operators
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=", "%1 = %1 %2 ")
 	-- rewrite inspect operator "?"
+	lua = lua:gsub("([\n\r]%s*)?([^\n\r]*)", "%1print(%2)")
 	lua = lua:gsub("^(%s*)?([^\n\r]*)", "%1print(%2)")
 	-- convert binary literals to hex literals
 	lua = lua:gsub("([^%w_])0[bB]([01.]+)", function(a, b)

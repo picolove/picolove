@@ -99,7 +99,6 @@ local __audio_buffer_size = 1024
 local video_frames = nil
 local osc
 host_time = 0
-local retro_mode = false
 local paused = false
 local focus = true
 

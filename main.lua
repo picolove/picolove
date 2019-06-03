@@ -132,11 +132,6 @@ function shdr_unpack(thing)
 	return unpack(thing, 1, 17) -- change to 16 once love2d shader bug is fixed
 end
 
-local function get_bits(v, s, e)
-	local mask = bit.lshift(bit.lshift(1, s)-1, e)
-	return bit.rshift(bit.band(mask, v))
-end
-
 function restore_clip()
 	if pico8.clip then
 		love.graphics.setScissor(unpack(pico8.clip))

@@ -9,7 +9,7 @@ local api = require("api")
 local cart = require("cart")
 
 cartname = nil -- used by api.reload
-local love_args = nil
+local love_args = nil -- luacheck: no unused
 
 pico8 = {
 	clip = nil,
@@ -488,7 +488,7 @@ local note_map = {
 	"B-",
 }
 
-local function note_to_string(note)
+local function note_to_string(note) -- luacheck: no unused
 	local octave = flr(note / 12)
 	note = flr(note % 12)
 	return string.format("%s%d", note_map[note], octave)

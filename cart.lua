@@ -253,8 +253,15 @@ function cart.load_p8(filename)
 					pico8.spritesheet_data:setPixel(col, row, v*16, v*16, v*16, 255)
 
 					col = col + 1
+					if col == 128 then
+						break
+					end
 				end
+
 				row = row + 1
+				if row == 128 then
+					break
+				end
 			end
 		end
 

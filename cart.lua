@@ -308,6 +308,10 @@ function cart.load_p8(filename)
 					v = tonumber(v, 16)
 					pico8.spriteflags[sprite + col] = v
 					col = col + 1
+
+					if col == 128 then
+						break
+					end
 				end
 
 				sprite = sprite + 128

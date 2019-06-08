@@ -372,11 +372,17 @@ function cart.load_p8(filename)
 					local fx    = tonumber(line:sub(i+4, i+4), 16)
 					pico8.sfx[_sfx][step] = {note, instr, vol, fx}
 					step = step + 1
+
+					if step == 32 then
+						break
+					end
 				end
 				_sfx = _sfx + 1
-			end
 
-			assert(_sfx == 64)
+				if _sfx == 64 then
+					break
+				end
+			end
 		end
 
 		-- load music

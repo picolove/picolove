@@ -103,18 +103,18 @@ function cart.load_p8(filename)
 		local version = nil
 		local compressed = false
 		local sprite = 0
-		for y=0,204 do
-			for x=0,159 do
-				local r,g,b,a = data:getPixel(x,y)
+		for y = 0, 204 do
+			for x = 0, 159 do
+				local r, g, b, a = data:getPixel(x, y)
 				-- extract lowest bits
-				r = bit.band(r,0x0003)
-				g = bit.band(g,0x0003)
-				b = bit.band(b,0x0003)
-				a = bit.band(a,0x0003)
-				data:setPixel(x,y,bit.lshift(r,6),bit.lshift(g,6),bit.lshift(b,6),255)
-				local byte = bit.lshift(a,6) + bit.lshift(r,4) + bit.lshift(g,2)+ b
-				local lo = bit.band(byte,0x0f)
-				local hi = bit.rshift(byte,4)
+				r = bit.band(r, 0x0003)
+				g = bit.band(g, 0x0003)
+				b = bit.band(b, 0x0003)
+				a = bit.band(a, 0x0003)
+				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g,6),bit.lshift(b, 6), 255)
+				local byte = bit.lshift(a, 6) + bit.lshift(r, 4) + bit.lshift(g, 2) + b
+				local lo = bit.band(byte, 0x0f)
+				local hi = bit.rshift(byte, 4)
 				if inbyte < 0x2000 then
 					-- spritesheet
 					if outY >= 64 then
@@ -125,9 +125,9 @@ function cart.load_p8(filename)
 							mapY = mapY + 1
 						end
 					end
-					pico8.spritesheet_data:setPixel(outX,outY,lo*16,lo*16,lo*16)
+					pico8.spritesheet_data:setPixel(outX, outY, lo*16, lo*16, lo*16)
 					outX = outX + 1
-					pico8.spritesheet_data:setPixel(outX,outY,hi*16,hi*16,hi*16)
+					pico8.spritesheet_data:setPixel(outX, outY, hi*16, hi*16, hi*16)
 					outX = outX + 1
 					if outX == 128 then
 						outY = outY + 1
@@ -136,9 +136,9 @@ function cart.load_p8(filename)
 							-- end of spritesheet, generate quads
 							pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 							local spriteCounter = 0
-							for yy=0,15 do
-								for xx=0,15 do
-									pico8.quads[spriteCounter] = love.graphics.newQuad(xx*8,yy*8,8,8,pico8.spritesheet:getDimensions())
+							for yy = 0, 15 do
+								for xx = 0, 15 do
+									pico8.quads[spriteCounter] = love.graphics.newQuad(xx*8, yy*8, 8, 8, pico8.spritesheet:getDimensions())
 									spriteCounter = spriteCounter + 1
 								end
 							end
@@ -161,19 +161,19 @@ function cart.load_p8(filename)
 				elseif inbyte < 0x3200 then
 					-- music
 					local _music = math.floor((inbyte-0x3100)/4)
-					pico8.music[_music][inbyte%4] = bit.band(byte,0x7F)
-					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte,0x80),7-inbyte%4),pico8.music[_music].loop)
+					pico8.music[_music][inbyte%4] = bit.band(byte, 0x7F)
+					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte, 0x80), 7-inbyte%4), pico8.music[_music].loop)
 				elseif inbyte < 0x4300 then
 					-- sfx
 					local _sfx = math.floor((inbyte-0x3200)/68)
 					local step = (inbyte-0x3200)%68
 					if step < 64 and inbyte%2 == 1 then
-						local note = bit.lshift(byte,8)+lastbyte
+						local note = bit.lshift(byte, 8) + lastbyte
 						pico8.sfx[_sfx][(step-1)/2] = {
-							bit.band(note,0x3f),
-							bit.rshift(bit.band(note,0x1c0),6),
-							bit.rshift(bit.band(note, 0xe00),9),
-							bit.rshift(bit.band(note,0x7000),12)
+							bit.band(note, 0x3f),
+							bit.rshift(bit.band(note, 0x1c0), 6),
+							bit.rshift(bit.band(note, 0xe00), 9),
+							bit.rshift(bit.band(note, 0x7000), 12)
 						}
 					elseif step == 64 then
 						pico8.sfx[_sfx].editor_mode = byte

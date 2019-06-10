@@ -201,7 +201,7 @@ function cart.load_p8(filename)
 		-- decompress code
 		log("version", version)
 		if version>8 then
-			api.print(string.format("unknown file version %d",version), nil, nil, 3)
+			api.print(string.format("unknown file version %d", version), nil, nil, 3)
 		end
 
 		if compressed then
@@ -409,7 +409,7 @@ function cart.load_p8(filename)
 
 	lua = patch_lua(lua)
 
-	log("finished loading cart",filename)
+	log("finished loading cart", filename)
 
 	loaded_code = lua
 

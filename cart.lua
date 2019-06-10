@@ -315,9 +315,10 @@ function cart.load_p8(filename)
 				end
 
 				sprite = sprite + 128
+				if sprite == 256 then
+					break
+				end
 			end
-
-			assert(sprite == 256,"wrong number of spriteflags:" .. sprite)
 		end
 
 		-- convert the tile data to a table

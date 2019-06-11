@@ -398,7 +398,11 @@ function cart.load_p8(filename)
 					[2] = tonumber(line:sub(8,9),16),
 					[3] = tonumber(line:sub(10,11),16)
 				}
+
 				_music = _music + 1
+				if _music == 64 then
+					break
+				end
 			end
 
 			assert(_music == 64)

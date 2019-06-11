@@ -359,9 +359,9 @@ function cart.load_p8(filename)
 
 			for line in sfxdata:gmatch("(.-)\n") do
 				pico8.sfx[_sfx].editor_mode = tonumber(line:sub(1, 2), 16)
-				pico8.sfx[_sfx].speed = tonumber(line:sub(3,4),16)
-				pico8.sfx[_sfx].loop_start = tonumber(line:sub(5,6),16)
-				pico8.sfx[_sfx].loop_end = tonumber(line:sub(7,8),16)
+				pico8.sfx[_sfx].speed = tonumber(line:sub(3, 4), 16)
+				pico8.sfx[_sfx].loop_start = tonumber(line:sub(5, 6), 16)
+				pico8.sfx[_sfx].loop_end = tonumber(line:sub(7, 8), 16)
 				local step = 0
 
 				for i=9, #line, 5 do

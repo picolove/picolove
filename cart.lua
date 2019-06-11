@@ -282,8 +282,6 @@ function cart.load_p8(filename)
 					end
 				end
 			end
-
-			assert(shared == 128 * 32, shared)
 		end
 
 		for y=0, 15 do

@@ -1,4 +1,6 @@
-.PHONY: all 10 11 check
+.PHONY: all 10 11 check build clean
+
+project_name := "picolove"
 
 all:
 	@love .
@@ -12,3 +14,13 @@ all:
 
 check:
 	luacheck .
+
+clean:
+	@echo deleting \"build/${project_name}.love\" ...
+	@rm -f build/${project_name}.love
+
+build: clean
+	@echo building \"build/${project_name}.love\" ...
+	@zip -9 -r build/"${project_name}".love ./nocart.p8
+	@zip -9 -r -x@excludelist.txt build/${project_name}.love .
+

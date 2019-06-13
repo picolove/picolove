@@ -346,7 +346,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-			assert(tiles + shared == 128 * 64,string.format("%d + %d != %d",tiles,shared,128*64))
+			--assert(tiles + shared == 128 * 64, string.format("%d + %d != %d", tiles, shared, 128 * 64))
 		end
 
 		-- load sfx
@@ -405,7 +405,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-			assert(_music == 64)
+			--assert(_music == 64, string.format("%d", _music))
 		end
 	end
 

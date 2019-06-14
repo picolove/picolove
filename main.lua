@@ -246,29 +246,29 @@ function love.load(argv)
 	end
 	-- detuned tri
 	osc[7] = function(x)
-		x=x*2
-		return (abs((x%2)-1)-0.5 + (abs(((x*127/128)%2)-1)-0.5)/2) - 1/4
+		x = x * 2
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 127 / 128) % 2) - 1) - 0.5) / 2) - 1 / 4
 	end
 	-- saw from 0 to 1, used for arppregiator
 	osc["saw_lfo"] = function(x)
-		return x%1
+		return x % 1
 	end
 
 	__audio_channels = {
-		[0]=QueueableSource:new(8),
+		[0] = QueueableSource:new(8),
 		QueueableSource:new(8),
 		QueueableSource:new(8),
 		QueueableSource:new(8)
 	}
 
-	for i=0,3 do
+	for i = 0, 3 do
 		__audio_channels[i]:play()
 	end
 
-	for i=0, 3 do
-		pico8.audio_channels[i]={
-			oscpos=0,
-			noise=osc[6](),
+	for i = 0, 3 do
+		pico8.audio_channels[i] = {
+			oscpos = 0,
+			noise = osc[6](),
 		}
 	end
 
@@ -308,7 +308,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
+	pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
 	pico8.sprite_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -319,8 +319,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
 }]])
-	pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
-	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
+	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 
 	pico8.text_shader = love.graphics.newShader([[
 extern float palette[16];
@@ -334,7 +334,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the color in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
 }]])
-	pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
+	pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
 	pico8.display_shader = love.graphics.newShader([[
 
@@ -345,7 +345,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	// lookup the color in the palette by index
 	return palette[index]/256.0;
 }]])
-	pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
+	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 
 	-- load the cart
 	api.clip()
@@ -366,29 +366,29 @@ function new_sandbox()
 
 	-- extra functions provided by picolove
 	local picolove_functions = {
-		error=error,
-		log=log,
-		ipairs=ipairs,
-		_keydown=nil,
-		_keyup=nil,
-		_textinput=nil,
+		error = error,
+		log = log,
+		ipairs = ipairs,
+		_keydown = nil,
+		_keyup = nil,
+		_textinput = nil,
 		-- used for repl
-		_allow_pause=_allow_pause,
-		_allow_shutdown=_allow_shutdown
+		_allow_pause = _allow_pause,
+		_allow_shutdown = _allow_shutdown
 	}
 	for k, v in pairs(picolove_functions) do
-		cart_env[k]=v
+		cart_env[k] = v
 	end
 
 	return cart_env;
 end
 
 local function inside(x, y, x0, y0, w, h) -- luacheck: no unused
-	return (x>=x0 and x<x0+w and y>=y0 and y<y0+h)
+	return (x >= x0 and x < x0 + w and y >= y0 and y < y0 + h)
 end
 
 local function update_buttons()
-	for p=0,1 do
+	for p = 0, 1 do
 		for i = 0, #pico8.keymap[p] do
 			for _, _ in pairs(pico8.keymap[p][i]) do
 				local v = pico8.keypressed[p][i]
@@ -442,15 +442,15 @@ function flip_screen()
 
 	local screen_w,screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
-		love.graphics.draw(pico8.screen,screen_w/2-64*scale,ypadding*scale,0,scale,scale)
+		love.graphics.draw(pico8.screen, screen_w / 2 - 64 * scale, ypadding * scale, 0, scale, scale)
 	else
-		love.graphics.draw(pico8.screen,xpadding*scale,screen_h/2-64*scale,0,scale,scale)
+		love.graphics.draw(pico8.screen, xpadding * scale, screen_h / 2 - 64 * scale, 0, scale, scale)
 	end
 
 	love.graphics.present()
 
 	if video_frames then
-		local tmp = love.graphics.newCanvas(pico8.resolution[1],pico8.resolution[2])
+		local tmp = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
 		love.graphics.setCanvas(tmp)
 		love.graphics.draw(pico8.screen,0,0)
 		table.insert(video_frames,tmp:getImageData())
@@ -467,9 +467,9 @@ function love.focus(f)
 end
 
 local function lowpass(y0, y1, cutoff) -- luacheck: no unused
-	local RC = 1.0/(cutoff*2*3.14)
-	local dt = 1.0/__sample_rate
-	local alpha = dt/(RC+dt)
+	local RC = 1.0 / (cutoff * 2 * 3.14)
+	local dt = 1.0 / __sample_rate
+	local alpha = dt / (RC + dt)
 	return y0 + (alpha*(y1 - y0))
 end
 
@@ -495,20 +495,20 @@ local function note_to_string(note) -- luacheck: no unused
 end
 
 local function oldosc(oscfn)
-	local x=0
+	local x = 0
 	return function(freq)
-		x=x+freq/__sample_rate
+		x = x + freq / __sample_rate
 		return oscfn(x)
 	end
 end
 
 local function lerp(a, b, t)
-	return (b-a)*t+a
+	return (b - a) * t + a
 end
 
 local function update_audio(time)
 	-- check what sfx should be playing
-	local samples = flr(time*__sample_rate)
+	local samples = flr(time * __sample_rate)
 
 	for _ = 0, samples - 1 do
 		if pico8.current_music then
@@ -540,7 +540,7 @@ local function update_audio(time)
 			local ch = pico8.audio_channels[channel]
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
-				ch.buffer = love.sound.newSoundData(__audio_buffer_size,__sample_rate,bits,channels)
+				ch.buffer = love.sound.newSoundData(__audio_buffer_size, __sample_rate, bits, channels)
 				ch.bufferpos = 0
 			end
 			if ch.sfx and pico8.sfx[ch.sfx] then
@@ -582,46 +582,46 @@ local function update_audio(time)
 					local vol = ch.vol
 					if ch.fx == 1 then
 						-- slide from previous note over the length of a step
-						ch.freq = lerp(note_to_hz(ch.lastnote or 0),note_to_hz(ch.note),ch.offset%1)
+						ch.freq = lerp(note_to_hz(ch.lastnote or 0), note_to_hz(ch.note), ch.offset % 1)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
-						ch.freq = lerp(note_to_hz(ch.note),note_to_hz(ch.note+0.5),ch.lfo(4))
+						ch.freq = lerp(note_to_hz(ch.note), note_to_hz(ch.note + 0.5), ch.lfo(4))
 					elseif ch.fx == 3 then
 						-- drop/bomb slide from note to c-0
-						local off = ch.offset%1
-						--local freq = lerp(note_to_hz(ch.note),note_to_hz(0),off)
-						local freq = lerp(note_to_hz(ch.note),0,off)
+						local off = ch.offset % 1
+						--local freq = lerp(note_to_hz(ch.note), note_to_hz(0), off)
+						local freq = lerp(note_to_hz(ch.note), 0, off)
 						ch.freq = freq
 					elseif ch.fx == 4 then
 						-- fade in
-						vol = lerp(0,ch.vol,ch.offset%1)
+						vol = lerp(0, ch.vol, ch.offset % 1)
 					elseif ch.fx == 5 then
 						-- fade out
-						vol = lerp(ch.vol,0,ch.offset%1)
+						vol = lerp(ch.vol, 0, ch.offset % 1)
 					elseif ch.fx == 6 then
 						-- fast appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(8)*4)
+						local off = bit.band(flr(ch.offset), 0xfc)
+						local lfo = flr(ch.lfo(8) * 4)
 						off = off + lfo
 						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					elseif ch.fx == 7 then
 						-- slow appreggio over 4 steps
-						local off = bit.band(flr(ch.offset),0xfc)
-						local lfo = flr(ch.lfo(4)*4)
+						local off = bit.band(flr(ch.offset), 0xfc)
+						local lfo = flr(ch.lfo(4) * 4)
 						off = off + lfo
 						local note = sfx[flr(off)][1]
 						ch.freq = note_to_hz(note)
 					end
-					ch.sample = ch.osc(ch.oscpos) * vol/7
-					ch.oscpos = ch.oscpos + ch.freq/__sample_rate
-					ch.buffer:setSample(ch.bufferpos,ch.sample)
+					ch.sample = ch.osc(ch.oscpos) * vol / 7
+					ch.oscpos = ch.oscpos + ch.freq / __sample_rate
+					ch.buffer:setSample(ch.bufferpos, ch.sample)
 				else
-					ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
+					ch.buffer:setSample(ch.bufferpos, lerp(ch.sample or 0, 0, 0.1))
 					ch.sample = 0
 				end
 			else
-				ch.buffer:setSample(ch.bufferpos,lerp(ch.sample or 0,0,0.1))
+				ch.buffer:setSample(ch.bufferpos, lerp(ch.sample or 0, 0, 0.1))
 				ch.sample = 0
 			end
 			ch.bufferpos = ch.bufferpos + 1

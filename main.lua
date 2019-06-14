@@ -832,8 +832,10 @@ function patch_lua(lua)
 		end
 	end)
 	-- rewrite assignment operators
-	lua = lua:gsub("([\n\r]%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
-	lua = lua:gsub("^(%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
+	-- TODO: handle edge case "if x then i += 1 % 2 end" with % as +-*/%(^.:#)[
+	--lua = lua:gsub("([\n\r]%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
+	--lua = lua:gsub("^(%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
+	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=", "%1 = %1 %2 ")
 	-- rewrite inspect operator "?"
 	lua = lua:gsub("([\n\r]%s*)?([^\n\r]*)", "%1print(%2)")
 	lua = lua:gsub("^(%s*)?([^\n\r]*)", "%1print(%2)")

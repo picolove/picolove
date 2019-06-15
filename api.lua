@@ -9,11 +9,11 @@ local function color(c)
 end
 
 local function warning(msg)
-	log(debug.traceback("WARNING: "..msg, 3))
+	log(debug.traceback("WARNING: " .. msg, 3))
 end
 
 local function _horizontal_line(lines, x0, y, x1)
-	table.insert(lines, {x0 + 0.5,y + 0.5,x1 + 0.5,y + 0.5})
+	table.insert(lines, {x0 + 0.5, y + 0.5, x1 + 0.5, y + 0.5})
 end
 
 local function _plot4points(lines, cx, cy, x, y)
@@ -27,7 +27,7 @@ local function scroll(pixels)
 	local base = 0x6000
 	local delta = base + pixels*0x40
 	local basehigh = 0x8000
-	api.memcpy(base, delta, basehigh-delta)
+	api.memcpy(base, delta, basehigh - delta)
 end
 
 local function setfps(fps)
@@ -72,7 +72,7 @@ function api._call(code)
 		ok,e = pcall(f)
 		if not ok then
 			api.print("runtime error", nil, nil, 14)
-			api.print(api.sub(e,20), nil, nil, 6)
+			api.print(api.sub(e, 20), nil, nil, 6)
 		end
 	end
 	return true
@@ -111,7 +111,7 @@ function api.cls(c)
 end
 
 function api.folder()
-	love.system.openURL("file://"..love.filesystem.getWorkingDirectory())
+	love.system.openURL("file://" .. love.filesystem.getWorkingDirectory())
 end
 
 -- TODO: move interactive implementatn into nocart
@@ -122,19 +122,19 @@ function api.ls()
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory..file) then
-			output[#output + 1] = {name=file:lower(), color=14}
+			output[#output + 1] = {name = file:lower(), color = 14}
 		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
-			output[#output + 1] = {name=file:lower(), color=6}
+			output[#output + 1] = {name = file:lower(), color = 6}
 		else
-			output[#output + 1] = {name=file:lower(), color=5}
+			output[#output + 1] = {name = file:lower(), color = 5}
 		end
 	end
 	local count = 0
 	love.keyboard.setTextInput(false)
 	for _, item in ipairs(output) do
 		api.color(item.color)
-		for j=1,#item.name,32 do
-			api.print(item.name:sub(j,j+32))
+		for j = 1, #item.name, 32 do
+			api.print(item.name:sub(j, j + 32))
 			flip_screen()
 			count = count + 1
 			if count == 20 then
@@ -271,7 +271,7 @@ function api.print(str, x, y, col)
 		color(col)
 	end
 	local canscroll = y==nil
-	if y==nil then
+	if y == nil then
 		y = pico8.cursor[2]
 		pico8.cursor[2] = pico8.cursor[2] + 6
 	end
@@ -335,7 +335,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 	if w == 1 and h == 1 then
 		q = pico8.quads[n]
 		if not q then
-			log("warning: sprite "..n.." is missing")
+			log("warning: sprite ".. n .." is missing")
 			return
 		end
 	else
@@ -376,8 +376,8 @@ function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 		flr(dx) + (flip_x and dw or 0),
 		flr(dy) + (flip_y and dh or 0),
 		0,
-		dw/sw * (flip_x and -1 or 1),
-		dh/sh * (flip_y and -1 or 1))
+		dw / sw * (flip_x and -1 or 1),
+		dh / sh * (flip_y and -1 or 1))
 	love.graphics.setShader(pico8.draw_shader)
 end
 
@@ -385,7 +385,7 @@ function api.rect(x0, y0, x1, y1, col)
 	if col then
 		color(col)
 	end
-	love.graphics.rectangle("line", flr(x0)+1, flr(y0)+1, flr(x1-x0), flr(y1-y0))
+	love.graphics.rectangle("line", flr(x0) + 1, flr(y0) + 1, flr(x1 - x0), flr(y1 - y0))
 end
 
 function api.rectfill(x0, y0, x1, y1, col)
@@ -428,7 +428,7 @@ function api.circ(ox, oy, r, col)
 			decisionOver2 = decisionOver2 + 2 * y + 1
 		else
 			x = x - 1
-			decisionOver2 = decisionOver2 + 2 * (y-x) + 1
+			decisionOver2 = decisionOver2 + 2 * (y - x) + 1
 		end
 	end
 	if #points > 0 then
@@ -502,7 +502,7 @@ function api.line(x0, y0, x1, y1, col)
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
 		points = {}
-		if x0 > x1 then x0,x1 = x1,x0 end
+		if x0 > x1 then x0, x1 = x1, x0 end
 		for x = x0, x1 do
 			table.insert(points, {x, y0})
 		end
@@ -541,7 +541,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				y0 = y0 + stepy
 				fraction = fraction + dx
-				table.insert(points,{flr(x0), flr(y0)})
+				table.insert(points, {flr(x0), flr(y0)})
 			end
 		end
 	end
@@ -555,35 +555,35 @@ function api.pal(c0, c1, p)
 		if __palette_modified == false then
 			return
 		end
-		for i=1,16 do
+		for i = 1, 16 do
 			pico8.draw_palette[i] = i
 			pico8.display_palette[i] = pico8.palette[i]
 		end
-		pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
-		pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
-		pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
-		pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
+		pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
+		pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 		__palette_modified = false
 		-- According to PICO-8 manual:
 		-- pal() to reset to system defaults (including transparency values)
 		api.palt()
 	elseif p == 1 and c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = flr(c0) % 16
+		c1 = flr(c1) % 16
 		c1 = c1 + 1
 		c0 = c0 + 1
 		pico8.display_palette[c0] = pico8.palette[c1]
-		pico8.display_shader:send("palette",shdr_unpack(pico8.display_palette))
+		pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 		__palette_modified = true
 	elseif c1 ~= nil then
-		c0 = flr(c0)%16
-		c1 = flr(c1)%16
+		c0 = flr(c0) % 16
+		c1 = flr(c1) % 16
 		c1 = c1 + 1
 		c0 = c0 + 1
 		pico8.draw_palette[c0] = c1
-		pico8.draw_shader:send("palette",shdr_unpack(pico8.draw_palette))
-		pico8.sprite_shader:send("palette",shdr_unpack(pico8.draw_palette))
-		pico8.text_shader:send("palette",shdr_unpack(pico8.draw_palette))
+		pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
+		pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
+		pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 		__palette_modified = true
 	end
 end
@@ -594,14 +594,14 @@ function api.palt(c, t)
 			pico8.pal_transparent[i] = i == 1 and 0 or 1
 		end
 	else
-		c = flr(c)%16
+		c = flr(c) % 16
 		if t == false then
 			pico8.pal_transparent[c + 1] = 1
 		elseif t == true then
 			pico8.pal_transparent[c + 1] = 0
 		end
 	end
-	pico8.sprite_shader:send("transparent",shdr_unpack(pico8.pal_transparent))
+	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 end
 
 function api.fillp(_)
@@ -617,11 +617,11 @@ function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	sy = flr(sy or 0)
 	cel_w = flr(cel_w or 128)
 	cel_h = flr(cel_h or 64)
-	for y=0,cel_h-1 do
-		if cel_y+y < 64 and cel_y+y >= 0 then
-			for x=0,cel_w-1 do
-				if cel_x+x < 128 and cel_x+x >= 0 then
-					local v = pico8.map[flr(cel_y+y)][flr(cel_x+x)]
+	for y = 0, cel_h - 1 do
+		if cel_y + y < 64 and cel_y + y >= 0 then
+			for x = 0, cel_w - 1 do
+				if cel_x + x < 128 and cel_x + x >= 0 then
+					local v = pico8.map[flr(cel_y + y)][flr(cel_x + x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
 							love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
@@ -643,7 +643,7 @@ api.mapdraw = api.map
 function api.mget(x, y)
 	x = flr(x or 0)
 	y = flr(y or 0)
-	if x>=0 and x<128 and y>=0 and y<64 then
+	if x >= 0 and x < 128 and y >= 0 and y < 64 then
 		return pico8.map[y][x]
 	end
 	return 0
@@ -714,7 +714,7 @@ end
 function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 	-- TODO: implement fade out
 	if n == -1 then
-		for i=0,3 do
+		for i = 0, 3 do
 			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then
 				pico8.audio_channels[i].sfx = nil
 				pico8.audio_channels[i].offset = 0
@@ -726,12 +726,12 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 	end
 	local m = pico8.music[n]
 	if not m then
-		warning(string.format("music %d does not exist",n))
+		warning(string.format("music %d does not exist", n))
 		return
 	end
 	local music_speed = nil
 	local music_channel = nil
-	for i=0,3 do
+	for i = 0, 3 do
 		if m[i] < 64 then
 			local sfx = pico8.sfx[m[i]]
 			if music_speed == nil or music_speed > sfx.speed then
@@ -741,8 +741,8 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 		end
 	end
 	pico8.audio_channels[music_channel].loop = false
-	pico8.current_music = {music=n, offset=0, channel_mask=channel_mask or 15, speed=music_speed}
-	for i=0,3 do
+	pico8.current_music = {music = n, offset = 0, channel_mask = channel_mask or 15, speed = music_speed}
+	for i = 0, 3 do
 		if pico8.music[n][i] < 64 then
 			pico8.audio_channels[i].sfx = pico8.music[n][i]
 			pico8.audio_channels[i].offset = 0
@@ -764,7 +764,7 @@ function api.sfx(n, channel, offset)
 	offset = offset or 0
 	if channel == -1 then
 		-- find a free channel
-		for i=0,3 do
+		for i = 0, 3 do
 			if pico8.audio_channels[i].sfx == nil then
 				channel = i
 			end
@@ -798,7 +798,9 @@ function api.peek(addr)
 	elseif addr < 0x5e00 then
 		return pico8.usermemory[addr - 0x4300]
 	elseif addr < 0x5f00 then
-		-- TODO: card data
+		local val = pico8.cartdata[flr((addr - 0x5e00) / 4)] * 0x10000
+		local shift = (addr % 4) * 8
+		return bit.rshift(bit.band(val, bit.lshift(0xFF, shift)), shift)
 	elseif addr < 0x5f40 then
 		-- TODO: draw state
 		if addr == 0x5f20 then
@@ -843,7 +845,7 @@ function api.poke(addr, val)
 	if tonumber(val) == nil then
 		return
 	end
-	addr, val = flr(tonumber(addr) or 0), flr(val)%256
+	addr, val = flr(tonumber(addr) or 0), flr(val) % 256
 	if addr < 0 or addr >= 0x8000 then
 		error("bad memory access")
 	elseif addr < 0x1000 then -- luacheck: ignore 542
@@ -907,8 +909,8 @@ function api.peek4(addr)
 end
 
 function api.poke2(addr, val)
-	api.poke(addr+0, bit.rshift(bit.band(val, 0x00FF),  0))
-	api.poke(addr+1, bit.rshift(bit.band(val, 0xFF00),  8))
+	api.poke(addr + 0, bit.rshift(bit.band(val, 0x00FF), 0))
+	api.poke(addr + 1, bit.rshift(bit.band(val, 0xFF00), 8))
 end
 
 function api.poke4(addr, val)
@@ -1016,11 +1018,11 @@ function api.mid(x, y, z)
 end
 
 function api.cos(x)
-	return math.cos((x or 0)*math.pi*2)
+	return math.cos((x or 0) * math.pi * 2)
 end
 
 function api.sin(x)
-	return -math.sin((x or 0)*math.pi*2)
+	return -math.sin((x or 0) * math.pi * 2)
 end
 
 api.sqrt = math.sqrt
@@ -1072,7 +1074,7 @@ function api.run()
 		log("=======8<========")
 		log(loaded_code)
 		log("=======>8========")
-		error("Error loading lua: "..tostring(e))
+		error("Error loading lua: " .. tostring(e))
 	else
 		setfenv(f, pico8.cart)
 		love.graphics.setShader(pico8.draw_shader)
@@ -1081,7 +1083,7 @@ function api.run()
 		restore_clip()
 		ok, e = pcall(f)
 		if not ok then
-			error("Error running lua: "..tostring(e))
+			error("Error running lua: " .. tostring(e))
 		else
 			log("lua completed")
 		end
@@ -1192,7 +1194,7 @@ function api.btn(i, p)
 				bitfield = bitfield + bit.lshift(1, j)
 			end
 		end
-		for j=0,7 do
+		for j = 0, 7 do
 			if pico8.keypressed[1][j] then
 				bitfield = bitfield + bit.lshift(1, j + 8)
 			end
@@ -1286,8 +1288,8 @@ function api.stat(x)
 	elseif x == 33 then
 		return getmousey()
 	elseif x == 34 then
-		local btns=0
-		for i=0, 2 do
+		local btns = 0
+		for i = 0, 2 do
 			if love.mouse.isDown(i + 1) then
 				btns = bit.bor(btns, bit.lshift(1, i))
 			end
@@ -1384,7 +1386,7 @@ function api.del(a, dv)
 	end
 	for i, v in ipairs(a) do
 		if v == dv then
-			table.remove(a,i)
+			table.remove(a, i)
 		end
 	end
 end
@@ -1446,16 +1448,16 @@ assert(api.mid(3, 1, 2) == 2)
 assert(api.mid(3, 2, 1) == 2)
 
 assert(api.atan2(1, 0) == 0)
-assert(api.atan2(0,-1) == 0.25)
-assert(api.atan2(-1,0) == 0.5)
+assert(api.atan2(0, -1) == 0.25)
+assert(api.atan2(-1, 0) == 0.5)
 assert(api.atan2(0, 1) == 0.75)
 
-assert(bit.band(0x01,bit.lshift(1,0)) ~= 0)
-assert(bit.band(0x02,bit.lshift(1,1)) ~= 0)
-assert(bit.band(0x04,bit.lshift(1,2)) ~= 0)
+assert(bit.band(0x01, bit.lshift(1, 0)) ~= 0)
+assert(bit.band(0x02, bit.lshift(1, 1)) ~= 0)
+assert(bit.band(0x04, bit.lshift(1, 2)) ~= 0)
 
-assert(bit.band(0x05,bit.lshift(1,2)) ~= 0)
-assert(bit.band(0x05,bit.lshift(1,0)) ~= 0)
-assert(bit.band(0x05,bit.lshift(1,3)) == 0)
+assert(bit.band(0x05, bit.lshift(1, 2)) ~= 0)
+assert(bit.band(0x05, bit.lshift(1, 0)) ~= 0)
+assert(bit.band(0x05, bit.lshift(1, 3)) == 0)
 
 return api

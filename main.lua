@@ -52,13 +52,13 @@ pico8 = {
 	},
 	keymap = {
 		[0] = {
-			[0] = {"left","kp4"},
-			[1] = {"right","kp6"},
-			[2] = {"up","kp8"},
-			[3] = {"down","kp5"},
-			[4] = {"z","c","n","kp-","kp1","insert"},
-			[5] = {"x","v","m","8","kp2","delete"},
-			[6] = {"return","escape"},
+			[0] = {"left", "kp4"},
+			[1] = {"right", "kp6"},
+			[2] = {"up", "kp8"},
+			[3] = {"down", "kp5"},
+			[4] = {"z", "c", "n", "kp-", "kp1", "insert"},
+			[5] = {"x", "v", "m", "8", "kp2", "delete"},
+			[6] = {"return", "escape"},
 			[7] = {},
 		},
 		[1] = {
@@ -66,8 +66,8 @@ pico8 = {
 			[1] = {"f"},
 			[2] = {"e"},
 			[3] = {"d"},
-			[4] = {"tab","lshift","w"},
-			[5] = {"q","a"},
+			[4] = {"tab", "lshift", "w"},
+			[5] = {"q", "a"},
 			[6] = {},
 			[7] = {},
 		}
@@ -140,29 +140,29 @@ function restore_clip()
 end
 
 function setColor(c)
-	love.graphics.setColor(c*16, 0, 0, 255)
+	love.graphics.setColor(c * 16, 0, 0, 255)
 end
 
 function _load(_cartname)
-	local exts = {"",".p8",".p8.png",".png"}
+	local exts = {"", ".p8", ".p8.png", ".png"}
 	local cart_no_ext = _cartname
 
 	if _cartname:sub(-3) == ".p8" then
-		exts = {".p8",".p8.png"}
-		cart_no_ext = _cartname:sub(1,-4)
+		exts = {".p8", ".p8.png"}
+		cart_no_ext = _cartname:sub(1, -4)
 	elseif _cartname:sub(-7) == ".p8.png" then
 		exts = {".p8.png"}
-		cart_no_ext = _cartname:sub(1,-8)
+		cart_no_ext = _cartname:sub(1, -8)
 	elseif _cartname:sub(-4) == ".png" then
 		exts = {".png", ".p8.png"}
-		cart_no_ext = _cartname:sub(1,-5)
+		cart_no_ext = _cartname:sub(1, -5)
 	end
 
 	local file_found = false
-	for i=1,#exts do
-		if love.filesystem.isFile(currentDirectory..cart_no_ext..exts[i]) then
+	for i = 1, #exts do
+		if love.filesystem.isFile(currentDirectory .. cart_no_ext .. exts[i]) then
 			file_found = true
-			_cartname = cart_no_ext..exts[i]
+			_cartname = cart_no_ext .. exts[i]
 			break
 		end
 	end
@@ -178,23 +178,23 @@ function _load(_cartname)
 	api.camera()
 	restore_clip()
 	cartname = _cartname
-	if cart.load_p8(currentDirectory.._cartname) then
-		api.print("loaded ".._cartname, nil, nil, 6)
+	if cart.load_p8(currentDirectory .. _cartname) then
+		api.print("loaded " .. _cartname, nil, nil, 6)
 	end
 end
 
-function love.resize(w,h)
+function love.resize(w, h)
 	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
-		scale = h/(pico8.resolution[2]+ypadding*2)
+		scale = h / (pico8.resolution[2] + ypadding * 2)
 	else
-		scale = w/(pico8.resolution[1]+xpadding*2)
+		scale = w / (pico8.resolution[1] + xpadding * 2)
 	end
 end
 
 local function note_to_hz(note)
-	return 440*2^((note-33)/12)
+	return 440 * 2 ^ ((note - 33) / 12)
 end
 
 function love.load(argv)
@@ -206,42 +206,42 @@ function love.load(argv)
 	osc = {}
 	-- tri
 	osc[0] = function(x)
-		return (abs((x%1)*2-1)*2-1) * 0.7
+		return (abs((x % 1) * 2 - 1) * 2 - 1) * 0.7
 	end
 	-- uneven tri
 	osc[1] = function(x)
-		local t = x%1
-		return (((t < 0.875) and (t * 16 / 7) or ((1-t)*16)) -1) * 0.7
+		local t = x % 1
+		return (((t < 0.875) and (t * 16 / 7) or ((1 - t) * 16)) - 1) * 0.7
 	end
 	-- saw
 	osc[2] = function(x)
-		return (x%1-0.5) * 0.9
+		return (x % 1 - 0.5) * 0.9
 	end
 	-- sqr
 	osc[3] = function(x)
-		return (x%1 < 0.5 and 1 or -1) * 1/3
+		return (x % 1 < 0.5 and 1 or -1) * 1 / 3
 	end
 	-- pulse
 	osc[4] = function(x)
-		return (x%1 < 0.3125 and 1 or -1) * 1/3
+		return (x % 1 < 0.3125 and 1 or -1) * 1 / 3
 	end
 	-- tri/2
 	osc[5] = function(x)
-		x=x*4
-		return (abs((x%2)-1)-0.5 + (abs(((x*0.5)%2)-1)-0.5)/2-0.1) * 0.7
+		x = x * 4
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 0.5) % 2) - 1) - 0.5) / 2 - 0.1) * 0.7
 	end
 	-- noise
 	osc[6] = function()
-		local lastx=0
-		local sample=0
-		local lsample=0
-		local tscale=note_to_hz(63)/__sample_rate
+		local lastx = 0
+		local sample = 0
+		local lsample = 0
+		local tscale = note_to_hz(63) / __sample_rate
 		return function(x)
-			local scale=(x-lastx)/tscale
-			lsample=sample
-			sample=(lsample+scale*(math.random()*2-1))/(1+scale)
-			lastx=x
-			return math.min(math.max((lsample+sample)*4/3*(1.75-scale), -1), 1)*0.7
+			local scale = (x - lastx) / tscale
+			lsample = sample
+			sample = (lsample + scale * (math.random() * 2 - 1)) / (1 + scale)
+			lastx = x
+			return math.min(math.max((lsample + sample) * 4 / 3 * (1.75 - scale), -1), 1) * 0.7
 		end
 	end
 	-- detuned tri
@@ -294,7 +294,7 @@ function love.load(argv)
 	pico8.draw_palette = {}
 	pico8.display_palette = {}
 	pico8.pal_transparent = {}
-	for i=1,16 do
+	for i = 1, 16 do
 		pico8.draw_palette[i] = i
 		pico8.pal_transparent[i] = i == 1 and 0 or 1
 		pico8.display_palette[i] = pico8.palette[i]
@@ -452,8 +452,8 @@ function flip_screen()
 	if video_frames then
 		local tmp = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
 		love.graphics.setCanvas(tmp)
-		love.graphics.draw(pico8.screen,0,0)
-		table.insert(video_frames,tmp:getImageData())
+		love.graphics.draw(pico8.screen, 0, 0)
+		table.insert(video_frames, tmp:getImageData())
 	end
 	-- get ready for next time
 	love.graphics.setShader(pico8.draw_shader)

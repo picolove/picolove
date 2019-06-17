@@ -14,6 +14,7 @@ globals = {
   "love.graphics.point",
   "love.handlers",
   "love.graphics.newScreenshot",
+  "love.graphics.isActive",
 
   -- functions
   "warning",

@@ -361,7 +361,7 @@ function new_sandbox()
 	local cart_env = {}
 
 	for k, v in pairs(api) do
-		cart_env[k]=v
+		cart_env[k] = v
 	end
 
 	-- extra functions provided by picolove
@@ -442,7 +442,7 @@ function flip_screen()
 	love.graphics.setBackgroundColor(3, 5, 10)
 	love.graphics.clear()
 
-	local screen_w,screen_h = love.graphics.getDimensions()
+	local screen_w, screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
 		love.graphics.draw(pico8.screen, screen_w / 2 - 64 * scale, ypadding * scale, 0, scale, scale)
 	else
@@ -657,16 +657,16 @@ function love.keypressed(key)
 	elseif key == "f1" or key == "f6" then
 		-- screenshot
 		local screenshot = love.graphics.newScreenshot(false)
-		local filename = cartname.."-"..os.time()..".png"
+		local filename = cartname .. "-" .. os.time() .. ".png"
 		screenshot:encode("png", filename)
-		log("saved screenshot to",filename)
+		log("saved screenshot to", filename)
 	elseif key == "f3" or key=="f8" then
 		-- start recording
 		video_frames = {}
 	elseif key == "f4" or key == "f9" then
 		-- stop recording and save
 		local basename = cartname .. "-" .. os.time() .. "-"
-		for i,v in ipairs(video_frames) do
+		for i, v in ipairs(video_frames) do
 			v:encode(string.format("%s%04d.png", basename, i))
 		end
 		video_frames = nil
@@ -731,7 +731,7 @@ end
 function love.run()
 	if love.math then
 		love.math.setRandomSeed(os.time())
-		for _=1,3 do
+		for _ = 1, 3 do
 			love.math.random()
 		end
 	end
@@ -800,8 +800,8 @@ function love.run()
 		if render and love.graphics and love.graphics.isActive() then
 			love.graphics.origin()
 			if paused or not focus then
-				api.rectfill(64-4*4, 60, 64+4*4-2, 64+4+4, 1)
-				api.print("paused", 64-3*4, 64, (host_time*20)%8<4 and 7 or 13)
+				api.rectfill(64 - 4 * 4, 60, 64 + 4 * 4 - 2, 64 + 4 + 4, 1)
+				api.print("paused", 64 - 3 * 4, 64, (host_time * 20) % 8 < 4 and 7 or 13)
 			else
 				if love.draw then
 					love.draw()
@@ -819,8 +819,8 @@ end
 
 function patch_lua(lua)
 	-- patch lua code
-	lua = lua:gsub("!=","~=")
-	lua = lua:gsub("//","--")
+	lua = lua:gsub("!=", "~=")
+	lua = lua:gsub("//", "--")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n", function(a, b)
 		local nl = a:find("\n", nil, true)
@@ -831,7 +831,7 @@ function patch_lua(lua)
 		if not (nl or th or an or o) then
 			if ce then
 				local c, t = b:match("(.-)(%s-%-%-.*)")
-				return "if " .. a:sub(2,-2) .. " then " .. c .. " end" .. t .. "\n"
+				return "if " .. a:sub(2, -2) .. " then " .. c .. " end" .. t .. "\n"
 			else
 				return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
 			end

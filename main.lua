@@ -419,7 +419,9 @@ function love.draw()
 	love.graphics.setShader(pico8.draw_shader)
 
 	-- run the cart's draw function
-	if pico8.cart._draw then pico8.cart._draw() end
+	if pico8.cart._draw then
+		pico8.cart._draw()
+	end
 
 	-- draw the contents of pico screen to our screen
 	flip_screen()
@@ -743,7 +745,9 @@ function love.run()
 	end
 
 	-- We don't want the first frame's dt to include time taken by love.load.
-	if love.timer then love.timer.step() end
+	if love.timer then
+		love.timer.step()
+	end
 
 	local dt = 0
 
@@ -799,7 +803,9 @@ function love.run()
 				api.rectfill(64-4*4, 60, 64+4*4-2, 64+4+4, 1)
 				api.print("paused", 64-3*4, 64, (host_time*20)%8<4 and 7 or 13)
 			else
-				if love.draw then love.draw() end
+				if love.draw then
+					love.draw()
+				end
 			end
 			-- reset mouse wheel
 			pico8.mwheel = 0

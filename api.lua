@@ -258,7 +258,7 @@ function api.pget(x, y)
 		local r = __screen_img:getPixel(flr(x), flr(y))
 		return flr(r / 17.0)
 	end
-	warning(string.format("pget out of screen %d,%d", x, y))
+	warning(string.format("pget out of screen %d, %d", x, y))
 	return 0
 end
 
@@ -335,7 +335,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 	if w == 1 and h == 1 then
 		q = pico8.quads[n]
 		if not q then
-			log("warning: sprite ".. n .." is missing")
+			log("warning: sprite " .. n .. " is missing")
 			return
 		end
 	else

@@ -392,11 +392,11 @@ function cart.load_p8(filename)
 
 			for line in musicdata:gmatch("(.-)\n") do
 				pico8.music[_music] = {
-					loop = tonumber(line:sub(1,2),16),
-					[0] = tonumber(line:sub(4,5),16),
-					[1] = tonumber(line:sub(6,7),16),
-					[2] = tonumber(line:sub(8,9),16),
-					[3] = tonumber(line:sub(10,11),16)
+					loop = tonumber(line:sub(1, 2), 16),
+					[0] = tonumber(line:sub(4, 5), 16),
+					[1] = tonumber(line:sub(6, 7), 16),
+					[2] = tonumber(line:sub(8, 9), 16),
+					[3] = tonumber(line:sub(10, 11), 16)
 				}
 
 				_music = _music + 1

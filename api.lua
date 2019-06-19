@@ -915,8 +915,8 @@ end
 
 function api.poke4(addr, val)
 	val = val * 0x10000
-	api.poke(addr + 0, bit.rshift(bit.band(val, 0x000000FF),  0))
-	api.poke(addr + 1, bit.rshift(bit.band(val, 0x0000FF00),  8))
+	api.poke(addr + 0, bit.rshift(bit.band(val, 0x000000FF), 0))
+	api.poke(addr + 1, bit.rshift(bit.band(val, 0x0000FF00), 8))
 	api.poke(addr + 2, bit.rshift(bit.band(val, 0x00FF0000), 16))
 	api.poke(addr + 3, bit.rshift(bit.band(val, 0xFF000000), 24))
 end
@@ -1304,7 +1304,7 @@ function api.stat(x)
 		else
 			tinfo = os.date("*t")
 		end
-		return tinfo[tfield[x%10]]
+		return tinfo[tfield[x % 10]]
 	elseif x == 100 then
 		return nil -- TODO: breadcrumb not supported
 	elseif x == 101 then

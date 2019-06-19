@@ -472,7 +472,7 @@ local function lowpass(y0, y1, cutoff) -- luacheck: no unused
 	local RC = 1.0 / (cutoff * 2 * 3.14)
 	local dt = 1.0 / __sample_rate
 	local alpha = dt / (RC + dt)
-	return y0 + (alpha*(y1 - y0))
+	return y0 + (alpha * (y1 - y0))
 end
 
 local note_map = {
@@ -660,7 +660,7 @@ function love.keypressed(key)
 		local filename = cartname .. "-" .. os.time() .. ".png"
 		screenshot:encode("png", filename)
 		log("saved screenshot to", filename)
-	elseif key == "f3" or key=="f8" then
+	elseif key == "f3" or key == "f8" then
 		-- start recording
 		video_frames = {}
 	elseif key == "f4" or key == "f9" then

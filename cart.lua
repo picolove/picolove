@@ -111,7 +111,7 @@ function cart.load_p8(filename)
 				g = bit.band(g, 0x0003)
 				b = bit.band(b, 0x0003)
 				a = bit.band(a, 0x0003)
-				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g,6),bit.lshift(b, 6), 255)
+				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g, 6),bit.lshift(b, 6), 255)
 				local byte = bit.lshift(a, 6) + bit.lshift(r, 4) + bit.lshift(g, 2) + b
 				local lo = bit.band(byte, 0x0f)
 				local hi = bit.rshift(byte, 4)
@@ -125,9 +125,9 @@ function cart.load_p8(filename)
 							mapY = mapY + 1
 						end
 					end
-					pico8.spritesheet_data:setPixel(outX, outY, lo*16, lo*16, lo*16)
+					pico8.spritesheet_data:setPixel(outX, outY, lo * 16, lo * 16, lo * 16)
 					outX = outX + 1
-					pico8.spritesheet_data:setPixel(outX, outY, hi*16, hi*16, hi*16)
+					pico8.spritesheet_data:setPixel(outX, outY, hi * 16, hi * 16, hi * 16)
 					outX = outX + 1
 					if outX == 128 then
 						outY = outY + 1
@@ -250,7 +250,7 @@ function cart.load_p8(filename)
 				local col = 0
 				for v in line:gmatch(".") do
 					v = tonumber(v, 16)
-					pico8.spritesheet_data:setPixel(col, row, v*16, v*16, v*16, 255)
+					pico8.spritesheet_data:setPixel(col, row, v * 16, v * 16, v * 16, 255)
 
 					col = col + 1
 					if col == 128 then

@@ -62,6 +62,6 @@ Extra features:
 
 Android Packaging:
 
-Replace nocart.p8 with your game, since this is the default cartridge on boot. Text P8 or PNG P8.PNG is supported.  
-Follow the steps at [Android Game Packaging](https://bitbucket.org/MartinFelis/love-android-sdl2/wiki/Game_Packaging)  
-An additional step when editing AndroidManifest.xml is to remove ```android:screenOrientation="landscape"``` if you would like your game to support orientation rotation (Portrait and Landscape)
+Replace the default cartridge (nocart.p8) with your game. Text (P8) or PNG (P8.PNG) is supported.  
+Follow the [Android Game Packaging](https://bitbucket.org/MartinFelis/love-android-sdl2/wiki/Game_Packaging) steps.  
+Optionally, for orientation rotation support (Portrait and Landscape), remove ```android:screenOrientation="landscape"``` in the AndroidManifest.xml

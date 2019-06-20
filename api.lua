@@ -597,11 +597,7 @@ function api.palt(c, t)
 		end
 	else
 		c = flr(c) % 16
-		if t == false then
-			pico8.pal_transparent[c + 1] = 1
-		elseif t == true then
-			pico8.pal_transparent[c + 1] = 0
-		end
+		pico8.pal_transparent[c + 1] = t and 0 or 1
 	end
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 end

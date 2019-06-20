@@ -1,4 +1,4 @@
-local api=require("api")
+local api = require("api")
 
 local compression_map = {}
 for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(".") do
@@ -26,7 +26,7 @@ local function decompress(code)
 				local offset = (copy - 0x3c) * 16 + bit.band(byte, 0xf)
 				local length = bit.rshift(byte, 4) + 2
 				offset = #lua - offset
-				local buffer = lua:sub(offset + 1, offset+length)
+				local buffer = lua:sub(offset + 1, offset + length)
 				lua = lua .. buffer
 				mode = 0
 			elseif byte == 0x00 then
@@ -45,7 +45,7 @@ local function decompress(code)
 	return lua
 end
 
-local cart={}
+local cart = {}
 
 function cart.load_p8(filename)
 	log("Loading", filename)
@@ -54,9 +54,9 @@ function cart.load_p8(filename)
 	pico8.quads = {}
 	pico8.spritesheet_data = love.image.newImageData(128, 128)
 	pico8.map = {}
-	for y=0, 63 do
+	for y = 0, 63 do
 		pico8.map[y] = {}
-		for x=0, 127 do
+		for x = 0, 127 do
 			pico8.map[y][x] = 0
 		end
 	end
@@ -65,19 +65,19 @@ function cart.load_p8(filename)
 		pico8.spriteflags[i] = 0
 	end
 	pico8.sfx = {}
-	for i=0, 63 do
+	for i = 0, 63 do
 		pico8.sfx[i] = {
 			editor_mode = 0,
-			speed=16,
-			loop_start=0,
-			loop_end=0
+			speed = 16,
+			loop_start = 0,
+			loop_end = 0
 		}
-		for j=0, 31 do
+		for j = 0, 31 do
 			pico8.sfx[i][j] = {0, 0, 0, 0}
 		end
 	end
 	pico8.music = {}
-	for i=0, 63 do
+	for i = 0, 63 do
 		pico8.music[i] = {
 			loop = 0,
 			[0] = 1,
@@ -111,7 +111,7 @@ function cart.load_p8(filename)
 				g = bit.band(g, 0x0003)
 				b = bit.band(b, 0x0003)
 				a = bit.band(a, 0x0003)
-				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g, 6),bit.lshift(b, 6), 255)
+				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g, 6), bit.lshift(b, 6), 255)
 				local byte = bit.lshift(a, 6) + bit.lshift(r, 4) + bit.lshift(g, 2) + b
 				local lo = bit.band(byte, 0x0f)
 				local hi = bit.rshift(byte, 4)
@@ -138,7 +138,7 @@ function cart.load_p8(filename)
 							local spriteCounter = 0
 							for yy = 0, 15 do
 								for xx = 0, 15 do
-									pico8.quads[spriteCounter] = love.graphics.newQuad(xx*8, yy*8, 8, 8, pico8.spritesheet:getDimensions())
+									pico8.quads[spriteCounter] = love.graphics.newQuad(xx * 8, yy * 8, 8, 8, pico8.spritesheet:getDimensions())
 									spriteCounter = spriteCounter + 1
 								end
 							end
@@ -160,16 +160,16 @@ function cart.load_p8(filename)
 					sprite = sprite + 1
 				elseif inbyte < 0x3200 then
 					-- music
-					local _music = math.floor((inbyte-0x3100)/4)
-					pico8.music[_music][inbyte%4] = bit.band(byte, 0x7F)
-					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte, 0x80), 7-inbyte%4), pico8.music[_music].loop)
+					local _music = math.floor((inbyte - 0x3100) / 4)
+					pico8.music[_music][inbyte % 4] = bit.band(byte, 0x7F)
+					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte, 0x80), 7 - inbyte % 4), pico8.music[_music].loop)
 				elseif inbyte < 0x4300 then
 					-- sfx
-					local _sfx = math.floor((inbyte-0x3200)/68)
-					local step = (inbyte-0x3200)%68
-					if step < 64 and inbyte%2 == 1 then
+					local _sfx = math.floor((inbyte - 0x3200) / 68)
+					local step = (inbyte - 0x3200) % 68
+					if step < 64 and inbyte % 2 == 1 then
 						local note = bit.lshift(byte, 8) + lastbyte
-						pico8.sfx[_sfx][(step-1)/2] = {
+						pico8.sfx[_sfx][(step - 1) / 2] = {
 							bit.band(note, 0x3f),
 							bit.rshift(bit.band(note, 0x1c0), 6),
 							bit.rshift(bit.band(note, 0xe00), 9),
@@ -200,7 +200,7 @@ function cart.load_p8(filename)
 
 		-- decompress code
 		log("version", version)
-		if version>8 then
+		if version > 8 then
 			api.print(string.format("unknown file version %d", version), nil, nil, 3)
 		end
 
@@ -210,7 +210,7 @@ function cart.load_p8(filename)
 			lua = lua:match("(.-)%f[%z]")
 		end
 	else
-		local data,size = love.filesystem.read(filename)
+		local data, size = love.filesystem.read(filename)
 		if not data or size == 0 then
 			error(string.format("Unable to open: %s", filename))
 		end
@@ -229,8 +229,8 @@ function cart.load_p8(filename)
 		if start == nil then
 			error("invalid cart")
 		end
-		local next_line = data:find("\n",start+#header)
-		local version_str = data:sub(start+#header, next_line-1)
+		local next_line = data:find("\n", start + #header)
+		local version_str = data:sub(start + #header, next_line - 1)
 		local version = tonumber(version_str)
 		log("version", version)
 
@@ -270,8 +270,8 @@ function cart.load_p8(filename)
 			for sy = 64, 127 do
 				for sx = 0, 127, 2 do
 					-- get the two pixel values and merge them
-					local lo = api.flr(pico8.spritesheet_data:getPixel(sx,sy)/16)
-					local hi = api.flr(pico8.spritesheet_data:getPixel(sx+1,sy)/16)
+					local lo = api.flr(pico8.spritesheet_data:getPixel(sx, sy) / 16)
+					local hi = api.flr(pico8.spritesheet_data:getPixel(sx + 1, sy) / 16)
 					local v = bit.bor(bit.lshift(hi, 4), lo)
 					pico8.map[ty][tx] = v
 					shared = shared + 1
@@ -284,9 +284,9 @@ function cart.load_p8(filename)
 			end
 		end
 
-		for y=0, 15 do
-			for x=0, 15 do
-				pico8.quads[y*16+x] = love.graphics.newQuad(8*x, 8*y, 8, 8, 128, 128)
+		for y = 0, 15 do
+			for x = 0, 15 do
+				pico8.quads[y * 16 + x] = love.graphics.newQuad(8 * x, 8 * y, 8, 8, 128, 128)
 			end
 		end
 
@@ -346,7 +346,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-			--assert(tiles + shared == 128 * 64, string.format("%d + %d != %d", tiles, shared, 128 * 64))
+		--assert(tiles + shared == 128 * 64, string.format("%d + %d != %d", tiles, shared, 128 * 64))
 		end
 
 		-- load sfx
@@ -362,13 +362,13 @@ function cart.load_p8(filename)
 				pico8.sfx[_sfx].loop_end = tonumber(line:sub(7, 8), 16)
 				local step = 0
 
-				for i=9, #line, 5 do
-					local v = line:sub(i, i+4)
+				for i = 9, #line, 5 do
+					local v = line:sub(i, i + 4)
 					assert(#v == 5)
-					local note  = tonumber(line:sub(i,   i+1), 16)
-					local instr = tonumber(line:sub(i+2, i+2), 16)
-					local vol   = tonumber(line:sub(i+3, i+3), 16)
-					local fx    = tonumber(line:sub(i+4, i+4), 16)
+					local note = tonumber(line:sub(i, i + 1), 16)
+					local instr = tonumber(line:sub(i + 2, i + 2), 16)
+					local vol = tonumber(line:sub(i + 3, i + 3), 16)
+					local fx = tonumber(line:sub(i + 4, i + 4), 16)
 					pico8.sfx[_sfx][step] = {note, instr, vol, fx}
 					step = step + 1
 
@@ -405,7 +405,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-			--assert(_music == 64, string.format("%d", _music))
+		--assert(_music == 64, string.format("%d", _music))
 		end
 	end
 

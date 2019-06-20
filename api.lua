@@ -25,7 +25,7 @@ end
 
 local function scroll(pixels)
 	local base = 0x6000
-	local delta = base + pixels*0x40
+	local delta = base + pixels * 0x40
 	local basehigh = 0x8000
 	api.memcpy(base, delta, basehigh - delta)
 end
@@ -37,7 +37,6 @@ local function setfps(fps)
 	end
 	pico8.frametime = 1 / pico8.fps
 end
-
 
 local function getmousex()
 	return flr((love.mouse.getX() - xpadding) / scale)
@@ -69,7 +68,7 @@ function api._call(code)
 		return false
 	else
 		setfenv(f, pico8.cart)
-		ok,e = pcall(f)
+		ok, e = pcall(f)
 		if not ok then
 			api.print("runtime error", nil, nil, 14)
 			api.print(api.sub(e, 20), nil, nil, 6)
@@ -87,8 +86,8 @@ function api.flip()
 end
 
 function api.camera(x, y)
-		pico8.camera_x = flr(tonumber(x) or 0)
-		pico8.camera_y = flr(tonumber(y) or 0)
+	pico8.camera_x = flr(tonumber(x) or 0)
+	pico8.camera_y = flr(tonumber(y) or 0)
 	restore_camera()
 end
 
@@ -121,7 +120,7 @@ function api.ls()
 	api.print("directory: " .. currentDirectory, nil, nil, 12)
 	local output = {}
 	for _, file in ipairs(files) do
-		if love.filesystem.isDirectory(currentDirectory..file) then
+		if love.filesystem.isDirectory(currentDirectory .. file) then
 			output[#output + 1] = {name = file:lower(), color = 14}
 		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
 			output[#output + 1] = {name = file:lower(), color = 6}
@@ -179,13 +178,13 @@ function api.cd(name)
 	-- filter /TEXT/../ -> /
 	count = 1
 	while count > 0 do
-		newDirectory, count = newDirectory:gsub("/[^/]*/%.%./","/")
+		newDirectory, count = newDirectory:gsub("/[^/]*/%.%./", "/")
 	end
 
 	-- filter /TEXT/..$ -> /
 	count = 1
 	while count > 0 do
-		newDirectory, count = newDirectory:gsub("/[^/]*/%.%.$","/")
+		newDirectory, count = newDirectory:gsub("/[^/]*/%.%.$", "/")
 	end
 
 	local failed = newDirectory:find("%.%.") ~= nil
@@ -270,7 +269,7 @@ function api.print(str, x, y, col)
 	if col then
 		color(col)
 	end
-	local canscroll = y==nil
+	local canscroll = y == nil
 	if y == nil then
 		y = pico8.cursor[2]
 		pico8.cursor[2] = pico8.cursor[2] + 6
@@ -350,12 +349,15 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 	if not q then
 		log("missing quad", n)
 	end
-	love.graphics.draw(pico8.spritesheet, q,
+	love.graphics.draw(
+		pico8.spritesheet,
+		q,
 		flr(x) + (w * 8 * (flip_x and 1 or 0)),
 		flr(y) + (h * 8 * (flip_y and 1 or 0)),
 		0,
 		flip_x and -1 or 1,
-		flip_y and -1 or 1)
+		flip_y and -1 or 1
+	)
 	love.graphics.setShader(pico8.draw_shader)
 end
 
@@ -372,12 +374,15 @@ function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 	local q = love.graphics.newQuad(sx, sy, sw, sh, pico8.spritesheet:getDimensions())
 	love.graphics.setShader(pico8.sprite_shader)
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
-	love.graphics.draw(pico8.spritesheet, q,
+	love.graphics.draw(
+		pico8.spritesheet,
+		q,
 		flr(dx) + (flip_x and dw or 0),
 		flr(dy) + (flip_y and dh or 0),
 		0,
 		dw / sw * (flip_x and -1 or 1),
-		dh / sh * (flip_y and -1 or 1))
+		dh / sh * (flip_y and -1 or 1)
+	)
 	love.graphics.setShader(pico8.draw_shader)
 end
 
@@ -532,7 +537,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				x0 = x0 + stepx
 				fraction = fraction + dy
-				table.insert(points,{flr(x0), flr(y0)})
+				table.insert(points, {flr(x0), flr(y0)})
 			end
 		else
 			local fraction = dx - bit.rshift(dy, 1)
@@ -625,7 +630,7 @@ function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 							love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
 						else
 							if bit.band(pico8.spriteflags[v], bitmask) ~= 0 then
-								love.graphics.draw(pico8.spritesheet,pico8.quads[v], sx + 8 * x, sy + 8 * y)
+								love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
 							end
 						end
 					end
@@ -657,7 +662,9 @@ function api.mset(x, y, v)
 end
 
 function api.fget(n, f)
-	if n == nil then return nil end
+	if n == nil then
+		return nil
+	end
 	if f ~= nil then
 		-- return just that bit as a boolean
 		if not pico8.spriteflags[flr(n)] then
@@ -774,7 +781,7 @@ function api.sfx(n, channel, offset)
 	local ch = pico8.audio_channels[channel]
 	ch.sfx = n
 	ch.offset = offset
-	ch.last_step = offset-1
+	ch.last_step = offset - 1
 	ch.loop = true
 end
 
@@ -1026,9 +1033,8 @@ end
 api.sqrt = math.sqrt
 
 function api.atan2(x, y)
-	return (0.75 + math.atan2(x,y) / (math.pi * 2)) % 1.0
+	return (0.75 + math.atan2(x, y) / (math.pi * 2)) % 1.0
 end
-
 
 local bit = require("bit")
 

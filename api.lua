@@ -65,7 +65,7 @@ function api._call(code)
 	local ok, f, e = pcall(load, code, "repl")
 	if not ok or f == nil then
 		api.print("syntax error", nil, nil, 14)
-		api.print(api.sub(e,20), nil, nil, 6)
+		api.print(api.sub(e, 20), nil, nil, 6)
 		return false
 	else
 		setfenv(f, pico8.cart)
@@ -502,7 +502,9 @@ function api.line(x0, y0, x1, y1, col)
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
 		points = {}
-		if x0 > x1 then x0, x1 = x1, x0 end
+		if x0 > x1 then
+			x0, x1 = x1, x0
+		end
 		for x = x0, x1 do
 			table.insert(points, {x, y0})
 		end
@@ -864,7 +866,7 @@ function api.poke(addr, val)
 		pico8.usermemory[addr - 0x4300] = val
 	elseif addr < 0x5f00 then -- luacheck: ignore 542
 		-- TODO: cart data
-	elseif addr  < 0x5f40 then -- luacheck: ignore 542
+	elseif addr < 0x5f40 then -- luacheck: ignore 542
 		-- TODO: draw state
 		if addr == 0x5f26 then
 			pico8.cursor[1] = val
@@ -879,7 +881,7 @@ function api.poke(addr, val)
 		elseif addr == 0x5f2b then
 			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
 		end
-	elseif addr  < 0x5f80 then -- luacheck: ignore 542
+	elseif addr < 0x5f80 then -- luacheck: ignore 542
 		-- TODO: hardware state
 	elseif addr < 0x6000 then -- luacheck: ignore 542
 		-- TODO: gpio pins
@@ -926,7 +928,7 @@ function api.memcpy(dest_addr, source_addr, len)
 		return
 	end
 
-	-- only for range 0x6000+0x8000
+	-- only for range 0x6000 + 0x8000
 	if source_addr < 0x6000 or dest_addr < 0x6000 then
 		return
 	end
@@ -1392,7 +1394,7 @@ function api.del(a, dv)
 end
 
 function api.serial(channel, address, length) -- luacheck: no unused
-  -- TODO: implement this
+	-- TODO: implement this
 end
 
 -- tests

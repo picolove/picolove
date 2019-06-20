@@ -985,7 +985,7 @@ function api.srand(seed)
 	if seed == 0 then
 		seed = 1
 	end
-	return love.math.setRandomSeed(flr(seed * 32768))
+	return love.math.setRandomSeed(flr(seed * 0x8000))
 end
 
 api.flr = math.floor

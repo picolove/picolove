@@ -18,19 +18,19 @@ pico8 = {
 	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
-		{  0,   0,   0, 255},
-		{ 29,  43,  83, 255},
-		{126,  37,  83, 255},
-		{  0, 135,  81, 255},
-		{171,  82,  54, 255},
-		{ 95,  87,  79, 255},
+		{0, 0, 0, 255},
+		{29, 43, 83, 255},
+		{126, 37, 83, 255},
+		{0, 135, 81, 255},
+		{171, 82, 54, 255},
+		{95, 87, 79, 255},
 		{194, 195, 199, 255},
 		{255, 241, 232, 255},
-		{255,   0,  77, 255},
-		{255, 163,   0, 255},
-		{255, 240,  36, 255},
-		{  0, 231,  86, 255},
-		{ 41, 173, 255, 255},
+		{255, 0, 77, 255},
+		{255, 163, 0, 255},
+		{255, 240, 36, 255},
+		{0, 231, 86, 255},
+		{41, 173, 255, 255},
 		{131, 118, 156, 255},
 		{255, 119, 168, 255},
 		{255, 204, 170, 255}
@@ -48,7 +48,7 @@ pico8 = {
 	clipboard = "",
 	keypressed = {
 		[0] = {},
-		[1] = {},
+		[1] = {}
 	},
 	keymap = {
 		[0] = {
@@ -59,7 +59,7 @@ pico8 = {
 			[4] = {"z", "c", "n", "kp-", "kp1", "insert"},
 			[5] = {"x", "v", "m", "8", "kp2", "delete"},
 			[6] = {"return", "escape"},
-			[7] = {},
+			[7] = {}
 		},
 		[1] = {
 			[0] = {"s"},
@@ -69,7 +69,7 @@ pico8 = {
 			[4] = {"tab", "lshift", "w"},
 			[5] = {"q", "a"},
 			[6] = {},
-			[7] = {},
+			[7] = {}
 		}
 	},
 	mwheel = 0,
@@ -87,7 +87,7 @@ pico8 = {
 	text_shader = nil,
 	quads = {},
 	spritesheet_data = nil,
-	spritesheet = nil,
+	spritesheet = nil
 }
 
 local flr, abs = math.floor, math.abs
@@ -108,7 +108,7 @@ local channels = 1
 local bits = 16
 
 currentDirectory = "/"
-local glyphs = "abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
+local glyphs = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
 local function _allow_pause(value)
 	if type(value) ~= "boolean" then
@@ -268,7 +268,7 @@ function love.load(argv)
 	for i = 0, 3 do
 		pico8.audio_channels[i] = {
 			oscpos = 0,
-			noise = osc[6](),
+			noise = osc[6]()
 		}
 	end
 
@@ -300,17 +300,21 @@ function love.load(argv)
 		pico8.display_palette[i] = pico8.palette[i]
 	end
 
-
-	pico8.draw_shader = love.graphics.newShader([[
+	pico8.draw_shader =
+		love.graphics.newShader(
+		[[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
-}]])
+}]]
+	)
 	pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
-	pico8.sprite_shader = love.graphics.newShader([[
+	pico8.sprite_shader =
+		love.graphics.newShader(
+		[[
 extern float palette[16];
 extern float transparent[16];
 
@@ -318,11 +322,14 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(floor(Texel(texture, texture_coords).r*16.0));
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
-}]])
+}]]
+	)
 	pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 
-	pico8.text_shader = love.graphics.newShader([[
+	pico8.text_shader =
+		love.graphics.newShader(
+		[[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
@@ -333,10 +340,13 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	// lookup the color in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
-}]])
+}]]
+	)
 	pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
-	pico8.display_shader = love.graphics.newShader([[
+	pico8.display_shader =
+		love.graphics.newShader(
+		[[
 
 extern vec4 palette[16];
 
@@ -344,7 +354,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(Texel(texture, texture_coords).r*15.0);
 	// lookup the color in the palette by index
 	return palette[index]/256.0;
-}]])
+}]]
+	)
 	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 
 	-- load the cart
@@ -380,7 +391,7 @@ function new_sandbox()
 		cart_env[k] = v
 	end
 
-	return cart_env;
+	return cart_env
 end
 
 local function inside(x, y, x0, y0, w, h) -- luacheck: no unused
@@ -487,7 +498,7 @@ local note_map = {
 	"G#",
 	"A-",
 	"A#",
-	"B-",
+	"B-"
 }
 
 local function note_to_string(note) -- luacheck: no unused
@@ -638,9 +649,7 @@ local function update_audio(time)
 end
 
 local function isCtrlOrGuiDown()
-	return (love.keyboard.isDown("lctrl") or
-		love.keyboard.isDown("lgui") or
-		love.keyboard.isDown("rctrl") or
+	return (love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or love.keyboard.isDown("rctrl") or
 		love.keyboard.isDown("rgui"))
 end
 
@@ -822,21 +831,25 @@ function patch_lua(lua)
 	lua = lua:gsub("!=", "~=")
 	lua = lua:gsub("//", "--")
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n", function(a, b)
-		local nl = a:find("\n", nil, true)
-		local th = b:find("%f[%w]then%f[%W]")
-		local an = b:find("%f[%w]and%f[%W]")
-		local o = b:find("%f[%w]or%f[%W]")
-		local ce = b:find("--", nil, true)
-		if not (nl or th or an or o) then
-			if ce then
-				local c, t = b:match("(.-)(%s-%-%-.*)")
-				return "if " .. a:sub(2, -2) .. " then " .. c .. " end" .. t .. "\n"
-			else
-				return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
+	lua =
+		lua:gsub(
+		"if%s*(%b())%s*([^\n]*)\n",
+		function(a, b)
+			local nl = a:find("\n", nil, true)
+			local th = b:find("%f[%w]then%f[%W]")
+			local an = b:find("%f[%w]and%f[%W]")
+			local o = b:find("%f[%w]or%f[%W]")
+			local ce = b:find("--", nil, true)
+			if not (nl or th or an or o) then
+				if ce then
+					local c, t = b:match("(.-)(%s-%-%-.*)")
+					return "if " .. a:sub(2, -2) .. " then " .. c .. " end" .. t .. "\n"
+				else
+					return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
+				end
 			end
 		end
-	end)
+	)
 	-- rewrite assignment operators
 	-- TODO: handle edge case "if x then i += 1 % 2 end" with % as +-*/%(^.:#)[
 	--lua = lua:gsub("([\n\r]%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
@@ -846,22 +859,26 @@ function patch_lua(lua)
 	lua = lua:gsub("([\n\r]%s*)?([^\n\r]*)", "%1print(%2)")
 	lua = lua:gsub("^(%s*)?([^\n\r]*)", "%1print(%2)")
 	-- convert binary literals to hex literals
-	lua = lua:gsub("([^%w_])0[bB]([01.]+)", function(a, b)
-		local p1, p2 = b, ""
-		if b:find(".", nil, true) then
-			p1, p2 = b:match("(.-)%.(.*)")
-		end
-		-- pad to 4 characters
-		p2 = p2 .. string.rep("0", 3 - ((#p2 - 1) % 4))
-		p1, p2 = tonumber(p1, 2), tonumber(p2, 2)
-		if p1 then
-			if p2 then
-				return string.format("%s0x%x.%x", a, p1, p2)
-			else
-				return string.format("%s0x%x", a, p1)
+	lua =
+		lua:gsub(
+		"([^%w_])0[bB]([01.]+)",
+		function(a, b)
+			local p1, p2 = b, ""
+			if b:find(".", nil, true) then
+				p1, p2 = b:match("(.-)%.(.*)")
+			end
+			-- pad to 4 characters
+			p2 = p2 .. string.rep("0", 3 - ((#p2 - 1) % 4))
+			p1, p2 = tonumber(p1, 2), tonumber(p2, 2)
+			if p1 then
+				if p2 then
+					return string.format("%s0x%x.%x", a, p1, p2)
+				else
+					return string.format("%s0x%x", a, p1)
+				end
 			end
 		end
-	end)
+	)
 
 	return lua
 end

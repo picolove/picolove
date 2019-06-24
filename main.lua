@@ -8,6 +8,8 @@ local bit = require("bit")
 local api = require("api")
 local cart = require("cart")
 
+require("test")
+
 cartname = nil -- used by api.reload
 local love_args = nil -- luacheck: no unused
 

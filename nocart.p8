@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
 function _init()
+	-- TODO: move all variables into hidden table to prevent overwriting via commandline
 	_allow_pause(false)
 	_allow_shutdown(true)
 	pencolor = 6
@@ -117,6 +118,9 @@ function _keydown(key)
 		local endbuffer = linebuffer:sub(cursorx+1)
 		linebuffer = startbuffer .. stat(4) .. endbuffer
 		cursorx = cursorx + #stat(4)
+
+	elseif key == "tab" then
+		-- TODO: implement file and folder name tab completion
 
 	elseif key == "return" or key == "kpenter" then
 		--add to history

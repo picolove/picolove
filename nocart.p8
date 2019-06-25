@@ -46,6 +46,7 @@ function _keydown(key)
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+1+delchars)
 		linebuffer = startbuffer .. endbuffer
+
 	elseif key == "delete" then
 		--delete carret
 		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
@@ -53,20 +54,25 @@ function _keydown(key)
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+2)
 		linebuffer = startbuffer .. endbuffer
+
 	elseif key == "home" then
 		cursorx = 0
+
 	elseif key == "end" then
 		cursorx = #linebuffer
+
 	elseif key == "left" then
 		cursorx-=1
 		if (cursorx < 0) then
 			cursorx = 0
 		end
+
 	elseif key == "right" then
 		cursorx+=1
 		if (cursorx > #linebuffer) then
 			cursorx = #linebuffer
 		end
+
 	elseif key == "up" then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
@@ -82,6 +88,7 @@ function _keydown(key)
 
 		linebuffer = commandhistory[commandindex] or linebuffer
 		cursorx = #linebuffer
+
 	elseif key == "down" then
 		--delete text and carret
 		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
@@ -101,13 +108,16 @@ function _keydown(key)
 
 		linebuffer = newbuffer or linebuffer
 		cursorx = #linebuffer
+
 	elseif key == "lctrl" then
 		isctrldown = true
+
 	elseif key == "v" and isctrldown then
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+1)
 		linebuffer = startbuffer .. stat(4) .. endbuffer
 		cursorx = cursorx + #stat(4)
+
 	elseif key == "return" or key == "kpenter" then
 		--add to history
 		if linebuffer != commandhistory[#commandhistory] then
@@ -153,6 +163,7 @@ function _keydown(key)
 			_call(linebuffer)
 			pencolor = peek(0x5f25) or pencolor
 		end
+
 		linebuffer = ""
 		cursorx = 0
 	end

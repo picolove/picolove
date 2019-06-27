@@ -25,6 +25,32 @@ end
 
 c=[==[
 
+comments:
+"//"
+//
+
+
+shorthands:
+"if (not i) a=1 a=2"
+if (not i) a=1 a=2
+
+
+unary math operators:
+"i != a"
+i != a
+"i += a"
+i += a
+"i -= a"
+i -= a
+"i *= a"
+i *= a
+"i /= a"
+i /= a
+"i %= a"
+i %= a
+
+
+unary math operators - adcanced tests:
 "i+=a"
 i+=a
 "i+=  b"
@@ -117,6 +143,8 @@ if x then i += h else e end
 if x then i += h(e) end
 "if x then i += h -- e end"
 if x then i += h -- e end
+"if x then i += h // e end"
+if x then i += h // e end
 "if x then i += h(e,f) end"
 if x then i += h(e,f) end
 "if x then i += h [ e end"
@@ -125,7 +153,9 @@ if x then i += h [ e end
 if x then i += h ] e end
 "if x then i += h[e] end"
 if x then i += h[e] end
+
 ]==]
+
 cls()
 
 doutput(c,printh)

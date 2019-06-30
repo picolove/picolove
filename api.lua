@@ -266,6 +266,7 @@ function api.color(c)
 end
 
 function api.print(str, x, y, col)
+	--TODO: support printing special pico8 chars
 	if col then
 		color(col)
 	end

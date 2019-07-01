@@ -53,21 +53,29 @@ i += a
 ]==]
 assert("i = i + ( a) \n" == addpatch)
 
+-- TODO: fix issue with missing/misplaced parens
+-- TODO: modify make patched code look like in pico8
 local subpatch = [==[
 i -= a
 ]==]
 assert("i = i - ( a) \n" == subpatch)
 
+-- TODO: fix issue with missing/misplaced parens
+-- TODO: modify make patched code look like in pico8
 local mulpatch = [==[
 i *= a
 ]==]
 assert("i = i * ( a) \n" == mulpatch)
 
+-- TODO: fix issue with missing/misplaced parens
+-- TODO: modify make patched code look like in pico8
 local divpatch = [==[
 i /= a
 ]==]
 assert("i = i / ( a) \n" == divpatch)
 
+-- TODO: fix issue with missing/misplaced parens
+-- TODO: modify make patched code look like in pico8
 local modpatch = [==[
 i %= a
 ]==]

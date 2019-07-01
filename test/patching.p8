@@ -23,6 +23,29 @@ function doutput(s,tof,bp)
  print("done")
 end
 
+local commentpatch = [==[
+//
+]==]
+assert("--\n" == commentpatch)
+
+-- TODO: fix
+--[[
+local ifpatch = [==[
+if (not i) a=1 a=2
+]==]
+assert("if (not i) a=1 a=2 end\n" == ifpatch)
+--]]
+
+local negpatch = [==[
+i != a
+]==]
+assert("i ~= a\n" == negpatch)
+
+local addpatch = [==[
+i += a
+]==]
+assert("i = i +  a\n" == addpatch)
+
 c=[==[
 
 comments:

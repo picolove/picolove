@@ -1,6 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
 version 18
 __lua__
+-- TODO: modify run with "make test" or similar
+
 function doutput(s,tof,bp)
  local prnt = tof or print
  local j = 1
@@ -23,12 +25,14 @@ function doutput(s,tof,bp)
  print("done")
 end
 
+-- TODO: remove comment lines when patching
 local commentpatch = [==[
 //
 ]==]
 assert("--\n" == commentpatch)
 
--- TODO: fix
+-- TODO: fix issue with misplaced end statement
+-- TODO: modify make patched code look like in pico8
 --[[
 local ifpatch = [==[
 if (not i) a=1 a=2
@@ -41,11 +45,14 @@ i != a
 ]==]
 assert("i ~= a\n" == negpatch)
 
+-- TODO: fix issue with missing/misplaced parens
+-- TODO: modify make patched code look like in pico8
 local addpatch = [==[
 i += a
 ]==]
 assert("i = i +  a\n" == addpatch)
 
+-- TODO: add more patching tests
 c=[==[
 
 comments:

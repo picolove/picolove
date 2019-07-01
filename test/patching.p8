@@ -32,16 +32,14 @@ end
 local commentpatch = [==[
 //
 ]==]
-assert("--\n" == commentpatch)
+assert("\n" == commentpatch)
 
 -- TODO: fix issue with misplaced end statement
 -- TODO: modify make patched code look like in pico8
---[[
 local ifpatch = [==[
 if (not i) a=1 a=2
 ]==]
-assert("if (not i) a=1 a=2 end\n" == ifpatch)
---]]
+assert("if (not i) then  a=1 a=2 end \n" == ifpatch)
 
 local negpatch = [==[
 i != a
@@ -53,7 +51,7 @@ assert("i ~= a\n" == negpatch)
 local addpatch = [==[
 i += a
 ]==]
-assert("i = i +  a\n" == addpatch)
+assert("i = i + ( a) \n" == addpatch)
 
 -- TODO: add more patching tests
 c=[==[

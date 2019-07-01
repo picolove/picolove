@@ -53,6 +53,27 @@ i += a
 ]==]
 assert("i = i + ( a) \n" == addpatch)
 
+local subpatch = [==[
+i -= a
+]==]
+assert("i = i - ( a) \n" == subpatch)
+
+local mulpatch = [==[
+i *= a
+]==]
+assert("i = i * ( a) \n" == mulpatch)
+
+local divpatch = [==[
+i /= a
+]==]
+assert("i = i / ( a) \n" == divpatch)
+
+local modpatch = [==[
+i %= a
+]==]
+assert("i = i % ( a) \n" == modpatch)
+
+
 -- TODO: add more patching tests
 c=[==[
 

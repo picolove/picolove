@@ -25,6 +25,9 @@ function doutput(s,tof,bp)
  print("done")
 end
 
+-- for debugging
+-- print("^"..testpatch.."$")
+
 -- TODO: remove comment lines when patching
 local commentpatch = [==[
 //

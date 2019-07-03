@@ -82,6 +82,17 @@ i %= a
 assert("i = i % ( a) \n" == modpatch)
 
 
+local advspacepatch1 = [==[
+i+=a
+]==]
+assert("i = i + (a) \n" == advspacepatch1)
+
+local advspacepatch2 = [==[
+i+=  b
+]==]
+assert("i = i + (  b) \n" == advspacepatch2)
+
+
 -- todo: add more patching tests
 c=[==[
 

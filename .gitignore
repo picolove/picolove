@@ -1,4 +1,5 @@
 !nocart.p8
+!test/*.p8
 *.p8
 .DS_Store
 build/*.love

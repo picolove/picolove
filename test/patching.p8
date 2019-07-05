@@ -102,6 +102,13 @@ i  +=   d
 ]==]
 assert("i = i + (   d) \n" == advspacepatch3)
 
+local advspacepatch4 = [==[
+i+=e   ]==]
+assert("i = i + (e)    " == advspacepatch4)
+
+local advspacepatch5 = [==[
+i  +=   f    ]==]
+assert("i = i + (   f)     " == advspacepatch5)
 
 -- todo: add more patching tests
 c=[==[

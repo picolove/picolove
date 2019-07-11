@@ -110,6 +110,14 @@ local advspacepatch5 = [==[
 i  +=   f    ]==]
 assert("i = i + (   f)     " == advspacepatch5)
 
+local advspacepatch6 = [==[
+  i+=g   ]==]
+assert("  i = i + (g)    " == advspacepatch6)
+
+local advspacepatch7 = [==[
+  i  +=   h    ]==]
+assert("  i = i + (   h)     " == advspacepatch7)
+
 -- todo: add more patching tests
 c=[==[
 

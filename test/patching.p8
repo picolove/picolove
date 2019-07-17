@@ -6,6 +6,7 @@ __lua__
 function doutput(s,tof,bp)
  local prnt = tof or print
  local j = 1
+ local s = s or ""
  for i=1,#s do
   local c = sub(s,i,i)
   if c == "\n" then
@@ -156,6 +157,18 @@ local advspacepatch16 = [==[
 if x then i += h " e end]==]
 assert('if x then i = i + ( h)  " e end' == advspacepatch16)
 
+local advspacepatch17 = [==[
+if x then i += h $ e end]==]
+assert("if x then i = i + ( h)  $ e end" == advspacepatch17)
+
+local advspacepatch18 = [==[
+if x then i += h & e end]==]
+assert("if x then i = i + ( h)  & e end" == advspacepatch18)
+
+local advspacepatch19 = [==[
+if x then i += h ( e end]==]
+assert("if x then i = i + ( h)  ( e end" == advspacepatch19)
+
 -- todo: add more patching tests
 c=[==[
 
@@ -221,7 +234,7 @@ if x then i += h % e end
 if x then i += h ! e end
 "if x then i += h " e end"
 if x then i += h " e end
-"if x then i += h $e end"
+"if x then i += h $ e end"
 if x then i += h $ e end
 "if x then i += h & e end"
 if x then i += h & e end

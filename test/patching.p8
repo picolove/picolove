@@ -166,8 +166,17 @@ if x then i += h & e end]==]
 assert("if x then i = i + ( h)  & e end" == advspacepatch18)
 
 local advspacepatch19 = [==[
-if x then i += h ( e end]==]
-assert("if x then i = i + ( h)  ( e end" == advspacepatch19)
+if x then i += h ( e end
+]==]
+assert("if x then i = i + ( h ( e end) \n" == advspacepatch19)
+
+local advspacepatch20 = [==[
+if x then i += h ) e end]==]
+assert("if x then i = i + ( h ) ) e end" == advspacepatch20)
+
+local advspacepatch21 = [==[
+if x then i += h = e end]==]
+assert("if x then i = i + ( h)  = e end" == advspacepatch21)
 
 -- todo: add more patching tests
 c=[==[

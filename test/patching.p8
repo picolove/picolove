@@ -178,6 +178,10 @@ local advspacepatch21 = [==[
 if x then i += h = e end]==]
 assert("if x then i = i + ( h)  = e end" == advspacepatch21)
 
+local advspacepatch22 = [==[
+if x then i += h ? e end]==]
+assert("if x then i = i + ( h)  ? e end" == advspacepatch22)
+
 -- todo: add more patching tests
 c=[==[
 

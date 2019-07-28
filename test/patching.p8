@@ -222,6 +222,26 @@ local advspacepatch32 = [==[
 if x then i += h : e end]==]
 assert("if x then i = i + ( h : e)  end" == advspacepatch32)
 
+local advspacepatch33 = [==[
+if x then i += h _ e end]==]
+assert("if x then i = i + ( h)  _ e end" == advspacepatch33)
+
+local advspacepatch34 = [==[
+if x then i += h # e end]==]
+assert("if x then i = i + ( h # e)  end" == advspacepatch34)
+
+local advspacepatch35 = [==[
+if x then i += h ' e end]==]
+assert("if x then i = i + ( h)  ' e end" == advspacepatch35)
+
+local advspacepatch36 = [==[
+if x then i += h ~ e end]==]
+assert("if x then i = i + ( h)  ~ e end" == advspacepatch36)
+
+local advspacepatch37 = [==[
+if x then i += h == e end]==]
+assert("if x then i = i + ( h)  == e end" == advspacepatch37)
+
 -- todo: add more patching tests
 c=[==[
 

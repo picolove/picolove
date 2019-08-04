@@ -259,8 +259,8 @@ if x then i += h else e end]==]
 assert("if x then i = i + ( h)  else e end" == advspacepatch41)
 
 local advspacepatch42 = [==[
-if x then i += h(e) e end]==]
-assert("if x then i = i + ( h(e))  e end" == advspacepatch42)
+if x then i += h(e) end]==]
+assert("if x then i = i + ( h(e))  end" == advspacepatch42)
 
 local advspacepatch43 = [==[
 if x then i += h -- e end
@@ -389,7 +389,7 @@ if x then i += h and e end
 if x then i += h not e end
 "if x then i += h else e end"
 if x then i += h else e end
-"if x then i += h(e) e end"
+"if x then i += h(e) end"
 if x then i += h(e) end
 "if x then i += h -- e end"
 if x then i += h -- e end

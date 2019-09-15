@@ -113,6 +113,15 @@ function _keydown(key)
 	elseif key == "lctrl" then
 		isctrldown = true
 
+	elseif key == "c" and isctrldown then
+		-- NOTE: feature not part of pico
+		--delete text and carret
+		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		--render command
+		print("> "..linebuffer, nil, nil, 7)
+		linebuffer = ""
+		cursorx = 0
+
 	elseif key == "v" and isctrldown then
 		local startbuffer = linebuffer:sub(1,cursorx)
 		local endbuffer = linebuffer:sub(cursorx+1)

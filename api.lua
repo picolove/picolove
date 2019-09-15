@@ -113,6 +113,101 @@ function api.folder()
 	love.system.openURL("file://" .. love.filesystem.getWorkingDirectory())
 end
 
+function api._completecommand(command, path)
+	-- TODO: handle depending on command
+
+	local startDir = ""
+	local pos = path:find("/", 1, true)
+	if pos ~= nil then
+		startDir = startDir .. path:sub(1, pos)
+		path = path:sub(pos + 1)
+	end
+	local files = love.filesystem.getDirectoryItems(currentDirectory .. startDir)
+
+	local filteredFiles = {}
+	for _, file in ipairs(files) do
+		if string.sub(file:lower(), 1, string.len(path)) == path then
+			filteredFiles[#filteredFiles + 1] = file
+		end
+	end
+	files = filteredFiles
+
+	local result = path
+	if #files == 0 then
+	elseif #files == 1 then
+		if love.filesystem.isDirectory(currentDirectory .. startDir .. files[1]) then
+			result = files[1]:lower() .. "/"
+		else
+			result = files[1]:lower()
+		end
+	else
+		local matches
+		local match = path
+
+		repeat
+			result = match
+			if #match == #files[1] then
+				break
+			end
+
+			match = files[1]:sub(1, #match + 1)
+			matches = 0
+			for _, file in ipairs(files) do
+				if string.sub(file:lower(), 1, string.len(match)) == match then
+					matches = matches + 1
+				end
+			end
+		until matches ~= #files
+
+		result = result:lower()
+
+		if #result == #path then
+			-- TODO: remove duplicate code (see api.ls())
+			local output = {}
+			for _, file in ipairs(files) do
+				if love.filesystem.isDirectory(currentDirectory .. file) then
+					output[#output + 1] = {name = file:lower(), color = 14}
+				elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
+					output[#output + 1] = {name = file:lower(), color = 6}
+				else
+					output[#output + 1] = {name = file:lower(), color = 5}
+				end
+			end
+
+			local count = 0
+			love.keyboard.setTextInput(false)
+			api.color(12)
+			api.print(#output .. " files")
+			for _, item in ipairs(output) do
+				api.color(item.color)
+				for j = 1, #item.name, 32 do
+					api.print(item.name:sub(j, j + 32))
+					flip_screen()
+					count = count + 1
+					if count == 20 then
+						api.print("--more--", nil, nil, 12)
+						flip_screen()
+						local y = api._getcursory() - 6
+						api.cursor(0, y)
+						api.rectfill(0, y, 127, y + 6, 0)
+						api.color(item.color)
+						while true do
+							local e = love.event.wait()
+							if e == "keypressed" then
+								break
+							end
+						end
+						count = 0
+					end
+				end
+			end
+			love.keyboard.setTextInput(true)
+		end
+	end
+
+	return command .. " " .. startDir .. result
+end
+
 -- TODO: move interactive implementatn into nocart
 -- TODO: should return table of strings
 function api.ls()

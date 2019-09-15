@@ -129,8 +129,18 @@ function _keydown(key)
 		cursorx = cursorx + #stat(4)
 
 	elseif key == "tab" then
-		-- TODO: implement file and folder name tab completion
-
+		-- NOTE: we display colors for file types (pico doesn't)
+		-- NOTE: we use blue colors for "3 files" text (pico uses light red)
+		-- NOTE: split at first space (pico does last space -> bug)
+		local newbuffer = linebuffer
+		local pos = linebuffer:find(" ",1,true)
+		if pos ~= nil and pos < #linebuffer then
+			rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+			local command = linebuffer:sub(1,pos-1)
+			local file= linebuffer:sub(pos+1)
+			linebuffer = _completecommand(command, file)
+			cursorx = #linebuffer
+		end
 	elseif key == "return" or key == "kpenter" then
 		--add to history
 		if linebuffer != commandhistory[#commandhistory] then

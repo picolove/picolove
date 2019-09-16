@@ -132,8 +132,9 @@ function api._completecommand(command, path)
 	end
 	files = filteredFiles
 
-	local result = path
+	local result
 	if #files == 0 then
+		result = path
 	elseif #files == 1 then
 		if love.filesystem.isDirectory(currentDirectory .. startDir .. files[1]) then
 			result = files[1]:lower() .. "/"

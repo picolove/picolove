@@ -16,7 +16,7 @@ all:
 11:
 	@"${LOVE11}" .
 
-check:
+lint:
 	luacheck .
 
 format:

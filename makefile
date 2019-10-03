@@ -1,4 +1,4 @@
-.PHONY: all 10 11 check build clean format
+.PHONY: all 9 10 11 check build clean format
 
 project_name := "picolove"
 # ignore subfolders for now
@@ -9,6 +9,8 @@ all:
 
 # run specific love version
 # setup environment variable with path to love executable first
+9:
+	@"${LOVE9}" .
 10:
 	@"${LOVE10}" .
 11:

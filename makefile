@@ -1,4 +1,4 @@
-.PHONY: all 9 10 11 check build clean format
+.PHONY: all 9 10 11 check build clean format test
 
 project_name := "picolove"
 # ignore subfolders for now
@@ -25,6 +25,10 @@ format:
 clean:
 	@echo deleting \"build/${project_name}.love\" ...
 	@rm -f build/${project_name}.love
+
+test:
+	# todo implement test running
+	@love .
 
 build: clean
 	@echo building \"build/${project_name}.love\" ...

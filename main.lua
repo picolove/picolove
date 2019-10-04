@@ -129,8 +129,38 @@ end
 log = print
 --log = function() end
 
-function shdr_unpack(thing)
-	return unpack(thing, 1, 17) -- change to 16 once love2d shader bug is fixed
+-- TODO: move into separate file
+local major, minor, revision = love.getVersion()
+
+-- fixes for 0.10.2
+if major == 0 and minor == 10 and revision == 2 then
+	-- workaround love2d 0.10.2 shader bug
+	function shdr_unpack(thing)
+		return unpack(thing, 1, table.maxn(thing) + 1)
+	end
+else
+	shdr_unpack = unpack
+end
+
+-- minimal fixes for 0.9.2 to make picolove work
+if major == 0 and minor == 9 then
+	love.graphics.isActive = function()
+		return true
+	end
+
+	local newCanvasOrg = love.graphics.newCanvas
+	love.graphics.newCanvas = function(width, height) -- luacheck: ignore 122
+		local ret = newCanvasOrg(width, height)
+		local mt = getmetatable(ret)
+		mt.newImageData = mt.getImageData
+		return ret
+	end
+
+	love.graphics.points = function(points) -- luacheck: ignore 122
+		for _, point in ipairs(points) do
+			love.graphics.point(point[1], point[2])
+		end
+	end
 end
 
 function restore_clip()

@@ -1448,6 +1448,10 @@ api.rawequal = rawequal
 api.next = next
 
 function api.all(a)
+	if a == nil then
+		return function() end
+	end
+
 	local i = 0
 	local n = table.getn(a)
 	return function()

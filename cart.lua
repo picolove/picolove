@@ -405,7 +405,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-		--assert(_music == 64, string.format("%d", _music))
+			--assert(_music == 64, string.format("%d", _music))
 		end
 	end
 

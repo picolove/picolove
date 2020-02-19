@@ -15,8 +15,8 @@ function _init()
 	commandbuffer = ""
 	cursorx = 0
 	cls()
-	spr(32,0,3,6,1)
-	spr(38,45,0)
+	spr(32, 0, 3, 6, 1)
+	spr(38, 45, 0)
 	print("")
 	print("")
 

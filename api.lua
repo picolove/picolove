@@ -817,14 +817,16 @@ end
 function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 	-- TODO: implement fade out
 	if n == -1 then
-		for i = 0, 3 do
-			if pico8.current_music and pico8.music[pico8.current_music.music][i] < 64 then
-				pico8.audio_channels[i].sfx = nil
-				pico8.audio_channels[i].offset = 0
-				pico8.audio_channels[i].last_step = -1
+		if pico8.current_music then
+			for i = 0, 3 do
+				if pico8.music[pico8.current_music.music][i] < 64 then
+					pico8.audio_channels[i].sfx = nil
+					pico8.audio_channels[i].offset = 0
+					pico8.audio_channels[i].last_step = -1
+				end
 			end
+			pico8.current_music = nil
 		end
-		pico8.current_music = nil
 		return
 	end
 	local m = pico8.music[n]

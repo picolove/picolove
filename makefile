@@ -37,3 +37,6 @@ build: clean
 	@zip -9 -r build/"${project_name}".love ./nocart.p8
 	@zip -9 -r -x@excludelist.txt build/${project_name}.love .
 
+run_build:
+	@echo "executing \"build/${project_name}.love\" ..."
+	@love build/${project_name}.love

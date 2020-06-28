@@ -1,4 +1,4 @@
-.PHONY: all 9 10 11 check build clean format test
+.PHONY: all 9 10 11 lint build clean format test
 
 project_name := "picolove"
 # ignore subfolders for now

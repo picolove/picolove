@@ -1,7 +1,9 @@
 local api = require("api")
 
 local compression_map = {}
-for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(".") do
+for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(
+	"."
+) do
 	table.insert(compression_map, entry)
 end
 
@@ -111,7 +113,14 @@ function cart.load_p8(filename)
 				g = bit.band(g, 0x0003)
 				b = bit.band(b, 0x0003)
 				a = bit.band(a, 0x0003)
-				data:setPixel(x, y, bit.lshift(r, 6), bit.lshift(g, 6), bit.lshift(b, 6), 255)
+				data:setPixel(
+					x,
+					y,
+					bit.lshift(r, 6),
+					bit.lshift(g, 6),
+					bit.lshift(b, 6),
+					255
+				)
 				local byte = bit.lshift(a, 6) + bit.lshift(r, 4) + bit.lshift(g, 2) + b
 				local lo = bit.band(byte, 0x0f)
 				local hi = bit.rshift(byte, 4)
@@ -138,7 +147,14 @@ function cart.load_p8(filename)
 							local spriteCounter = 0
 							for yy = 0, 15 do
 								for xx = 0, 15 do
-									pico8.quads[spriteCounter] = love.graphics.newQuad(xx * 8, yy * 8, 8, 8, pico8.spritesheet:getDimensions())
+									pico8.quads[spriteCounter] =
+										love.graphics.newQuad(
+										xx * 8,
+										yy * 8,
+										8,
+										8,
+										pico8.spritesheet:getDimensions()
+									)
 									spriteCounter = spriteCounter + 1
 								end
 							end
@@ -162,7 +178,11 @@ function cart.load_p8(filename)
 					-- music
 					local _music = math.floor((inbyte - 0x3100) / 4)
 					pico8.music[_music][inbyte % 4] = bit.band(byte, 0x7F)
-					pico8.music[_music].loop = bit.bor(bit.rshift(bit.band(byte, 0x80), 7 - inbyte % 4), pico8.music[_music].loop)
+					pico8.music[_music].loop =
+						bit.bor(
+						bit.rshift(bit.band(byte, 0x80), 7 - inbyte % 4),
+						pico8.music[_music].loop
+					)
 				elseif inbyte < 0x4300 then
 					-- sfx
 					local _sfx = math.floor((inbyte - 0x3200) / 68)
@@ -225,7 +245,8 @@ function cart.load_p8(filename)
 
 		-- check for header and vesion
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-		local start = data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
+		local start =
+			data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then
 			error("invalid cart")
 		end
@@ -286,7 +307,8 @@ function cart.load_p8(filename)
 
 		for y = 0, 15 do
 			for x = 0, 15 do
-				pico8.quads[y * 16 + x] = love.graphics.newQuad(8 * x, 8 * y, 8, 8, 128, 128)
+				pico8.quads[y * 16 + x] =
+					love.graphics.newQuad(8 * x, 8 * y, 8, 8, 128, 128)
 			end
 		end
 

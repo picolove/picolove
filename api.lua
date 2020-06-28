@@ -440,7 +440,15 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 		if pico8.quads[id] then
 			q = pico8.quads[id]
 		else
-			q = love.graphics.newQuad(flr(n % 16) * 8, flr(n / 16) * 8, 8 * w, 8 * h, 128, 128)
+			q =
+				love.graphics.newQuad(
+				flr(n % 16) * 8,
+				flr(n / 16) * 8,
+				8 * w,
+				8 * h,
+				128,
+				128
+			)
 			pico8.quads[id] = q
 		end
 	end
@@ -469,7 +477,8 @@ function api.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
 	dw = dw or sw
 	dh = dh or sh
 	-- FIXME: cache this quad
-	local q = love.graphics.newQuad(sx, sy, sw, sh, pico8.spritesheet:getDimensions())
+	local q =
+		love.graphics.newQuad(sx, sy, sw, sh, pico8.spritesheet:getDimensions())
 	love.graphics.setShader(pico8.sprite_shader)
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 	love.graphics.draw(
@@ -488,7 +497,13 @@ function api.rect(x0, y0, x1, y1, col)
 	if col then
 		color(col)
 	end
-	love.graphics.rectangle("line", flr(x0) + 1, flr(y0) + 1, flr(x1 - x0), flr(y1 - y0))
+	love.graphics.rectangle(
+		"line",
+		flr(x0) + 1,
+		flr(y0) + 1,
+		flr(x1 - x0),
+		flr(y1 - y0)
+	)
 end
 
 function api.rectfill(x0, y0, x1, y1, col)
@@ -501,7 +516,13 @@ function api.rectfill(x0, y0, x1, y1, col)
 	if y1 < y0 then
 		y0, y1 = y1, y0
 	end
-	love.graphics.rectangle("fill", flr(x0), flr(y0), flr(x1 - x0) + 1, flr(y1 - y0) + 1)
+	love.graphics.rectangle(
+		"fill",
+		flr(x0),
+		flr(y0),
+		flr(x1 - x0) + 1,
+		flr(y1 - y0) + 1
+	)
 end
 
 function api.circ(ox, oy, r, col)
@@ -725,10 +746,20 @@ function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 					local v = pico8.map[flr(cel_y + y)][flr(cel_x + x)]
 					if v > 0 then
 						if bitmask == nil or bitmask == 0 then
-							love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
+							love.graphics.draw(
+								pico8.spritesheet,
+								pico8.quads[v],
+								sx + 8 * x,
+								sy + 8 * y
+							)
 						else
 							if bit.band(pico8.spriteflags[v], bitmask) ~= 0 then
-								love.graphics.draw(pico8.spritesheet, pico8.quads[v], sx + 8 * x, sy + 8 * y)
+								love.graphics.draw(
+									pico8.spritesheet,
+									pico8.quads[v],
+									sx + 8 * x,
+									sy + 8 * y
+								)
 							end
 						end
 					end
@@ -786,7 +817,8 @@ function api.fset(n, f, v)
 		if v then
 			pico8.spriteflags[n] = bit.bor(pico8.spriteflags[n], bit.lshift(1, f))
 		else
-			pico8.spriteflags[n] = bit.band(pico8.spriteflags[n], bit.bnot(bit.lshift(1, f)))
+			pico8.spriteflags[n] =
+				bit.band(pico8.spriteflags[n], bit.bnot(bit.lshift(1, f)))
 		end
 	else
 		-- set bitfield to v (number)
@@ -846,7 +878,12 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 		end
 	end
 	pico8.audio_channels[music_channel].loop = false
-	pico8.current_music = {music = n, offset = 0, channel_mask = channel_mask or 15, speed = music_speed}
+	pico8.current_music = {
+		music = n,
+		offset = 0,
+		channel_mask = channel_mask or 15,
+		speed = music_speed
+	}
 	for i = 0, 3 do
 		if pico8.music[n][i] < 64 then
 			pico8.audio_channels[i].sfx = pico8.music[n][i]

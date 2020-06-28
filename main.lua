@@ -110,7 +110,8 @@ local channels = 1
 local bits = 16
 
 currentDirectory = "/"
-local glyphs = 'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
+local glyphs =
+	'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
 
 local function _allow_pause(value)
 	if type(value) ~= "boolean" then
@@ -260,7 +261,8 @@ function love.load(argv)
 	-- tri/2
 	osc[5] = function(x)
 		x = x * 4
-		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 0.5) % 2) - 1) - 0.5) / 2 - 0.1) * 0.7
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 0.5) % 2) - 1) - 0.5) / 2 - 0.1) *
+			0.7
 	end
 	-- noise
 	osc[6] = function()
@@ -273,13 +275,15 @@ function love.load(argv)
 			lsample = sample
 			sample = (lsample + scale * (math.random() * 2 - 1)) / (1 + scale)
 			lastx = x
-			return math.min(math.max((lsample + sample) * 4 / 3 * (1.75 - scale), -1), 1) * 0.7
+			return math.min(math.max((lsample + sample) * 4 / 3 * (1.75 - scale), -1), 1) *
+				0.7
 		end
 	end
 	-- detuned tri
 	osc[7] = function(x)
 		x = x * 2
-		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 127 / 128) % 2) - 1) - 0.5) / 2) - 1 / 4
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 127 / 128) % 2) - 1) - 0.5) / 2) -
+			1 / 4
 	end
 	-- saw from 0 to 1, used for arppregiator
 	osc["saw_lfo"] = function(x)
@@ -306,7 +310,8 @@ function love.load(argv)
 
 	love.graphics.clear()
 	love.graphics.setDefaultFilter("nearest", "nearest")
-	pico8.screen = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
+	pico8.screen =
+		love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
 	pico8.screen:setFilter("linear", "nearest")
 
 	local font = love.graphics.newImageFont("font.png", glyphs, 1)
@@ -487,9 +492,23 @@ function flip_screen()
 
 	local screen_w, screen_h = love.graphics.getDimensions()
 	if screen_w > screen_h then
-		love.graphics.draw(pico8.screen, screen_w / 2 - 64 * scale, ypadding * scale, 0, scale, scale)
+		love.graphics.draw(
+			pico8.screen,
+			screen_w / 2 - 64 * scale,
+			ypadding * scale,
+			0,
+			scale,
+			scale
+		)
 	else
-		love.graphics.draw(pico8.screen, xpadding * scale, screen_h / 2 - 64 * scale, 0, scale, scale)
+		love.graphics.draw(
+			pico8.screen,
+			xpadding * scale,
+			screen_h / 2 - 64 * scale,
+			0,
+			scale,
+			scale
+		)
 	end
 
 	love.graphics.present()
@@ -557,7 +576,9 @@ local function update_audio(time)
 
 	for _ = 0, samples - 1 do
 		if pico8.current_music then
-			pico8.current_music.offset = pico8.current_music.offset + 7350 / (61 * pico8.current_music.speed * __sample_rate)
+			pico8.current_music.offset =
+				pico8.current_music.offset +
+				7350 / (61 * pico8.current_music.speed * __sample_rate)
 			if pico8.current_music.offset >= 32 then
 				local next_track = pico8.current_music.music
 				if pico8.music[next_track].loop == 2 then
@@ -585,7 +606,8 @@ local function update_audio(time)
 			local ch = pico8.audio_channels[channel]
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
-				ch.buffer = love.sound.newSoundData(__audio_buffer_size, __sample_rate, bits, channels)
+				ch.buffer =
+					love.sound.newSoundData(__audio_buffer_size, __sample_rate, bits, channels)
 				ch.bufferpos = 0
 			end
 			if ch.sfx and pico8.sfx[ch.sfx] then
@@ -627,7 +649,8 @@ local function update_audio(time)
 					local vol = ch.vol
 					if ch.fx == 1 then
 						-- slide from previous note over the length of a step
-						ch.freq = lerp(note_to_hz(ch.lastnote or 0), note_to_hz(ch.note), ch.offset % 1)
+						ch.freq =
+							lerp(note_to_hz(ch.lastnote or 0), note_to_hz(ch.note), ch.offset % 1)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
 						ch.freq = lerp(note_to_hz(ch.note), note_to_hz(ch.note + 0.5), ch.lfo(4))
@@ -681,7 +704,8 @@ local function update_audio(time)
 end
 
 local function isCtrlOrGuiDown()
-	return (love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or love.keyboard.isDown("rctrl") or
+	return (love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or
+		love.keyboard.isDown("rctrl") or
 		love.keyboard.isDown("rgui"))
 end
 
@@ -712,7 +736,10 @@ function love.keypressed(key)
 		end
 		video_frames = nil
 		log("saved video to", basename)
-	elseif key == "return" and (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) then
+	elseif
+		key == "return" and
+			(love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))
+	 then
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 	else
 		for p = 0, 1 do

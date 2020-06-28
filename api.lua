@@ -1452,7 +1452,7 @@ api.next = next
 
 local function arraylen(t)
 	local len = 0
-	for i,_ in pairs(t) do
+	for i, _ in pairs(t) do
 		if type(i) == "number" then
 			len = i
 		end
@@ -1462,14 +1462,15 @@ end
 
 function api.all(a)
 	if a == nil then
-		return function() end
+		return function()
+		end
 	end
 
 	local i = 0
 	local n = arraylen(a)
 	return function()
 		i = i + 1
-		while(a[i] == nil and i <= n) do
+		while (a[i] == nil and i <= n) do
 			i = i + 1
 		end
 		return a[i]

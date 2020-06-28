@@ -65,7 +65,7 @@ assert(bit.band(0x05, bit.lshift(1, 2)) ~= 0)
 assert(bit.band(0x05, bit.lshift(1, 0)) ~= 0)
 assert(bit.band(0x05, bit.lshift(1, 3)) == 0)
 
-local iter = api.all({nil,nil,11,nil,22,33,33,b=42,44})
+local iter = api.all({nil, nil, 11, nil, 22, 33, 33, b = 42, 44})
 assert(iter() == 11)
 assert(iter() == 22)
 assert(iter() == 33)

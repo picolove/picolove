@@ -1071,8 +1071,9 @@ function api.memset(dest_addr, val, len)
 	end
 end
 
-function api.reload(dest_addr, source_addr, len) -- luacheck: no unused
+function api.reload(dest_addr, source_addr, len, filepath) -- luacheck: no unused
 	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
+	-- FIXME: doesn't handle filepaths
 	_load(cartname)
 end
 

@@ -30,7 +30,6 @@ clean:
 
 test:
 	# todo implement test running
-	@love .
 
 build: clean
 	@echo "building \"build/${project_name}.love\" ..."

@@ -10,10 +10,12 @@ all:
 # run specific love version
 # setup environment variable with path to love executable first
 9:
+	@echo "Love 9 support is WIP"
 	@"${LOVE9}" .
 10:
 	@"${LOVE10}" .
 11:
+	@echo "Love 11 support is WIP"
 	@"${LOVE11}" .
 
 lint:

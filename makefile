@@ -7,8 +7,7 @@ lua_files = $(wildcard *.lua)
 run:
 	@love .
 
-all:
-	@love .
+all: format lint test build
 
 # run specific love version
 # setup environment variable with path to love executable first

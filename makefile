@@ -23,7 +23,7 @@ format:
 	@$(foreach file,$(lua_files),luafmt -w replace -i 2 --use-tabs $(file);)
 
 clean:
-	@echo deleting \"build/${project_name}.love\" ...
+	@echo "deleting \"build/${project_name}.love\" ..."
 	@rm -f build/${project_name}.love
 
 test:
@@ -31,7 +31,7 @@ test:
 	@love .
 
 build: clean
-	@echo building \"build/${project_name}.love\" ...
+	@echo "building \"build/${project_name}.love\" ..."
 	@zip -9 -r build/"${project_name}".love ./nocart.p8
 	@zip -9 -r -x@excludelist.txt build/${project_name}.love .
 

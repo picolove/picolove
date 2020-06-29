@@ -35,7 +35,7 @@ pico8 = {
 		{41, 173, 255, 255},
 		{131, 118, 156, 255},
 		{255, 119, 168, 255},
-		{255, 204, 170, 255},
+		{255, 204, 170, 255}
 	},
 	color = nil,
 	spriteflags = {},
@@ -50,7 +50,7 @@ pico8 = {
 	clipboard = "",
 	keypressed = {
 		[0] = {},
-		[1] = {},
+		[1] = {}
 	},
 	keymap = {
 		[0] = {
@@ -61,7 +61,7 @@ pico8 = {
 			[4] = {"z", "c", "n", "kp-", "kp1", "insert"},
 			[5] = {"x", "v", "m", "8", "kp2", "delete"},
 			[6] = {"return", "escape"},
-			[7] = {},
+			[7] = {}
 		},
 		[1] = {
 			[0] = {"s"},
@@ -71,8 +71,8 @@ pico8 = {
 			[4] = {"tab", "lshift", "w"},
 			[5] = {"q", "a"},
 			[6] = {},
-			[7] = {},
-		},
+			[7] = {}
+		}
 	},
 	mwheel = 0,
 	cursor = {0, 0},
@@ -89,7 +89,7 @@ pico8 = {
 	text_shader = nil,
 	quads = {},
 	spritesheet_data = nil,
-	spritesheet = nil,
+	spritesheet = nil
 }
 
 local flr, abs = math.floor, math.abs
@@ -294,7 +294,7 @@ function love.load(argv)
 		[0] = QueueableSource:new(8),
 		QueueableSource:new(8),
 		QueueableSource:new(8),
-		QueueableSource:new(8),
+		QueueableSource:new(8)
 	}
 
 	for i = 0, 3 do
@@ -304,7 +304,7 @@ function love.load(argv)
 	for i = 0, 3 do
 		pico8.audio_channels[i] = {
 			oscpos = 0,
-			noise = osc[6](),
+			noise = osc[6]()
 		}
 	end
 
@@ -422,7 +422,7 @@ function new_sandbox()
 		_textinput = nil,
 		-- used for repl
 		_allow_pause = _allow_pause,
-		_allow_shutdown = _allow_shutdown,
+		_allow_shutdown = _allow_shutdown
 	}
 	for k, v in pairs(picolove_functions) do
 		cart_env[k] = v
@@ -549,7 +549,7 @@ local note_map = {
 	"G#",
 	"A-",
 	"A#",
-	"B-",
+	"B-"
 }
 
 local function note_to_string(note) -- luacheck: no unused

@@ -72,7 +72,7 @@ function cart.load_p8(filename)
 			editor_mode = 0,
 			speed = 16,
 			loop_start = 0,
-			loop_end = 0,
+			loop_end = 0
 		}
 		for j = 0, 31 do
 			pico8.sfx[i][j] = {0, 0, 0, 0}
@@ -85,7 +85,7 @@ function cart.load_p8(filename)
 			[0] = 1,
 			[1] = 2,
 			[2] = 3,
-			[3] = 4,
+			[3] = 4
 		}
 	end
 
@@ -193,7 +193,7 @@ function cart.load_p8(filename)
 							bit.band(note, 0x3f),
 							bit.rshift(bit.band(note, 0x1c0), 6),
 							bit.rshift(bit.band(note, 0xe00), 9),
-							bit.rshift(bit.band(note, 0x7000), 12),
+							bit.rshift(bit.band(note, 0x7000), 12)
 						}
 					elseif step == 64 then
 						pico8.sfx[_sfx].editor_mode = byte
@@ -418,7 +418,7 @@ function cart.load_p8(filename)
 					[0] = tonumber(line:sub(4, 5), 16),
 					[1] = tonumber(line:sub(6, 7), 16),
 					[2] = tonumber(line:sub(8, 9), 16),
-					[3] = tonumber(line:sub(10, 11), 16),
+					[3] = tonumber(line:sub(10, 11), 16)
 				}
 
 				_music = _music + 1

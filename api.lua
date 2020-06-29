@@ -361,6 +361,12 @@ function api.color(c)
 	color(c)
 end
 
+-- workaround for non printable chars
+local tostring_org = tostring
+local function tostring(str)
+	return tostring_org(str):gsub("[^%z\32-\127]", "8")
+end
+
 function api.print(str, x, y, col)
 	--TODO: support printing special pico8 chars
 	if col then

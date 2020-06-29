@@ -1535,6 +1535,7 @@ function api.add(a, v)
 		return
 	end
 	table.insert(a, v)
+	return v
 end
 
 function api.del(a, dv)
@@ -1545,6 +1546,7 @@ function api.del(a, dv)
 	for i, v in ipairs(a) do
 		if v == dv then
 			table.remove(a, i)
+			return dv
 		end
 	end
 end

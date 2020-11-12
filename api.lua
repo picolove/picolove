@@ -1150,7 +1150,23 @@ function api.cstore(dest_addr, source_addr, len) -- luacheck: no unused
 end
 
 function api.rnd(x)
-	return love.math.random() * (x or 1)
+	local t = type(x)
+	assert(t == "number" or t == "table", "rnd() accepts a number or a table")
+	if t == "number" then
+		return love.math.random() * (x or 1)
+	elseif t == "table" then
+		local len = #x
+		if len > 0
+		then
+			local index = 0
+			while(index == 0)
+			do
+				index = math.ceil(love.math.random() * len)
+			end
+			return x[index]
+		end
+		return nil
+	end
 end
 
 function api.srand(seed)

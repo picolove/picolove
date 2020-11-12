@@ -599,6 +599,31 @@ function api.circfill(cx, cy, r, col)
 	end
 end
 
+function api.oval(x1, y1, x2, y2, col)
+	_ellipse("line", x1, y1, x2, y2, col)
+end
+
+function api.ovalfill(x1, y1, x2, y2, col)
+	_ellipse("fill", x1, y1, x2, y2, col)
+end
+
+function _ellipse(drawmode, x1, y1, x2, y2, col)
+	assert(drawmode == "line" or drawmode == "fill")
+	assert(x1 ~= nil and x2 ~= nil and x1 <= x2)
+	assert(y1 ~= nil and y2 ~= nil and y1 <= y2)
+	assert((col >= 0 and col <=15) or col == nil)
+
+	if col then
+		color(col)
+	end
+
+	local rx = (x2 - x1) / 2
+	local ry = (y2 - y1) / 2
+	local x = x1 + rx
+	local y = y1 + ry
+	love.graphics.ellipse(drawmode, x, y, rx, ry)
+end
+
 function api.line(x0, y0, x1, y1, col)
 	if col then
 		color(col)

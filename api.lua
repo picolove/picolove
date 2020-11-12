@@ -609,8 +609,8 @@ end
 
 function _ellipse(drawmode, x1, y1, x2, y2, col)
 	assert(drawmode == "line" or drawmode == "fill")
-	assert(x1 ~= nil and x2 ~= nil and x1 <= x2)
-	assert(y1 ~= nil and y2 ~= nil and y1 <= y2)
+	assert(x1 ~= nil and x2 ~= nil)
+	assert(y1 ~= nil and y2 ~= nil)
 	assert((col >= 0 and col <=15) or col == nil)
 
 	if col then

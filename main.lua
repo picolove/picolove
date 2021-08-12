@@ -1,4 +1,5 @@
-package.path = package.path .. ";./lib/?.lua"
+package.path = package.path .. ";?.lua;lib/?.lua"
+love.filesystem.setRequirePath(package.path)
 
 require("lib.strict")
 local QueueableSource = require("lib.QueueableSource")

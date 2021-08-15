@@ -2,9 +2,10 @@ pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
 function _init()
-	-- TODO: move all variables into hidden table to prevent overwriting via commandline
 	_allow_pause(false)
 	_allow_shutdown(true)
+
+	-- TODO: move all variables into hidden table to prevent overwriting via commandline
 	pencolor = 6
 	tc = 0
 	isctrldown = false

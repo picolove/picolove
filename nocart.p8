@@ -40,7 +40,7 @@ function _keydown(key)
 
 		cursorx-=1
 		local delchars = 1
-		if (cursorx < 0) then
+		if cursorx < 0 then
 			cursorx = 0
 			delchars = 0
 		end
@@ -65,13 +65,13 @@ function _keydown(key)
 
 	elseif key == "left" then
 		cursorx-=1
-		if (cursorx < 0) then
+		if cursorx < 0 then
 			cursorx = 0
 		end
 
 	elseif key == "right" then
 		cursorx+=1
-		if (cursorx > #linebuffer) then
+		if cursorx > #linebuffer then
 			cursorx = #linebuffer
 		end
 

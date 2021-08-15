@@ -36,25 +36,25 @@ end
 function _keydown(key)
 	if key == "backspace" then
 		--delete carret
-		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
-		cursorx-=1
+		cursorx -= 1
 		local delchars = 1
 		if cursorx < 0 then
 			cursorx = 0
 			delchars = 0
 		end
 
-		local startbuffer = linebuffer:sub(1,cursorx)
-		local endbuffer = linebuffer:sub(cursorx+1+delchars)
+		local startbuffer = linebuffer:sub(1, cursorx)
+		local endbuffer = linebuffer:sub(cursorx + 1 + delchars)
 		linebuffer = startbuffer .. endbuffer
 
 	elseif key == "delete" then
 		--delete carret
-		rectfill((#linebuffer+2)*4,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
-		local startbuffer = linebuffer:sub(1,cursorx)
-		local endbuffer = linebuffer:sub(cursorx+2)
+		local startbuffer = linebuffer:sub(1, cursorx)
+		local endbuffer = linebuffer:sub(cursorx + 2)
 		linebuffer = startbuffer .. endbuffer
 
 	elseif key == "home" then
@@ -64,20 +64,20 @@ function _keydown(key)
 		cursorx = #linebuffer
 
 	elseif key == "left" then
-		cursorx-=1
+		cursorx -= 1
 		if cursorx < 0 then
 			cursorx = 0
 		end
 
 	elseif key == "right" then
-		cursorx+=1
+		cursorx += 1
 		if cursorx > #linebuffer then
 			cursorx = #linebuffer
 		end
 
 	elseif key == "up" then
 		--delete text and carret
-		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		if commandindex == #commandhistory + 1 then
 			commandbuffer = linebuffer
@@ -93,7 +93,7 @@ function _keydown(key)
 
 	elseif key == "down" then
 		--delete text and carret
-		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		if commandindex == #commandhistory + 1 then
 			commandbuffer = linebuffer
@@ -117,15 +117,15 @@ function _keydown(key)
 	elseif key == "c" and isctrldown then
 		-- NOTE: feature not part of pico
 		--delete text and carret
-		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 		--render command
-		print("> "..linebuffer, nil, nil, 7)
+		print("> " .. linebuffer, nil, nil, 7)
 		linebuffer = ""
 		cursorx = 0
 
 	elseif key == "v" and isctrldown then
-		local startbuffer = linebuffer:sub(1,cursorx)
-		local endbuffer = linebuffer:sub(cursorx+1)
+		local startbuffer = linebuffer:sub(1, cursorx)
+		local endbuffer = linebuffer:sub(cursorx + 1)
 		linebuffer = startbuffer .. stat(4) .. endbuffer
 		cursorx = cursorx + #stat(4)
 
@@ -134,11 +134,11 @@ function _keydown(key)
 		-- NOTE: we use blue colors for "3 files" text (pico uses light red)
 		-- NOTE: split at first space (pico does last space -> bug)
 		local newbuffer = linebuffer
-		local pos = linebuffer:find(" ",1,true)
+		local pos = linebuffer:find(" ", 1, true)
 		if pos ~= nil and pos < #linebuffer then
-			rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
-			local command = linebuffer:sub(1,pos-1)
-			local file= linebuffer:sub(pos+1)
+			rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
+			local command = linebuffer:sub(1, pos - 1)
+			local file = linebuffer:sub(pos + 1)
 			linebuffer = _completecommand(command, file)
 			cursorx = #linebuffer
 		end
@@ -150,17 +150,17 @@ function _keydown(key)
 		commandindex = #commandhistory + 1
 
 		--delete text and carret
-		rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 		--render command
-		print("> "..linebuffer, nil, nil, 7)
+		print("> " .. linebuffer, nil, nil, 7)
 		if linebuffer == "dir" or linebuffer == "ls"
-			or (#linebuffer > 4 and linebuffer:sub(1,4) == "dir ")
-			or (#linebuffer > 3 and linebuffer:sub(1,3) == "ls ") then
+			or (#linebuffer > 4 and linebuffer:sub(1, 4) == "dir ")
+			or (#linebuffer > 3 and linebuffer:sub(1, 3) == "ls ") then
 			ls()
-		elseif linebuffer:sub(1,5) == "load " then
-			load(linebuffer:sub(6,#linebuffer))
+		elseif linebuffer:sub(1, 5) == "load " then
+			load(linebuffer:sub(6, #linebuffer))
 		elseif linebuffer == "cls" then
-			line=-1
+			line = -1
 			cls()
 		elseif linebuffer == "help" then
 			help()
@@ -170,9 +170,9 @@ function _keydown(key)
 			folder()
 		elseif linebuffer == "run" then
 			run()
-		elseif linebuffer == "cd" or linebuffer:sub(1,3) == "cd " then
+		elseif linebuffer == "cd" or linebuffer:sub(1, 3) == "cd " then
 			cd(linebuffer:sub(4))
-		elseif linebuffer:sub(1,6) == "mkdir " and #linebuffer>6 then
+		elseif linebuffer:sub(1, 6) == "mkdir " and #linebuffer > 6 then
 			mkdir(linebuffer:sub(7))
 		elseif #linebuffer == 0 then
 			--do nothing
@@ -180,7 +180,7 @@ function _keydown(key)
 			--TODO
 		elseif linebuffer == "reboot" then
 			reboot()
-		elseif linebuffer:sub(1,5) == "save " then
+		elseif linebuffer:sub(1, 5) == "save " then
 			--TODO
 		else
 			color(pencolor)
@@ -200,8 +200,8 @@ function _keyup(key)
 end
 
 function _textinput(text)
-	local startbuffer = linebuffer:sub(1,cursorx)
-	local endbuffer = linebuffer:sub(cursorx+1,#linebuffer)
+	local startbuffer = linebuffer:sub(1, cursorx)
+	local endbuffer = linebuffer:sub(cursorx + 1, #linebuffer)
 	linebuffer = startbuffer .. text .. endbuffer
 
 	if #text then
@@ -216,12 +216,12 @@ function _draw()
 		cursor(0, 120)
 	end
 	-- delete text and carret
-	rectfill(0,_getcursory(),(#linebuffer+2)*4+3,_getcursory()+4,0)
+	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 	-- render text
-	print("> "..linebuffer,0,_getcursory(),7)
+	print("> " .. linebuffer, 0, _getcursory(), 7)
 	-- render carret
 	if tc % 16 < 8 then
-		rectfill((cursorx+2)*4,_getcursory(),(cursorx+2)*4+3,_getcursory()+4,8)
+		rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
 	end
 end
 

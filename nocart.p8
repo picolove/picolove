@@ -15,6 +15,7 @@ function _init()
 	commandindex = 0
 	commandbuffer = ""
 	cursorx = 0
+
 	cls()
 	spr(32, 0, 3, 6, 1)
 	spr(38, 45, 0)
@@ -142,6 +143,7 @@ function _keydown(key)
 			linebuffer = _completecommand(command, file)
 			cursorx = #linebuffer
 		end
+
 	elseif key == "return" or key == "kpenter" then
 		--add to history
 		if linebuffer != commandhistory[#commandhistory] then
@@ -157,31 +159,44 @@ function _keydown(key)
 			or (#linebuffer > 4 and linebuffer:sub(1, 4) == "dir ")
 			or (#linebuffer > 3 and linebuffer:sub(1, 3) == "ls ") then
 			ls()
+
 		elseif linebuffer:sub(1, 5) == "load " then
 			load(linebuffer:sub(6, #linebuffer))
+
 		elseif linebuffer == "cls" then
 			line = -1
 			cls()
+
 		elseif linebuffer == "help" then
 			help()
+
 		elseif linebuffer == "shutdown" then
 			shutdown()
+
 		elseif linebuffer == "folder" then
 			folder()
+
 		elseif linebuffer == "run" then
 			run()
+
 		elseif linebuffer == "cd" or linebuffer:sub(1, 3) == "cd " then
 			cd(linebuffer:sub(4))
+
 		elseif linebuffer:sub(1, 6) == "mkdir " and #linebuffer > 6 then
 			mkdir(linebuffer:sub(7))
+
 		elseif #linebuffer == 0 then
 			--do nothing
+
 		elseif linebuffer == "resume" then
 			--TODO
+
 		elseif linebuffer == "reboot" then
 			reboot()
+
 		elseif linebuffer:sub(1, 5) == "save " then
 			--TODO
+
 		else
 			color(pencolor)
 			_call(linebuffer)

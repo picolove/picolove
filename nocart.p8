@@ -36,7 +36,7 @@ end
 
 function _keydown(key)
 	if key == "backspace" then
-		--delete carret
+		-- delete carret
 		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		cursorx -= 1
@@ -51,7 +51,7 @@ function _keydown(key)
 		linebuffer = startbuffer .. endbuffer
 
 	elseif key == "delete" then
-		--delete carret
+		-- delete carret
 		rectfill((#linebuffer + 2) * 4, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		local startbuffer = linebuffer:sub(1, cursorx)
@@ -77,7 +77,7 @@ function _keydown(key)
 		end
 
 	elseif key == "up" then
-		--delete text and carret
+		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		if commandindex == #commandhistory + 1 then
@@ -93,7 +93,7 @@ function _keydown(key)
 		cursorx = #linebuffer
 
 	elseif key == "down" then
-		--delete text and carret
+		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 
 		if commandindex == #commandhistory + 1 then
@@ -117,9 +117,9 @@ function _keydown(key)
 
 	elseif key == "c" and isctrldown then
 		-- NOTE: feature not part of pico
-		--delete text and carret
+		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
-		--render command
+		-- render command
 		print("> " .. linebuffer, nil, nil, 7)
 		linebuffer = ""
 		cursorx = 0
@@ -145,15 +145,15 @@ function _keydown(key)
 		end
 
 	elseif key == "return" or key == "kpenter" then
-		--add to history
+		-- add to history
 		if linebuffer != commandhistory[#commandhistory] then
 			add(commandhistory, linebuffer)
 		end
 		commandindex = #commandhistory + 1
 
-		--delete text and carret
+		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
-		--render command
+		-- render command
 		print("> " .. linebuffer, nil, nil, 7)
 		if linebuffer == "dir" or linebuffer == "ls"
 			or (#linebuffer > 4 and linebuffer:sub(1, 4) == "dir ")
@@ -186,16 +186,16 @@ function _keydown(key)
 			mkdir(linebuffer:sub(7))
 
 		elseif #linebuffer == 0 then
-			--do nothing
+			-- do nothing
 
 		elseif linebuffer == "resume" then
-			--TODO
+			-- TODO
 
 		elseif linebuffer == "reboot" then
 			reboot()
 
 		elseif linebuffer:sub(1, 5) == "save " then
-			--TODO
+			-- TODO
 
 		else
 			color(pencolor)

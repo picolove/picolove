@@ -244,8 +244,12 @@ function api.ls()
 				api.rectfill(0, y, 127, y + 6, 0)
 				api.color(item.color)
 				while true do
-					local e = love.event.wait()
+					local e, a = love.event.wait()
 					if e == "keypressed" then
+						if a == "escape" then
+							love.keyboard.setTextInput(true)
+							return
+						end
 						break
 					end
 				end

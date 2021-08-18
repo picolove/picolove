@@ -1295,7 +1295,17 @@ function api.import()
 	-- TODO: implement this
 end
 
+-- TODO: dummy api implementation should just return return null
+--function api.help()
+--	return nil
+--end
+-- TODO: move implementatn into nocart
 function api.help()
+	local commandKey = "ctrl"
+	if love.system.getOS() == "OS X" then
+		commandKey = "control"
+	end
+
 	api.print("")
 	api.color(12)
 	api.print("commands")
@@ -1304,12 +1314,12 @@ function api.help()
 	api.print("load <filename>  save <filename>")
 	api.print("run              resume")
 	api.print("shutdown         reboot")
-	api.print("install_demos    dir")
+	api.print("install_demos    ls")
 	api.print("cd <dirname>     mkdir <dirname>")
-	api.print("cd ..   go up a directory")
+	api.print("cd ..     to go up a directory")
 	api.print("")
 	api.print("alt+enter to toggle fullscreen")
-	api.print("alt+f4 or command+q to fastquit")
+	api.print("alt+f4 or " .. commandKey .. "+q to fastquit")
 	api.print("")
 	api.color(12)
 	api.print("see readme.md for more info")

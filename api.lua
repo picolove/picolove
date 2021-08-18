@@ -249,6 +249,8 @@ function api.ls()
 						if a == "escape" then
 							love.keyboard.setTextInput(true)
 							return
+						else
+							love.event.clear() -- consume keypress
 						end
 						break
 					end

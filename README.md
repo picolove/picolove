@@ -58,6 +58,7 @@ Extra features:
  * `warning(message)` prints warning and stacktrace to console
  * `setfps(fps)` changes the consoles framerate
  * `_keyup`, `_keydown`, `_textinput` allow using direct keyboard input
+ * `_touchup`, `_touchdown` allow using touch input
  * `_getcursorx()`, `_getcursory()` allow access to the cursor position
 
 Android Packaging:

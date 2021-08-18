@@ -420,6 +420,8 @@ function new_sandbox()
 		ipairs = ipairs,
 		_keydown = nil,
 		_keyup = nil,
+		_touchdown = nil,
+		_touchup = nil,
 		_textinput = nil,
 		-- used for repl
 		_allow_pause = _allow_pause,
@@ -786,6 +788,18 @@ function love.textinput(text)
 	end
 	if validchar and pico8.cart and pico8.cart._textinput then
 		return pico8.cart._textinput(text)
+	end
+end
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+	if pico8.cart and pico8.cart._touchdown then
+		return pico8.cart._touchdown(id, x, y, dx, dy, pressure)
+	end
+end
+
+function love.touchreleased(id, x, y, dx, dy, pressure)
+	if pico8.cart and pico8.cart._touchup then
+		return pico8.cart._touchup(id, x, y, dx, dy, pressure)
 	end
 end
 

@@ -16,6 +16,9 @@ function _init()
 	commandbuffer = ""
 	cursorx = 0
 
+	-- enable keyboard
+	poke(0x5f2d, 1)
+
 	cls()
 	spr(0, 1, -3, 6, 2)
 	spr(22, 43, 1)
@@ -230,6 +233,11 @@ function _textinput(text)
 	if #text then
 		cursorx += #text
 	end
+end
+
+function _touchup()
+	-- hide/show keyboard
+	poke(0x5f2d, peek(0x5f2d))
 end
 
 function _draw()

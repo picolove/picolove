@@ -20,6 +20,7 @@ function love.conf(t)
 
 	t.window.title = "picolöve " .. __picolove_version ..
 		" - (LÖVE " .. t.version .. ")"
+	t.window.icon = "icon.png"
 	t.window.width = __pico_resolution[1] * scale + xpadding * scale * 2
 	t.window.height = __pico_resolution[2] * scale + ypadding * scale * 2
 	t.window.resizable = true

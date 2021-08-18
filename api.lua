@@ -1478,11 +1478,16 @@ function api.stat(x)
 		return nil -- TODO: bbs id not supported
 	elseif x == 102 then
 		return 0 -- TODO: bbs site not supported
-	elseif x == 103 then
-		return 0
-	elseif x == 104 then
+	elseif x == 103 then -- UNKNOWN
+		return "0000000000000000000000000000000000000000"
+	elseif x == 104 then -- UNKNOWN
+		return false
+	elseif x == 106 then -- UNKNOWN
+		return "0000000000000000000000000000000000000000"
+	elseif x == 122 then -- UNKNOWN
 		return false
 	end
+
 	return 0
 end
 

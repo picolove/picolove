@@ -1215,7 +1215,7 @@ api.shl = bit.lshift
 api.shr = bit.rshift
 
 function api.load(filename)
-	_load(filename)
+	return _load(filename)
 end
 
 function api.save()

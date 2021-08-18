@@ -203,7 +203,7 @@ function _load(_cartname)
 
 	if not file_found then
 		api.print("could not load", nil, nil, 6)
-		return
+		return false
 	end
 
 	love.graphics.setShader(pico8.draw_shader)
@@ -215,6 +215,7 @@ function _load(_cartname)
 	if cart.load_p8(currentDirectory .. _cartname) then
 		api.print("loaded " .. _cartname, nil, nil, 6)
 	end
+	return true
 end
 
 function love.resize(w, h)

@@ -1215,7 +1215,11 @@ api.shl = bit.lshift
 api.shr = bit.rshift
 
 function api.load(filename)
-	return _load(filename)
+	local hasloaded = _load(filename)
+	if hasloaded then
+		love.window.setTitle(string.upper(cartname) .. " (PICOLÖVE)")
+	end
+	return hasloaded
 end
 
 function api.save()
@@ -1277,6 +1281,7 @@ function api.stop()
 end
 
 function api.reboot()
+	love.window.setTitle("UNTITLED.P8 (PICOLÖVE)")
 	_load("nocart.p8")
 	api.run()
 end

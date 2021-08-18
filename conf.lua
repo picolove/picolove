@@ -1,3 +1,5 @@
+__picolove_version = "0.1.0"
+
 scale = 4
 xpadding = 8.5
 ypadding = 3.5
@@ -16,7 +18,8 @@ function love.conf(t)
 		t.version = "0.10.2"
 	end
 
-	t.window.title = "picolöve 0.1 - (LÖVE " .. t.version .. ")"
+	t.window.title = "picolöve " .. __picolove_version ..
+		" - (LÖVE " .. t.version .. ")"
 	t.window.width = __pico_resolution[1] * scale + xpadding * scale * 2
 	t.window.height = __pico_resolution[2] * scale + ypadding * scale * 2
 	t.window.resizable = true

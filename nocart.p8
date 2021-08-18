@@ -23,7 +23,7 @@ function _init()
 	print("")
 
 	print("")
-	print("picolove 0.1")
+	print("picolove " .. _getpicoloveversion())
 	print("a pico-8 clone made with love <3")
 	print("")
 	print("type help for help")

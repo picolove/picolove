@@ -28,6 +28,14 @@ function _init()
 	print("")
 	print("type help for help")
 	print("")
+
+	-- show umlauts on "picolove" text
+	print(".", 19, 12)
+	print(".", 21, 12)
+
+	-- optional: show umlauts on "made with love" text
+	--print(".", 103, 18)
+	--print(".", 105, 18)
 end
 
 function _update()

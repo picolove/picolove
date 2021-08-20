@@ -178,6 +178,10 @@ function setColor(c)
 end
 
 function _load(_cartname)
+	if type(_cartname) ~= "string" then
+		return false
+	end
+
 	local exts = {"", ".p8", ".p8.png", ".png"}
 	local cart_no_ext = _cartname
 

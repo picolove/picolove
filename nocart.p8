@@ -175,6 +175,9 @@ function _keydown(key)
 		elseif linebuffer:sub(1, 5) == "load " then
 			load(linebuffer:sub(6, #linebuffer))
 
+		elseif linebuffer == "load" then
+			load()
+
 		elseif linebuffer == "cls" then
 			line = -1
 			cls()

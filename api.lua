@@ -67,15 +67,15 @@ function api._call(code)
 
 	local ok, f, e = pcall(load, code, "repl")
 	if not ok or f == nil then
-		api.print("syntax error", nil, nil, 14)
-		api.print(api.sub(e, 20), nil, nil, 6)
+		api.print("syntax error", 14)
+		api.print(api.sub(e, 20), 6)
 		return false
 	else
 		setfenv(f, pico8.cart)
 		ok, e = pcall(f)
 		if not ok then
-			api.print("runtime error", nil, nil, 14)
-			api.print(api.sub(e, 20), nil, nil, 6)
+			api.print("runtime error", 14)
+			api.print(api.sub(e, 20), 6)
 		end
 	end
 	return true
@@ -190,7 +190,7 @@ function api._completecommand(command, path)
 					flip_screen()
 					count = count + 1
 					if count == 20 then
-						api.print("--more--", nil, nil, 12)
+						api.print("--more--", 12)
 						flip_screen()
 						local y = api._getcursory() - 6
 						api.cursor(0, y)
@@ -217,7 +217,7 @@ end
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-	api.print("directory: " .. currentDirectory, nil, nil, 12)
+	api.print("directory: " .. currentDirectory, 12)
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory .. file) then
@@ -237,7 +237,7 @@ function api.ls()
 			flip_screen()
 			count = count + 1
 			if count == 20 then
-				api.print("--more--", nil, nil, 12)
+				api.print("--more--", 12)
 				flip_screen()
 				local y = api._getcursory() - 6
 				api.cursor(0, y)
@@ -377,9 +377,25 @@ local function tostring(str)
 	return tostring_org(str):gsub("[^%z\32-\127]", "8")
 end
 
-function api.print(str, x, y, col)
+function api.print(str, ...)
 	--TODO: support printing special pico8 chars
-	if col then
+
+	local argc = select('#', ...)
+	local x = nil
+	local y = nil
+	local col = nil
+
+	if argc == 1 then
+		col = select(1, ...) or 0
+	elseif argc > 1 then
+		x = select(1, ...) or 0
+		y = select(2, ...) or 0
+		if argc >= 3 then
+			col = select(3, ...) or 0
+		end
+	end
+
+	if col ~= nil then
 		color(col)
 	end
 	local canscroll = y == nil
@@ -1432,7 +1448,7 @@ function api.dget(index)
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then
-		api.print("** dget called before cartdata()", nil, nil, 6)
+		api.print("** dget called before cartdata()", 6)
 		return ""
 	end
 	if index < 0 or index > 63 then
@@ -1447,7 +1463,7 @@ function api.dset(index, value)
 	-- TODO: handle missing cartdata(id) call
 	index = flr(index)
 	if not pico8.can_cartdata then
-		api.print("** dget called before cartdata()", nil, nil, 6)
+		api.print("** dget called before cartdata()", 6)
 		return ""
 	end
 	if value >= 0x8000 or value < -0x8000 then

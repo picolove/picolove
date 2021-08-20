@@ -202,7 +202,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
-		api.print("could not load", nil, nil, 6)
+		api.print("could not load", 6)
 		return false
 	end
 
@@ -213,7 +213,7 @@ function _load(_cartname)
 	restore_clip()
 	cartname = _cartname
 	if cart.load_p8(currentDirectory .. _cartname) then
-		api.print("loaded " .. _cartname, nil, nil, 6)
+		api.print("loaded " .. _cartname, 6)
 	end
 	return true
 end

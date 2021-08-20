@@ -131,7 +131,7 @@ function _keydown(key)
 		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 		-- render command
-		print("> " .. linebuffer, nil, nil, 7)
+		print("> " .. linebuffer, 7)
 		linebuffer = ""
 		cursorx = 0
 
@@ -165,7 +165,7 @@ function _keydown(key)
 		-- delete text and carret
 		rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
 		-- render command
-		print("> " .. linebuffer, nil, nil, 7)
+		print("> " .. linebuffer, 7)
 		if linebuffer == "dir" or linebuffer == "ls"
 			or (#linebuffer > 4 and linebuffer:sub(1, 4) == "dir ")
 			or (#linebuffer > 3 and linebuffer:sub(1, 3) == "ls ") then

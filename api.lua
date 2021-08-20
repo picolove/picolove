@@ -1247,6 +1247,10 @@ function api.save()
 end
 
 function api.run()
+	if not cartname then
+		return
+	end
+
 	love.graphics.setCanvas(pico8.screen)
 	love.graphics.setShader(pico8.draw_shader)
 	restore_clip()
@@ -1304,6 +1308,7 @@ function api.reboot()
 	love.window.setTitle("UNTITLED.P8 (PICOLÖVE)")
 	_load("nocart.p8")
 	api.run()
+	cartname = nil
 end
 
 function api.shutdown()

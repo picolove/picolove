@@ -1003,6 +1003,8 @@ function api.peek(addr)
 			return pico8.camera_y % 256
 		elseif addr == 0x5f2b then
 			return flr(pico8.camera_y / 256)
+		elseif addr == 0x5f2c then
+			-- TODO: screen transformation mode
 		elseif addr == 0x5f2d then
 			-- TODO: fully implement
 			return love.keyboard.hasTextInput()
@@ -1059,6 +1061,8 @@ function api.poke(addr, val)
 			pico8.camera_y = flr(pico8.camera_y / 256) + val % 256
 		elseif addr == 0x5f2b then
 			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
+		elseif addr == 0x5f2c then
+			-- TODO: screen transformation mode
 		elseif addr == 0x5f2d then
 			love.keyboard.setTextInput(bit.band(val, 1) == 1)
 
@@ -1488,7 +1492,15 @@ end
 local tfield = {[0] = "year", "month", "day", "hour", "min", "sec"}
 function api.stat(x)
 	-- TODO: implement this
-	if x == 4 then
+	if x == 0 then
+		return 0 -- TODO memory usage
+	elseif x == 1 then
+		return 0 -- TODO total cpu usage
+	elseif x == 2 then
+		return 0 -- TODO system cpu usage
+	elseif x == 3 then
+		return 0 -- TODO current display (0..3)
+	elseif x == 4 then
 		return pico8.clipboard
 	elseif x == 5 then
 		return 32 -- pico-8 version - using latest

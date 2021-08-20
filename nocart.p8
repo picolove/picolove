@@ -220,6 +220,9 @@ function _keydown(key)
 
 		linebuffer = ""
 		cursorx = 0
+	elseif key == "escape" then
+		load("editor.p8")
+		run()
 	end
 end
 

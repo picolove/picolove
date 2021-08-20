@@ -380,6 +380,10 @@ end
 function api.print(str, ...)
 	--TODO: support printing special pico8 chars
 
+	if str == nil then
+		return
+	end
+
 	local argc = select('#', ...)
 	local x = nil
 	local y = nil

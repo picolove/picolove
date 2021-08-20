@@ -384,7 +384,7 @@ function api.print(str, ...)
 		return
 	end
 
-	local argc = select('#', ...)
+	local argc = select("#", ...)
 	local x = nil
 	local y = nil
 	local col = nil

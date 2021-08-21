@@ -185,7 +185,8 @@ function _keydown(key)
 		elseif linebuffer == "help" then
 			help()
 
-		elseif linebuffer == "shutdown" then
+		elseif linebuffer == "shutdown" or linebuffer == ":q" or
+			linebuffer == "exit" or linebuffer == "quit" then
 			shutdown()
 
 		elseif linebuffer == "folder" then

@@ -639,10 +639,10 @@ function api.line(x0, y0, x1, y1, col)
 		return
 	end
 
-	x0 = flr(x0)
-	y0 = flr(y0)
-	x1 = flr(x1)
-	y1 = flr(y1)
+	x0 = flr(x0) + 1
+	y0 = flr(y0) + 1
+	x1 = flr(x1) + 1
+	y1 = flr(y1) + 1
 
 	local dx = x1 - x0
 	local dy = y1 - y0

@@ -565,8 +565,8 @@ function api.circ(ox, oy, r, col)
 	if col then
 		color(col)
 	end
-	ox = flr(ox)
-	oy = flr(oy)
+	ox = flr(ox) + 1
+	oy = flr(oy) + 1
 	r = flr(r)
 	local points = {}
 	local x = r

@@ -217,6 +217,7 @@ end
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
+  api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 	api.print("directory: " .. currentDirectory, 12)
 	local output = {}
 	for _, file in ipairs(files) do
@@ -231,12 +232,13 @@ function api.ls()
 	local count = 0
 	love.keyboard.setTextInput(false)
 	for _, item in ipairs(output) do
-		api.color(item.color)
 		for j = 1, #item.name, 32 do
-			api.print(item.name:sub(j, j + 32))
+			api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
+			api.print(item.name:sub(j, j + 32), item.color)
 			flip_screen()
 			count = count + 1
 			if count == 20 then
+				api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 				api.print("--more--", 12)
 				flip_screen()
 				local y = api._getcursory() - 6

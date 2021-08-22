@@ -255,7 +255,7 @@ function _draw()
 		cursor(0, 120)
 	end
 	-- delete text and carret
-	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 3, _getcursory() + 4, 0)
+	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 4, _getcursory() + 5, 0)
 	-- render text
 	print("> " .. linebuffer, 0, _getcursory(), 7)
 	-- render carret

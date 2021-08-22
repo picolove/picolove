@@ -1348,6 +1348,7 @@ function api.help()
 		commandKey = "control"
 	end
 
+	api.rectfill(0, api._getcursory(), 128, 128, 0)
 	api.print("")
 	api.color(12)
 	api.print("commands")

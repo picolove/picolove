@@ -67,6 +67,7 @@ function api._call(code)
 
 	local ok, f, e = pcall(load, code, "repl")
 	if not ok or f == nil then
+		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5 + 6, 0)
 		api.print("syntax error", 14)
 		api.print(api.sub(e, 20), 6)
 		return false
@@ -74,6 +75,7 @@ function api._call(code)
 		setfenv(f, pico8.cart)
 		ok, e = pcall(f)
 		if not ok then
+			api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5 + 6, 0)
 			api.print("runtime error", 14)
 			api.print(api.sub(e, 20), 6)
 		end

@@ -205,6 +205,10 @@ function _keydown(key)
 			-- do nothing
 
 		elseif linebuffer == "resume" then
+			-- delete text and carret
+			rectfill(0, _getcursory(), 128, _getcursory() + 5, 0)
+			-- render text
+			print("nothing to resume", 6)
 			-- TODO
 
 		elseif linebuffer == "reboot" then

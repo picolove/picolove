@@ -271,7 +271,9 @@ api.dir = api.ls
 function api.cd(name)
 	local output, count
 
-	name = name .. "/"
+	if #name > 0 then
+		name = name .. "/"
+	end
 
 	-- filter /TEXT//$ -> /
 	count = 1

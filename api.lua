@@ -183,15 +183,16 @@ function api._completecommand(command, path)
 
 			local count = 0
 			love.keyboard.setTextInput(false)
-			api.color(12)
-			api.print(#output .. " files")
+			api.rectfill(0, api._getcursory(), 127, api._getcursory() + 6, 0)
+			api.print(#output .. " files", 12)
 			for _, item in ipairs(output) do
-				api.color(item.color)
 				for j = 1, #item.name, 32 do
-					api.print(item.name:sub(j, j + 32))
+					api.rectfill(0, api._getcursory(), 127, api._getcursory() + 6, 0)
+					api.print(item.name:sub(j, j + 32), item.color)
 					flip_screen()
 					count = count + 1
 					if count == 20 then
+						api.rectfill(0, api._getcursory(), 127, api._getcursory() + 6, 0)
 						api.print("--more--", 12)
 						flip_screen()
 						local y = api._getcursory() - 6

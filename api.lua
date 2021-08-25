@@ -325,15 +325,13 @@ function api.cd(name)
 			api.print(output:sub(i, i + 32))
 		end
 	else
-		api.color(7)
-		api.print(output)
+		api.print(output, 7)
 	end
 end
 
 function api.mkdir(name)
 	if name == nil then
-		api.color(6)
-		api.print("mkdir [name]")
+		api.print("mkdir [name]", 6)
 	else
 		love.filesystem.createDirectory(currentDirectory .. name)
 	end

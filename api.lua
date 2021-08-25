@@ -320,11 +320,13 @@ function api.cd(name)
 	end
 
 	if not failed then
+		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5 + api.flr(#output/32) * 6, 0)
 		api.color(12)
 		for i = 1, #output, 32 do
 			api.print(output:sub(i, i + 32))
 		end
 	else
+		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 		api.print(output, 7)
 	end
 end

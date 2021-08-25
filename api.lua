@@ -331,11 +331,12 @@ function api.cd(name)
 	end
 end
 
-function api.mkdir(name)
-	if name == nil then
+function api.mkdir(...)
+	local name = select(1, ...)
+	if select("#", ...) == 0 then
 		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 		api.print("mkdir [name]", 6)
-	else
+	elseif name ~= nil then
 		love.filesystem.createDirectory(currentDirectory .. name)
 	end
 end

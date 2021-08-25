@@ -333,6 +333,7 @@ end
 
 function api.mkdir(name)
 	if name == nil then
+		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 		api.print("mkdir [name]", 6)
 	else
 		love.filesystem.createDirectory(currentDirectory .. name)

@@ -178,9 +178,10 @@ function _keydown(key)
 		elseif linebuffer == "load" then
 			load()
 
-		elseif linebuffer == "cls" then
+		elseif linebuffer == "cls" or
+      linebuffer:sub(1, 4) == "cls " and #linebuffer > 4  then
 			line = -1
-			cls()
+			cls(linebuffer:sub(5):gsub('"%s*(%d+)%s*"', "%1"))
 
 		elseif linebuffer == "help" then
 			help()

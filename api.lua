@@ -220,7 +220,7 @@ end
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)
-  api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
+	api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 	api.print("directory: " .. currentDirectory, 12)
 	local output = {}
 	for _, file in ipairs(files) do

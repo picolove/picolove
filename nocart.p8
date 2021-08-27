@@ -183,7 +183,8 @@ function _keydown(key)
 			line = -1
 			cls(linebuffer:sub(5):gsub('"%s*(%d+)%s*"', "%1"))
 
-		elseif linebuffer == "help" then
+		elseif linebuffer == "help" or
+			linebuffer:sub(1, 5) == "help " and #linebuffer > 5  then
 			help()
 
 		elseif linebuffer == "shutdown" or linebuffer == ":q" or

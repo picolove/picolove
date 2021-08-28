@@ -911,6 +911,16 @@ function patch_lua(lua)
 	-- patch lua code
 	lua = lua:gsub("!=", "~=")
 	lua = lua:gsub("//", "--")
+	-- rewrite broken up while statements eg:
+	-- while fn
+	-- (0,0,
+	-- 0,0) do
+	-- end
+	lua = lua:gsub("while%s*(.-)%s*do", function(a)
+		a=a:gsub("%s*\n%s*", " ")
+		return "while " .. a .. " do"
+	end
+	)
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
 	lua =
 		lua:gsub(

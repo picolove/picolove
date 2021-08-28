@@ -749,6 +749,7 @@ function love.keypressed(key)
 			(love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))
 	 then
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
+		return
 	else
 		for p = 0, 1 do
 			for i = 0, #pico8.keymap[p] do

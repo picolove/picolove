@@ -223,7 +223,6 @@ function _load(_cartname)
 end
 
 function love.resize(w, h)
-	love.graphics.clear()
 	-- adjust stuff to fit the screen
 	if w > h then
 		scale = h / (pico8.resolution[2] + ypadding * 2)

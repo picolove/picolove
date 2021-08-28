@@ -116,7 +116,7 @@ function api.cls(c)
 end
 
 function api.folder()
-	love.system.openURL("file://" .. love.filesystem.getWorkingDirectory())
+	love.system.openURL("file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory)
 end
 
 function api._completecommand(command, path)

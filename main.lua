@@ -12,6 +12,7 @@ local cart = require("cart")
 require("test")
 
 cartname = nil -- used by api.reload
+local initialcartname = nil -- used by esc
 local love_args = nil -- luacheck: no unused
 
 pico8 = {
@@ -406,7 +407,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.pal()
 	api.color(6)
 
-	_load(argv[2] or "nocart.p8")
+	initialcartname = argv[2] or "nocart.p8"
+	_load(initialcartname)
 	api.run()
 	cartname = nil
 end
@@ -721,6 +723,14 @@ function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() then
 		api.reload()
 		api.run()
+	elseif key == "escape" and
+		cartname ~= nil and
+		cartname ~= initialcartname and
+		cartname ~= "nocart.p8" and
+		cartname ~= "editor.p8" then
+		api.load(initialcartname)
+		api.run()
+		return
 	elseif key == "q" and isCtrlOrGuiDown() then
 		love.event.quit()
 	elseif key == "v" and isCtrlOrGuiDown() then

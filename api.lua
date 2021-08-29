@@ -1012,7 +1012,7 @@ function api.peek(addr)
 			return pico8.camera_y % 256
 		elseif addr == 0x5f2b then
 			return flr(pico8.camera_y / 256)
-		elseif addr == 0x5f2c then
+		elseif addr == 0x5f2c then -- luacheck: ignore 542
 			-- TODO: screen transformation mode
 		elseif addr == 0x5f2d then
 			-- TODO: fully implement
@@ -1070,19 +1070,19 @@ function api.poke(addr, val)
 			pico8.camera_y = flr(pico8.camera_y / 256) + val % 256
 		elseif addr == 0x5f2b then
 			pico8.camera_y = flr((val % 256) * 256) + pico8.camera_y % 256
-		elseif addr == 0x5f2c then
+		elseif addr == 0x5f2c then -- luacheck: ignore 542
 			-- TODO: screen transformation mode
 		elseif addr == 0x5f2d then
 			love.keyboard.setTextInput(bit.band(val, 1) == 1)
 
-			if bit.band(val, 2) == 1 then
+			if bit.band(val, 2) == 1 then -- luacheck: ignore 542
 				-- TODO mouse buttons
-			else
+			else -- luacheck: ignore 542
 			end
 
-			if bit.band(val, 4) == 1 then
+			if bit.band(val, 4) == 1 then -- luacheck: ignore 542
 				-- TODO pointer lock
-			else
+			else -- luacheck: ignore 542
 			end
 		end
 	elseif addr < 0x5f80 then -- luacheck: ignore 542

@@ -1,16 +1,46 @@
 pico-8 cartridge // http://www.pico-8.com
 version 32
 __lua__
+local content = {
+	"todo: editor",
+	"",
+	"press esc to quit"
+}
+local caretx = 18
+local carety = 3
+local caretbig = false
+
 function _init()
 	tc = 0
+	-- enable keyboard
+	poke(0x5f2d, 1)
 end
 
 function _update()
 	tc += 1
 end
 
+function updatecaret()
+	carety = max(min(carety, #content), 1)
+	caretx = max(min(caretx, #content[carety]+1), 1)
+	caretbig = caretx == 1 or caretx <= #content[carety]
+end
+
 function _keydown(key)
-	if key == "escape" then
+	if key == "h" then
+		caretx -= 1
+		updatecaret()
+	elseif key == "j" then
+		carety += 1
+		updatecaret()
+	elseif key == "k" then
+		carety -= 1
+		updatecaret()
+	elseif key == "l" then
+		caretx += 1
+		updatecaret()
+
+	elseif key == "escape" then
 		load("nocart.p8")
 		run()
 	end
@@ -31,13 +61,19 @@ function _draw()
 	rectfill(0, 0, 128, 7, 8)
 	rectfill(0, 121, 128, 128, 8)
 
-	-- render dummy content
-	print("todo: editor", 1, 9, 6)
-	print("press esc to quit", 1, 21, 6)
-
 	-- render caret
 	if tc % 16 < 8 then
-		rectfill((15 + 2) * 4, 20, (15 + 2) * 4 + 4, 20 + 5, 8)
+		if caretbig then
+			rectfill(caretx*4-4, carety*6 + 2, caretx*4, carety*6 + 2 + 5, 8)
+		else
+			rectfill(caretx*4-4, carety*6 + 3, caretx*4, carety*6 + 3 + 4, 8)
+		end
+	end
+
+	-- render dummy content
+	color(6)
+	for i,v in ipairs(content) do
+		print(v, 1, 3 + i*6)
 	end
 
 	-- render toolbar

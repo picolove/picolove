@@ -17,6 +17,7 @@ local commandmode = {}
 local mode = normalmode
 
 local commandline = ""
+local commandlinecaret = 1
 
 local isctrldown = false
 
@@ -137,33 +138,45 @@ end
 function commandmode._keydown(key)
 	printh("cm-key: '" .. key .. "'")
 	if key == "escape" then
+		commandlinecaret = 1
 		mode = normalmode
 	elseif key == "return" then
+		commandlinecaret = 1
 		if commandline == ":q" then
 			returntomain()
 		else
 			mode = normalmode
 		end
 	elseif key == "backspace" then
-		if #commandline > 1 then
-			commandline = commandline:sub(1,-2)
-		else
+		if commandlinecaret > 1 then
+			commandline = commandline:sub(1, commandlinecaret - 1) .. commandline:sub(commandlinecaret + 1)
+			commandlinecaret -= 1
+			commandlinecaret = max(commandlinecaret, 1)
+		elseif #commandline <= 1 then
 			mode = normalmode
 		end
+	elseif key == "left" then
+		commandlinecaret -= 1
+		commandlinecaret = max(commandlinecaret, 1)
+	elseif key == "right" then
+		commandlinecaret += 1
+		commandlinecaret = min(commandlinecaret, #commandline)
 	end
 end
 function commandmode._keyup(key)
 end
 function commandmode._textinput(text)
 	printh("cm-text: '" .. text .. "'")
-	commandline = commandline .. text
+	commandline = commandline:sub(1,commandlinecaret) .. text .. commandline:sub(commandlinecaret + 1)
+	commandlinecaret += 1
+	commandlinecaret = min(commandlinecaret, #commandline)
 end
 function commandmode._drawstatusline()
 	print(commandline, 1, 122, 2)
 end
 function commandmode._drawcaret()
 	if tc % 16 < 8 then
-		rectfill(#commandline * 4, 121, #commandline * 4, 126, 14)
+		rectfill(commandlinecaret * 4, 121, commandlinecaret * 4 + 4, 126, 14)
 	end
 end
 

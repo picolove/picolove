@@ -147,6 +147,8 @@ function commandmode._keydown(key)
 	elseif key == "backspace" then
 		if #commandline > 1 then
 			commandline = commandline:sub(1,-2)
+		else
+			mode = normalmode
 		end
 	end
 end

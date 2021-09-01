@@ -178,7 +178,11 @@ function commandmode._drawstatusline()
 end
 function commandmode._drawcaret()
 	if tc % 16 < 8 then
-		rectfill(commandlinecaret * 4, 121, commandlinecaret * 4 + 4, 126, 14)
+		if commandlinecaret == #commandline then
+			rectfill(commandlinecaret * 4, 121, commandlinecaret * 4 + 4, 126, 14)
+		else
+			rectfill(commandlinecaret * 4, 121, commandlinecaret * 4, 126, 14)
+		end
 	end
 end
 

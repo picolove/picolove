@@ -147,6 +147,8 @@ function commandmode._keydown(key)
 		else
 			mode = normalmode
 		end
+	elseif key == "delete" then
+			commandline = commandline:sub(1, commandlinecaret) .. commandline:sub(commandlinecaret + 2)
 	elseif key == "backspace" then
 		if commandlinecaret > 1 then
 			commandline = commandline:sub(1, commandlinecaret - 1) .. commandline:sub(commandlinecaret + 1)

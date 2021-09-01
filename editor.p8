@@ -160,6 +160,9 @@ function commandmode._drawstatusline()
 	print(commandline, 1, 122, 2)
 end
 function commandmode._drawcaret()
+	if tc % 16 < 8 then
+		rectfill(#commandline * 4, 121, #commandline * 4, 126, 14)
+	end
 end
 
 

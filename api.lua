@@ -1650,6 +1650,21 @@ function api.del(a, dv)
 		end
 	end
 end
+function api.deli(a, index)
+	if a == nil then
+		warning("deli from nil")
+		return
+	elseif index == nil then
+		warning("deli without index")
+		return
+	end
+	for i, v in ipairs(a) do
+		if i == index then
+			table.remove(a, i)
+			return v
+		end
+	end
+end
 
 function api.serial(channel, address, length) -- luacheck: no unused
 	-- TODO: implement this

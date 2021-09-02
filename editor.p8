@@ -80,7 +80,13 @@ function normalmode._keydown(key)
 		updatecaret()
 		mode = inputmode
 	elseif key == "x" and caretbig then
-		content[carety] = content[carety]:sub(1, caretx - 1) .. content[carety]:sub(caretx + 1)
+		if caretbig then
+			if carety < #content and #content[carety] == 0 then
+				deli(content, carety)
+			else
+				content[carety] = content[carety]:sub(1, caretx - 1) .. content[carety]:sub(caretx + 1)
+			end
+		end
 		updatecaret()
 	end
 end

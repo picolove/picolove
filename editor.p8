@@ -79,6 +79,9 @@ function normalmode._keydown(key)
 		carety += 1
 		updatecaret()
 		mode = inputmode
+	elseif key == "x" and caretbig then
+		content[carety] = content[carety]:sub(1, caretx - 1) .. content[carety]:sub(caretx + 1)
+		updatecaret()
 	end
 end
 function normalmode._keyup(key)

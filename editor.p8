@@ -93,8 +93,10 @@ function normalmode._textinput(text)
 
 	if text == "0" then
 		caretx = 1
+		updatecaret()
 	elseif text == "$" then -- TODO: fix input filtering
 		caretx = #content[carety]+1
+		updatecaret()
 	end
 end
 function normalmode._drawstatusline()

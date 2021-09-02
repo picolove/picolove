@@ -46,7 +46,12 @@ function normalmode._keydown(key)
 	printh("nm-key: '" .. key .. "'")
 
 	if key == "h" then
-		caretx -= 1
+		if caretx == 1 and carety > 1 then
+			carety -= 1
+			caretx = #content[carety] + 1
+		else
+			caretx -= 1
+		end
 		updatecaret()
 	elseif key == "j" then
 		carety += 1
@@ -55,7 +60,12 @@ function normalmode._keydown(key)
 		carety -= 1
 		updatecaret()
 	elseif key == "l" then
-		caretx += 1
+		if caretx == #content[carety] + 1 and carety < #content then
+			carety += 1
+			caretx = 1
+		else
+			caretx += 1
+		end
 		updatecaret()
 	elseif key == "escape" then
 		returntomain()

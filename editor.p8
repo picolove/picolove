@@ -153,6 +153,12 @@ function inputmode._keydown(key)
 			caretx -= 1
 			updatecaret()
 		end
+	elseif key == "return" then
+		add(content, content[carety]:sub(caretx), carety + 1)
+		content[carety] = content[carety]:sub(1, caretx - 1)
+		carety += 1
+		caretx = 1
+		updatecaret()
 	end
 end
 function inputmode._keyup(key)

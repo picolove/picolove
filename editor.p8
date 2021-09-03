@@ -79,6 +79,35 @@ function normalmode._keydown(key)
 			end
 			caretx = 1
 			updatecaret()
+		elseif prevkey == "d" and key == "w" then
+			local delstartpos = caretx
+			local delendpos = nil
+
+			local foundpos = content[carety]:find(" ", caretx)
+
+			if foundpos ~= nil then
+				delendpos = foundpos
+			elseif #content[carety] == 0 and #content == 1 then
+				caretx = 1
+				carety = 1
+				content[1] = ""
+				delstartpos = nil
+			elseif #content[carety] == 0 then
+				caretx = 1
+				deli(content, carety)
+				delstartpos = nil
+			else
+				delendpos = #content[carety] + 1
+			end
+
+			if delstartpos ~= nil then
+				if delendpos ~= nil then
+					content[carety] = content[carety]:sub(1, delstartpos - 1) .. "" .. content[carety]:sub(delendpos + 1)
+				else
+					content[carety] = content[carety]:sub(1, delstartpos - 1)
+				end
+			end
+			updatecaret()
 		elseif prevkey == "g" and key == "g" then
 			carety = 1
 			caretx = 1

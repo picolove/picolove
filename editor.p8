@@ -6,8 +6,8 @@ local content = {
 	"",
 	"press esc to quit"
 }
-local caretx = 18
-local carety = 3
+local caretx = 1
+local carety = 1
 local caretbig = false
 
 local normalmode = {}

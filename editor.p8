@@ -77,6 +77,10 @@ function normalmode._keydown(key)
 			end
 			caretx = 1
 			updatecaret()
+		elseif prevkey == "g" and key == "g" then
+			carety = 1
+			caretx = 1
+			updatecaret()
 		end
 		prevkey = nil
 
@@ -153,6 +157,8 @@ function normalmode._keydown(key)
 	elseif isshiftdown and key == "g" then
 		carety = #content
 		caretx = 1
+	elseif key == "g" then
+		prevkey = key
 	elseif key == "o" then
 		if not isshiftdown then
 			carety += 1

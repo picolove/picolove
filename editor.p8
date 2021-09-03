@@ -20,6 +20,7 @@ local commandline = ""
 local commandlinecaret = 1
 
 local isctrldown = false
+local isshifdown = false
 
 function _init()
 	tc = 0
@@ -209,6 +210,8 @@ end
 function _keydown(key)
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = true
+	elseif key == "lshift" or key == "rshift" then
+		isshiftdown = true
 	end
 	mode._keydown(key)
 end
@@ -216,6 +219,8 @@ end
 function _keyup(key)
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = false
+	elseif key == "lshift" or key == "rshift" then
+		isshiftdown = false
 	end
 	mode._keyup(key)
 end

@@ -38,7 +38,6 @@ end
 
 function _update()
 	tc += 1
-	updatemode()
 end
 
 function returntomain()
@@ -85,14 +84,14 @@ function normalmode._keydown(key)
 		else
 			caretx += 1
 		end
-		updatecaret()
 		setmode(inputmode)
+		updatecaret()
 	elseif key == "i" then
 		setmode(inputmode)
 	elseif key == "o" then
 		carety += 1
-		updatecaret()
 		setmode(inputmode)
+		updatecaret()
 	elseif key == "x" and caretbig then
 		if caretbig then
 			if carety < #content and #content[carety] == 0 then
@@ -145,8 +144,8 @@ function inputmode._keydown(key)
 
 	if key == "escape" or (isctrldown and key == "c") then
 		caretx -= 1
-		updatecaret()
 		setmode(normalmode)
+		updatecaret()
 	elseif key == "backspace" then
 		if caretx > 1 then
 			content[carety] = content[carety]:sub(1, caretx - 2) .. content[carety]:sub(caretx)
@@ -241,6 +240,7 @@ end
 
 
 function _keydown(key)
+	updatemode()
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = true
 	elseif key == "lshift" or key == "rshift" then
@@ -250,6 +250,7 @@ function _keydown(key)
 end
 
 function _keyup(key)
+	updatemode()
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = false
 	elseif key == "lshift" or key == "rshift" then

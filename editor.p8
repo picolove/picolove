@@ -15,6 +15,7 @@ local inputmode = {}
 local commandmode = {}
 
 local mode = normalmode
+local nextmode = mode
 
 local commandline = ""
 local commandlinecaret = 1
@@ -28,8 +29,16 @@ function _init()
 	poke(0x5f2d, 1)
 end
 
+function setmode(mode)
+	nextmode = mode
+end
+function updatemode()
+	mode = nextmode
+end
+
 function _update()
 	tc += 1
+	updatemode()
 end
 
 function returntomain()
@@ -77,13 +86,13 @@ function normalmode._keydown(key)
 			caretx += 1
 		end
 		updatecaret()
-		mode = inputmode
+		setmode(inputmode)
 	elseif key == "i" then
-		mode = inputmode
+		setmode(inputmode)
 	elseif key == "o" then
 		carety += 1
 		updatecaret()
-		mode = inputmode
+		setmode(inputmode)
 	elseif key == "x" and caretbig then
 		if caretbig then
 			if carety < #content and #content[carety] == 0 then
@@ -102,7 +111,7 @@ function normalmode._textinput(text)
 
 	if text == ":" then
 		commandline = ":"
-		mode = commandmode
+		setmode(commandmode)
 	end
 
 	if text == "0" then
@@ -137,7 +146,7 @@ function inputmode._keydown(key)
 	if key == "escape" or (isctrldown and key == "c") then
 		caretx -= 1
 		updatecaret()
-		mode = normalmode
+		setmode(normalmode)
 	end
 end
 function inputmode._keyup(key)
@@ -163,13 +172,13 @@ function commandmode._keydown(key)
 	printh("cm-key: '" .. key .. "'")
 	if key == "escape" then
 		commandlinecaret = 1
-		mode = normalmode
+		setmode(normalmode)
 	elseif key == "return" then
 		commandlinecaret = 1
 		if commandline == ":q" then
 			returntomain()
 		else
-			mode = normalmode
+			setmode(normalmode)
 		end
 	elseif key == "delete" then
 			commandline = commandline:sub(1, commandlinecaret) .. commandline:sub(commandlinecaret + 2)
@@ -179,7 +188,7 @@ function commandmode._keydown(key)
 			commandlinecaret -= 1
 			commandlinecaret = max(commandlinecaret, 1)
 		elseif #commandline <= 1 then
-			mode = normalmode
+			setmode(normalmode)
 		end
 	elseif key == "left" then
 		commandlinecaret -= 1

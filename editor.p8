@@ -223,9 +223,13 @@ function commandmode._textinput(text)
 	commandlinecaret = min(commandlinecaret, #commandline)
 end
 function commandmode._drawstatusline()
+	commandmode._drawcaretextra()
 	print(commandline, 1, 122, 2)
 end
 function commandmode._drawcaret()
+	--no op
+end
+function commandmode._drawcaretextra()
 	if tc % 16 < 8 then
 		if commandlinecaret == #commandline then
 			rectfill(commandlinecaret * 4, 121, commandlinecaret * 4 + 4, 126, 14)
@@ -265,7 +269,6 @@ function _draw()
 	-- render background
 	cls(1)
 	rectfill(0, 0, 128, 7, 8)
-	rectfill(0, 121, 128, 128, 8)
 
 	mode._drawcaret()
 
@@ -281,6 +284,7 @@ function _draw()
 	print("0", 6, 2, 8)
 	print("+", 15, 2, 14)
 
+	rectfill(0, 121, 128, 128, 8)
 	mode._drawstatusline()
 end
 

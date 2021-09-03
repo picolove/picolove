@@ -128,18 +128,14 @@ end
 
 function inputmode._keydown(key)
 	printh("im-key: '" .. key .. "'")
-	if key == "lctrl" or key == "rctrl" then
-		isctrldown = true
-	elseif key == "escape" or (isctrldown and key == "c") then
+
+	if key == "escape" or (isctrldown and key == "c") then
 		caretx -= 1
 		updatecaret()
 		mode = normalmode
 	end
 end
 function inputmode._keyup(key)
-	if key == "lctrl" or key == "rctrl" then
-		isctrldown = false
-	end
 end
 function inputmode._textinput(text)
 	printh("im-text: '" .. text .. "'")
@@ -211,10 +207,16 @@ end
 
 
 function _keydown(key)
+	if key == "lctrl" or key == "rctrl" then
+		isctrldown = true
+	end
 	mode._keydown(key)
 end
 
 function _keyup(key)
+	if key == "lctrl" or key == "rctrl" then
+		isctrldown = false
+	end
 	mode._keyup(key)
 end
 

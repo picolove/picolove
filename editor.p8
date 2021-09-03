@@ -70,6 +70,8 @@ function normalmode._keydown(key)
 			key == "lctrl" or key == "rctrl" or
 			key == "lalt" or key == "ralt" then
 			return
+		elseif key >= "0" and key <= "9" then
+			prevkey = prevkey .. key
 		elseif prevkey == "d" and key == "d" then
 			deli(content, carety)
 			if #content == 0 then
@@ -81,9 +83,18 @@ function normalmode._keydown(key)
 			carety = 1
 			caretx = 1
 			updatecaret()
+		elseif isshiftdown and key == "g" then
+			local num = tonum(prevkey)
+			if num ~= nil then
+				carety = num
+				caretx = 1
+				updatecaret()
+			end
 		end
 		prevkey = nil
 
+	elseif key >= "1" and key <= "9" then
+		prevkey = key
 	elseif key == "h" then
 		if caretx == 1 and carety > 1 then
 			carety -= 1

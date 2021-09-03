@@ -165,6 +165,7 @@ function inputmode._keyup(key)
 end
 function inputmode._textinput(text)
 	printh("im-text: '" .. text .. "'")
+
 	content[carety] = content[carety]:sub(1, caretx - 1) .. text .. content[carety]:sub(caretx)
 	caretx += 1
 	updatecaret()

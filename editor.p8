@@ -66,7 +66,11 @@ function normalmode._keydown(key)
 	printh("nm-key: '" .. key .. "'")
 
 	if prevkey ~= nil then
-		if prevkey == "d" and key == "d" then
+		if key == "lshift" or key == "rshift" or
+			key == "lctrl" or key == "rctrl" or
+			key == "lalt" or key == "ralt" then
+			return
+		elseif prevkey == "d" and key == "d" then
 			deli(content, carety)
 			if #content == 0 then
 				content[1] = ""

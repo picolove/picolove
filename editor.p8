@@ -133,6 +133,7 @@ function normalmode._keydown(key)
 		setmode(inputmode)
 	elseif key == "o" then
 		carety += 1
+		add(content, "", carety)
 		setmode(inputmode)
 		updatecaret()
 	elseif key == "x" and caretbig then

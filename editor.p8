@@ -147,6 +147,12 @@ function inputmode._keydown(key)
 		caretx -= 1
 		updatecaret()
 		setmode(normalmode)
+	elseif key == "backspace" then
+		if caretx > 1 then
+			content[carety] = content[carety]:sub(1, caretx - 2) .. content[carety]:sub(caretx)
+			caretx -= 1
+			updatecaret()
+		end
 	end
 end
 function inputmode._keyup(key)

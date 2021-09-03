@@ -50,8 +50,13 @@ function returntomain()
 end
 
 function updatecaret()
+	local posaftertext = 1
+	if nextmode ~= inputmode then
+		posaftertext = 0
+	end
+
 	carety = max(min(carety, #content), 1)
-	caretx = max(min(caretx, #content[carety]+1), 1)
+	caretx = max(min(caretx, #content[carety] + posaftertext), 1)
 	caretbig = caretx == 1 or caretx <= #content[carety]
 end
 
@@ -61,7 +66,7 @@ function normalmode._keydown(key)
 	if key == "h" then
 		if caretx == 1 and carety > 1 then
 			carety -= 1
-			caretx = #content[carety] + 1
+			caretx = #content[carety]
 		else
 			caretx -= 1
 		end
@@ -73,7 +78,7 @@ function normalmode._keydown(key)
 		carety -= 1
 		updatecaret()
 	elseif key == "l" then
-		if caretx == #content[carety] + 1 and carety < #content then
+		if caretx == #content[carety] and carety < #content then
 			carety += 1
 			caretx = 1
 		else
@@ -121,7 +126,7 @@ function normalmode._textinput(text)
 		caretx = 1
 		updatecaret()
 	elseif text == "$" then -- TODO: fix input filtering
-		caretx = #content[carety]+1
+		caretx = #content[carety]
 		updatecaret()
 	end
 end

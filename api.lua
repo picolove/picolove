@@ -1629,12 +1629,15 @@ function api.count(a)
 	return #a
 end
 
-function api.add(a, v)
+function api.add(a, v, index)
 	if a == nil then
 		warning("add to nil")
 		return
+	elseif index == nil then
+		table.insert(a, v)
+	else
+		table.insert(a, index, v)
 	end
-	table.insert(a, v)
 	return v
 end
 

@@ -131,6 +131,9 @@ function normalmode._keydown(key)
 		updatecaret()
 	elseif key == "i" then
 		setmode(inputmode)
+	elseif isshiftdown and key == "g" then
+		carety = #content
+		caretx = 1
 	elseif key == "o" then
 		if not isshiftdown then
 			carety += 1

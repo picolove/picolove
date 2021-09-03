@@ -23,6 +23,8 @@ local commandlinecaret = 1
 local isctrldown = false
 local isshifdown = false
 
+local prevkey = nil
+
 function resetblink()
 	tc = 0
 end
@@ -63,7 +65,18 @@ end
 function normalmode._keydown(key)
 	printh("nm-key: '" .. key .. "'")
 
-	if key == "h" then
+	if prevkey ~= nil then
+		if prevkey == "d" and key == "d" then
+			deli(content, carety)
+			if #content == 0 then
+				content[1] = ""
+			end
+			caretx = 1
+			updatecaret()
+		end
+		prevkey = nil
+
+	elseif key == "h" then
 		if caretx == 1 and carety > 1 then
 			carety -= 1
 			caretx = #content[carety]
@@ -85,6 +98,8 @@ function normalmode._keydown(key)
 			caretx += 1
 		end
 		updatecaret()
+	elseif key == "d" then
+		prevkey = key
 	elseif key == "w" then
 		local pos, posend = content[carety]:find(" %S", caretx)
 		if pos ~= nil then

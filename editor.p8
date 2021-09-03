@@ -23,6 +23,10 @@ local commandlinecaret = 1
 local isctrldown = false
 local isshifdown = false
 
+function resetblink()
+	tc = 0
+end
+
 function _init()
 	tc = 0
 	-- enable keyboard
@@ -129,7 +133,7 @@ function normalmode._drawstatusline()
 	print("-", 123, 124, 2)
 end
 function normalmode._drawcaret()
-	if tc % 16 < 8 then
+	if tc % 16 < 8 or tc < 16 then
 		if caretbig then
 			rectfill(caretx*4-4, carety*6 + 2, caretx*4, carety*6 + 2 + 5, 8)
 		else
@@ -173,7 +177,7 @@ function inputmode._drawstatusline()
 	print("-- insert --", 1, 122, 2)
 end
 function inputmode._drawcaret()
-	if tc % 16 < 8 then
+	if tc % 16 < 8 or tc < 16 then
 		if caretbig then
 			rectfill(caretx*4-4, carety*6 + 2, caretx*4-4, carety*6 + 2 + 5, 8)
 		else
@@ -229,7 +233,7 @@ function commandmode._drawcaret()
 	--no op
 end
 function commandmode._drawcaretextra()
-	if tc % 16 < 8 then
+	if tc % 16 < 8 or tc < 16 then
 		if commandlinecaret == #commandline then
 			rectfill(commandlinecaret * 4, 121, commandlinecaret * 4 + 4, 126, 14)
 		else
@@ -240,6 +244,7 @@ end
 
 
 function _keydown(key)
+	resetblink()
 	updatemode()
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = true

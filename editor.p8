@@ -131,6 +131,8 @@ function inputmode._keydown(key)
 	if key == "lctrl" or key == "rctrl" then
 		isctrldown = true
 	elseif key == "escape" or (isctrldown and key == "c") then
+		caretx -= 1
+		updatecaret()
 		mode = normalmode
 	end
 end

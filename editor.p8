@@ -132,7 +132,9 @@ function normalmode._keydown(key)
 	elseif key == "i" then
 		setmode(inputmode)
 	elseif key == "o" then
-		carety += 1
+		if not isshiftdown then
+			carety += 1
+		end
 		add(content, "", carety)
 		setmode(inputmode)
 		updatecaret()

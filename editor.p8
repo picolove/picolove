@@ -71,7 +71,11 @@ function normalmode._keydown(key)
 	elseif key == "escape" then
 		returntomain()
 	elseif key == "a" then
-		caretx += 1
+		if isshiftdown then
+			caretx = #content[carety] + 1
+		else
+			caretx += 1
+		end
 		updatecaret()
 		mode = inputmode
 	elseif key == "i" then

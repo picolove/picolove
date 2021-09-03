@@ -96,6 +96,17 @@ function normalmode._keydown(key)
 			caretx = #content[carety]
 		end
 		updatecaret()
+	elseif key == "e" then
+		local pos, posend = content[carety]:find("%S ", caretx + 1)
+		if pos ~= nil then
+			caretx = pos
+		elseif caretx >= #content[carety] and carety < #content then
+			carety += 1
+			caretx = 1
+		else
+			caretx = #content[carety]
+		end
+		updatecaret()
 	elseif key == "escape" then
 		returntomain()
 	elseif key == "a" then

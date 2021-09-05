@@ -6,6 +6,7 @@ local content = {
 	"",
 	"press esc to quit"
 }
+
 local caretx = 1
 local carety = 1
 local caretbig = false
@@ -21,7 +22,7 @@ local commandline = ""
 local commandlinecaret = 1
 
 local isctrldown = false
-local isshifdown = false
+local isshiftdown = false
 
 local prevkey = nil
 
@@ -299,6 +300,7 @@ end
 
 function commandmode._keydown(key)
 	printh("cm-key: '" .. key .. "'")
+
 	if key == "escape" then
 		commandlinecaret = 1
 		setmode(normalmode)

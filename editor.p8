@@ -73,6 +73,8 @@ function normalmode._keydown(key)
 			return
 		elseif key >= "0" and key <= "9" then
 			prevkey = prevkey .. key
+		elseif prevkey == "escape" and key == "escape" then
+			returntomain()
 		elseif prevkey == "d" and key == "d" then
 			deli(content, carety)
 			if #content == 0 then
@@ -184,7 +186,7 @@ function normalmode._keydown(key)
 		end
 		updatecaret()
 	elseif key == "escape" then
-		returntomain()
+		prevkey = key
 	elseif key == "a" then
 		if isshiftdown then
 			caretx = #content[carety] + 1

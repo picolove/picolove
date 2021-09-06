@@ -243,15 +243,31 @@ function cart.load_p8(filename)
 		end
 		data = data .. "__eof__\n"
 
-		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
-		local start =
-			data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
-		if start == nil then
-			error("invalid cart")
 		-- check for header and version
+		local header = "pico%-8 cartridge"
+		local header_len = #header - 1  -- subtract escape char
+		local version_header = "\nversion"
+
+		local header_start = data:find(header)
+		if header_start == nil then
+			error("invalid cart (missing header)")
 		end
-		local next_line = data:find("\n", start + #header)
-		local version_str = data:sub(start + #header, next_line - 1)
+
+		local header_end = data:find(version_header, header_start + header_len)
+		if header_end == nil then
+			error("invalid cart (missing header-version)")
+		end
+		if header_end ~= data:find("\n", header_start + header_len) then
+			error("invalid cart (malformed header)")
+		end
+		header_end = header_end + #version_header
+
+		local next_line = data:find("\n", header_end)
+		if next_line == nil then
+			error("invalid cart (incomplete header)")
+		end
+
+		local version_str = data:sub(header_end, next_line - 1)
 		local version = tonumber(version_str)
 		log("version", version)
 

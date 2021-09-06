@@ -191,8 +191,9 @@ function _keydown(key)
 			linebuffer == "exit" or linebuffer == "quit" then
 			shutdown()
 
-		elseif linebuffer == "folder" then
-			folder()
+		elseif linebuffer == "folder" or
+			linebuffer:sub(1, 7) == "folder " and #linebuffer > 7 then
+			folder(linebuffer:sub(8))
 
 		elseif linebuffer == "run" then
 			run()

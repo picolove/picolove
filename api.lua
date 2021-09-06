@@ -115,8 +115,22 @@ function api.cls(c)
 	pico8.cursor = {0, 0}
 end
 
-function api.folder()
-	love.system.openURL("file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory)
+function api.folder(dir)
+	if dir == nil or dir == "local" then
+		love.system.openURL("file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory)
+	elseif dir == "bbs" then
+		api.print("not implemented", 14)
+	elseif dir == "backups" then
+		api.print("not implemented", 14)
+	elseif dir == "config" then
+		api.print("not implemented", 14)
+	elseif dir == "desktop" then
+		love.system.openURL("file://" .. love.filesystem.getUserDirectory() .. "Desktop")
+	else
+		api.print("useage: folder [location]", 14)
+		api.print("locations:", 6)
+		api.print("backups bbs config desktop local", 6)
+	end
 end
 
 function api._completecommand(command, path)

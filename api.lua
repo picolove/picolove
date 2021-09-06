@@ -116,7 +116,7 @@ function api.cls(c)
 end
 
 function api.folder(dir)
-	if dir == nil or dir == "local" then
+	if dir == nil then
 		love.system.openURL("file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory)
 	elseif dir == "bbs" then
 		api.print("not implemented", 14)
@@ -129,7 +129,7 @@ function api.folder(dir)
 	else
 		api.print("useage: folder [location]", 14)
 		api.print("locations:", 6)
-		api.print("backups bbs config desktop local", 6)
+		api.print("backups bbs config desktop", 6)
 	end
 end
 

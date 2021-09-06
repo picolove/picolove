@@ -243,12 +243,12 @@ function cart.load_p8(filename)
 		end
 		data = data .. "__eof__\n"
 
-		-- check for header and vesion
 		local header = "pico-8 cartridge // http://www.pico-8.com\nversion "
 		local start =
 			data:find("pico%-8 cartridge // http://www.pico%-8%.com\nversion ")
 		if start == nil then
 			error("invalid cart")
+		-- check for header and version
 		end
 		local next_line = data:find("\n", start + #header)
 		local version_str = data:sub(start + #header, next_line - 1)

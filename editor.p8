@@ -64,8 +64,6 @@ function updatecaret()
 end
 
 function normalmode._keydown(key)
-	printh("nm-key: '" .. key .. "'")
-
 	if prevkey ~= nil then
 		if key == "lshift" or key == "rshift" or
 			key == "lctrl" or key == "rctrl" or
@@ -223,8 +221,6 @@ end
 function normalmode._keyup(key)
 end
 function normalmode._textinput(text)
-	printh("nm-text: '" .. text .. "'")
-
 	if text == ":" then
 		commandline = ":"
 		setmode(commandmode)
@@ -257,8 +253,6 @@ end
 
 
 function inputmode._keydown(key)
-	printh("im-key: '" .. key .. "'")
-
 	if key == "escape" or (isctrldown and key == "c") then
 		caretx -= 1
 		setmode(normalmode)
@@ -280,8 +274,6 @@ end
 function inputmode._keyup(key)
 end
 function inputmode._textinput(text)
-	printh("im-text: '" .. text .. "'")
-
 	content[carety] = content[carety]:sub(1, caretx - 1) .. text .. content[carety]:sub(caretx)
 	caretx += 1
 	updatecaret()
@@ -301,8 +293,6 @@ end
 
 
 function commandmode._keydown(key)
-	printh("cm-key: '" .. key .. "'")
-
 	if key == "escape" then
 		commandlinecaret = 1
 		setmode(normalmode)
@@ -334,7 +324,6 @@ end
 function commandmode._keyup(key)
 end
 function commandmode._textinput(text)
-	printh("cm-text: '" .. text .. "'")
 	commandline = commandline:sub(1,commandlinecaret) .. text .. commandline:sub(commandlinecaret + 1)
 	commandlinecaret += 1
 	commandlinecaret = min(commandlinecaret, #commandline)

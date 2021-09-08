@@ -242,7 +242,9 @@ function normalmode._drawstatusline()
 	print("-", 123, 124, 2)
 end
 function normalmode._drawcaret()
-	if tc % 16 < 8 or tc < 16 then
+	if nextmode == inputmode then
+		nextmode._drawcaret()
+	elseif tc % 16 < 8 or tc < 16 then
 		if caretbig then
 			rectfill(caretx*4-4, carety*6 + 2, caretx*4, carety*6 + 2 + 5, 8)
 		else
@@ -282,7 +284,9 @@ function inputmode._drawstatusline()
 	print("-- insert --", 1, 122, 2)
 end
 function inputmode._drawcaret()
-	if tc % 16 < 8 or tc < 16 then
+	if nextmode == normalmode then
+		nextmode._drawcaret()
+	elseif tc % 16 < 8 or tc < 16 then
 		if caretbig then
 			rectfill(caretx*4-4, carety*6 + 2, caretx*4-4, carety*6 + 2 + 5, 8)
 		else

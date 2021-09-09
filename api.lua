@@ -458,7 +458,11 @@ function api.cursor(x, y, col)
 end
 
 function api.tonum(val)
-	return tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+	if type(val) == "boolean" then
+		return val and 1 or 0
+	else
+		return tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+	end
 end
 
 function api.tostr(val, hex)

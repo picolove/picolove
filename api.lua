@@ -397,7 +397,7 @@ end
 -- workaround for non printable chars
 local tostring_org = tostring
 local function tostring(str)
-	return tostring_org(str):gsub("[^%z\32-\127]", "8")
+	return (tostring_org(str):gsub("[^%z\32-\127]", "8"))
 end
 
 function api.print(str, ...)

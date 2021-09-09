@@ -471,16 +471,16 @@ function api.tostr(...)
 	end
 
 	local val = select(1, ...)
-	local format = select(2, ...)
-
-	if format == true then
-		format = 1
-	end
-
 	local kind = type(val)
+
 	if kind == "string" then
 		return val
 	elseif kind == "number" then
+		local format = select(2, ...)
+		if format == true then
+			format = 1
+		end
+
 		if format and bit.band(format, 1) ~= 0 then
 			val = val * 0x10000
 			local part1 = bit.rshift(bit.band(val, 0xFFFF0000), 16)
@@ -491,7 +491,7 @@ function api.tostr(...)
 				return string.format("0x%04x.%04x", part1, part2)
 			end
 		else
-			if format and bit.band(format, 0x2) ~= 0 then
+			if format and bit.band(format, 2) ~= 0 then
 				val = val * 0x10000
 			end
 			return tostring(val)

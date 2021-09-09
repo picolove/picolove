@@ -465,17 +465,35 @@ function api.tonum(val)
 	end
 end
 
-function api.tostr(val, hex)
+function api.tostr(...)
+	if select("#", ...) == 0 then
+		return ""
+	end
+
+	local val = select(1, ...)
+	local hex = select(2, ...)
+
+	if hex == true then
+		hex = 1
+	end
+
 	local kind = type(val)
 	if kind == "string" then
 		return val
 	elseif kind == "number" then
-		if hex then
+		if hex and bit.band(hex, 1) ~= 0 then
 			val = val * 0x10000
 			local part1 = bit.rshift(bit.band(val, 0xFFFF0000), 16)
 			local part2 = bit.band(val, 0xFFFF)
-			return string.format("0x%04x.%04x", part1, part2)
+			if bit.band(hex, 2) ~= 0 then
+				return string.format("0x%04x%04x", part1, part2)
+			else
+				return string.format("0x%04x.%04x", part1, part2)
+			end
 		else
+			if hex and bit.band(hex, 0x2) ~= 0 then
+				val = val * 0x10000
+			end
 			return tostring(val)
 		end
 	elseif kind == "boolean" then

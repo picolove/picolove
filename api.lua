@@ -442,7 +442,7 @@ function api.print(...)
 		api.color(c)
 		api.cursor(0, y + 6)
 	end
-	local to_print = tostring(str):gsub("[^%z\32-\127]", " ")
+	local to_print = tostring(api.tostr(str))
 	love.graphics.setShader(pico8.text_shader)
 	love.graphics.print(to_print, flr(x), flr(y))
 end

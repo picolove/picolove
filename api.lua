@@ -400,25 +400,26 @@ local function tostring(str)
 	return (tostring_org(str):gsub("[^%z\32-\127]", "8"))
 end
 
-function api.print(str, ...)
+function api.print(...)
 	--TODO: support printing special pico8 chars
 
-	if str == nil then
+	local argc = select("#", ...)
+	if argc == 0 then
 		return
 	end
 
-	local argc = select("#", ...)
 	local x = nil
 	local y = nil
 	local col = nil
+	local str = select(1, ...)
 
-	if argc == 1 then
-		col = select(1, ...) or 0
-	elseif argc > 1 then
-		x = select(1, ...) or 0
-		y = select(2, ...) or 0
-		if argc >= 3 then
-			col = select(3, ...) or 0
+	if argc == 2 then
+		col = select(2, ...) or 0
+	elseif argc > 2 then
+		x = select(2, ...) or 0
+		y = select(3, ...) or 0
+		if argc >= 4 then
+			col = select(4, ...) or 0
 		end
 	end
 

@@ -1662,8 +1662,18 @@ function api.foreach(a, f)
 end
 
 -- legacy function
-function api.count(a)
-	return #a
+function api.count(a, val)
+	if val ~= nil then
+		local count = 0
+		for i, v in pairs(a) do
+			if v == val then
+				count = count + 1
+			end
+		end
+		return count
+	else
+		return #a
+	end
 end
 
 function api.add(a, v, index)

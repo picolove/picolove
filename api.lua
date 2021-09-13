@@ -1350,7 +1350,7 @@ function api.run()
 	end
 end
 
-function api.stop()
+function api.stop(message, x, y, col) -- luacheck: no unused
 	-- TODO: implement this
 end
 

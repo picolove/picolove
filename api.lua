@@ -230,7 +230,7 @@ function api._completecommand(command, path)
 	return command .. " " .. startDir .. result
 end
 
--- TODO: move interactive implementatn into nocart
+-- TODO: move interactive implementation into nocart
 -- TODO: should return table of strings
 function api.ls()
 	local files = love.filesystem.getDirectoryItems(currentDirectory)

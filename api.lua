@@ -107,11 +107,11 @@ function api.clip(x, y, w, h)
 	end
 end
 
-function api.cls(c)
-	c = flr(tonumber(c) or 0) % 16
-	c = c + 1 -- TODO: fix workaround
+function api.cls(col)
+	col = flr(tonumber(col) or 0) % 16
+	col = col + 1 -- TODO: fix workaround
 
-	love.graphics.clear(c * 16, 0, 0, 255)
+	love.graphics.clear(col * 16, 0, 0, 255)
 	pico8.cursor = {0, 0}
 end
 
@@ -371,9 +371,9 @@ function api.splore()
 	-- TODO: implement this
 end
 
-function api.pset(x, y, c)
-	if c then
-		color(c)
+function api.pset(x, y, col)
+	if col then
+		color(col)
 	end
 	love.graphics.point(flr(x), flr(y))
 end
@@ -390,8 +390,8 @@ function api.pget(x, y)
 	return 0
 end
 
-function api.color(c)
-	color(c)
+function api.color(col)
+	color(col)
 end
 
 -- workaround for non printable chars

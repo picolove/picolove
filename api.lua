@@ -1704,6 +1704,8 @@ function api.deli(a, index)
 	if a == nil then
 		warning("deli from nil")
 		return
+	elseif type(a) ~= "table" then
+		return
 	elseif index == nil then
 		if #a > 0 then
 			return table.remove(a, #a)

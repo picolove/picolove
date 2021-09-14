@@ -1705,8 +1705,11 @@ function api.deli(a, index)
 		warning("deli from nil")
 		return
 	elseif index == nil then
-		warning("deli without index")
-		return
+		if #a > 0 then
+			return table.remove(a, #a)
+		else
+			return
+		end
 	end
 	for i, v in ipairs(a) do
 		if i == index then

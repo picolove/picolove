@@ -1602,7 +1602,8 @@ function api.holdframe()
 	-- TODO: Implement this
 end
 
-function api.menuitem()
+function api.menuitem(index, label, fn) -- luacheck: no unused
+	-- TODO: implement this
 end
 
 api.sub = string.sub

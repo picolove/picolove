@@ -1666,7 +1666,7 @@ end
 function api.count(a, val)
 	if val ~= nil then
 		local count = 0
-		for i, v in pairs(a) do
+		for _, v in pairs(a) do
 			if v == val then
 				count = count + 1
 			end

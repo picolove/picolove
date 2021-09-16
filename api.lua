@@ -466,6 +466,10 @@ function api.tonum(val)
 	end
 end
 
+function api.chr(num)
+	return tostring(string.char(num))
+end
+
 function api.tostr(...)
 	if select("#", ...) == 0 then
 		return ""

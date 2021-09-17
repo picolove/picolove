@@ -470,6 +470,34 @@ function api.chr(num)
 	return tostring(string.char(num))
 end
 
+function api.ord(...)
+	local str = select(1, ...)
+	if str == nil then
+		return nil
+	end
+
+	local argc = select("#", ...)
+	local index = select(2, ...) or 0
+	local count = select(3, ...) or 0
+
+	if argc == 1 then
+		return string.byte(str)
+	elseif argc == 2 then
+		return string.byte(str, index)
+	elseif argc >= 3 then
+		local values = {}
+		for i = 1, count do
+			if index + i > 1 then
+				values[i] = string.byte(str, index + i - 1)
+				api.printh(values[i], i)
+			end
+		end
+		return unpack(values, 1, count)
+	end
+
+	return nil
+end
+
 function api.tostr(...)
 	if select("#", ...) == 0 then
 		return ""

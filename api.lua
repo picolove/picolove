@@ -1679,8 +1679,12 @@ function api.foreach(a, f)
 		warning("foreach got a nil value")
 		return
 	end
-	for _, v in ipairs(a) do
-		f(v)
+
+	local len = #a
+	for i=1, len do
+		if a[i] ~= nil then
+			f(a[i])
+		end
 	end
 end
 

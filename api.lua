@@ -1728,23 +1728,28 @@ function api.del(a, dv)
 		end
 	end
 end
-function api.deli(a, index)
-	if a == nil then
-		warning("deli from nil")
+function api.deli(...)
+	local argc = select("#", ...)
+	local a = select(1, ...)
+	local index = select(2, ...)
+
+	if argc == 0 or type(a) ~= "table" or #a < 1 then
 		return
-	elseif type(a) ~= "table" then
-		return
-	elseif index == nil then
-		if #a > 0 then
-			return table.remove(a, #a)
-		else
-			return
-		end
 	end
-	for i, v in ipairs(a) do
+
+	if argc == 1 then
+		return table.remove(a, #a)
+	end
+
+	index = tonumber(index)
+	if type(index) ~= "number" then
+		return
+	end
+
+	local len = #a
+	for i=1, len do
 		if i == index then
-			table.remove(a, i)
-			return v
+			return table.remove(a, i)
 		end
 	end
 end

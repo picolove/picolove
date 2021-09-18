@@ -1657,16 +1657,6 @@ end
 api.rawequal = rawequal
 api.next = next
 
-local function arraylen(t)
-	local len = 0
-	for i, _ in pairs(t) do
-		if type(i) == "number" then
-			len = i
-		end
-	end
-	return len
-end
-
 function api.all(a)
 	if a == nil then
 		return function()
@@ -1674,7 +1664,7 @@ function api.all(a)
 	end
 
 	local i = 0
-	local n = arraylen(a)
+	local n = #a
 	return function()
 		i = i + 1
 		while (a[i] == nil and i <= n) do

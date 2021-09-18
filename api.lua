@@ -1663,11 +1663,13 @@ function api.all(a)
 	end
 
 	local i = 0
-	local n = #a
+	local len = #a
 	return function()
-		i = i + 1
-		while (a[i] == nil and i <= n) do
-			i = i + 1
+		len = len - 1
+		i = #a - len
+		while (a[i] == nil and len > 0) do
+			len = len - 1
+			i = #a - len
 		end
 		return a[i]
 	end

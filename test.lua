@@ -1,242 +1,314 @@
 local api = require("api")
-log = print
+-- hide warnings during test run
+--log = print
+log = function() end
 
--- test picolove api
+local lust = require("lust")
+local describe, it, expect, before, after, spy = -- luacheck: no unused
+lust.describe, lust.it, lust.expect, lust.before, lust.after, lust.spy
 
-do -- test api.min
-	-- works for numbers
-	assert(api.min(1, 2) == 1)
-	assert(api.min(2, 1) == 1)
-	assert(api.min(-1, 2) == -1)
-	assert(api.min(2, -1) == -1)
+local failcount = 0
+local failmsg = ""
+local cachenext = false
+local function cache_errors(text, count)
+	if cachenext then
+		cachenext = false
+		failmsg = failmsg .. "\n" .. text .. "\n"
+		if failcount == 5 then
+			failmsg = failmsg .. "\n..."
+		end
+	end
+	if count > 0 then
+		failcount = failcount + 1
+		if failcount <= 5 then
+			failmsg = failmsg .. "\n" .. text
+			cachenext = true
+		end
+	end
+end
 
-	-- works for strings
-	assert(api.min("1", "2") == 1)
-	assert(api.min("2", "1") == 1)
-	assert(api.min("-1", "2") == -1)
-	assert(api.min("2", "-1") == -1)
+-- format lust output (no color, modified tabs)
+local print_org = print
+local function print_nocolor(text)
+	local count
 
-	-- works for numbers + nils
-	assert(api.min(1, nil) == 0)
-	assert(api.min(nil, 1) == 0)
-	assert(api.min(-1, nil) == -1)
-	assert(api.min(nil, -1) == -1)
+	text = text:gsub('\27%[%d+m', '')
+	text = text:gsub('\t', '        ')
+	text, count = text:gsub('^(%s+)%s%s%sFAIL', '!!!%1FAIL')
+	print_org(text)
+	cache_errors(text, count)
+end
+print = function() end -- luacheck: globals print
+print = print_nocolor -- luacheck: globals print
 
-	-- works for numbers + strings
-	assert(api.min(1, "X") == 0)
-	assert(api.min("X", 1) == 0)
-	assert(api.min(-1, "X") == -1)
-	assert(api.min("X", -1) == -1)
 
-	-- works for nils
-	assert(api.min(nil, nil, nil) == 0)
-	assert(api.min(nil, nil) == 0)
-	assert(api.min(nil) == 0)
-	assert(api.min() == 0)
+print("")
+print("--------------")
+print("running tests:")
+print("--------------")
+
+describe("picolove api", function()
+	before(function()
+	end)
+
+	after(function()
+	end)
+
+	describe("api.min", function()
+		it("works for numbers", function()
+			expect(api.min(1, 2)).to.equal(1)
+			expect(api.min(2, 1)).to.equal(1)
+			expect(api.min(-1, 2)).to.equal(-1)
+			expect(api.min(2, -1)).to.equal(-1)
+		end)
+
+		it("works for strings", function()
+			expect(api.min("1", "2")).to.equal(1)
+			expect(api.min("2", "1")).to.equal(1)
+			expect(api.min("-1", "2")).to.equal(-1)
+			expect(api.min("2", "-1")).to.equal(-1)
+		end)
+
+		it("works for numbers + nils", function()
+			expect(api.min(1, nil)).to.equal(0)
+			expect(api.min(nil, 1)).to.equal(0)
+			expect(api.min(-1, nil)).to.equal(-1)
+			expect(api.min(nil, -1)).to.equal(-1)
+		end)
+
+		it("works for numbers + strings", function()
+			expect(api.min(1, "X")).to.equal(0)
+			expect(api.min("X", 1)).to.equal(0)
+			expect(api.min(-1, "X")).to.equal(-1)
+			expect(api.min("X", -1)).to.equal(-1)
+		end)
+
+		it("works for nils", function()
+			expect(api.min(nil, nil, nil)).to.equal(0)
+			expect(api.min(nil, nil)).to.equal(0)
+			expect(api.min(nil)).to.equal(0)
+			expect(api.min()).to.equal(0)
+		end)
+	end)
+
+
+	describe("api.max", function()
+		it("works for numbers", function()
+			expect(api.max(1, 2)).to.equal(2)
+			expect(api.max(2, 1)).to.equal(2)
+			expect(api.max(-1, 2)).to.equal(2)
+			expect(api.max(2, -1)).to.equal(2)
+		end)
+
+		it("works for strings", function()
+			expect(api.max("1", "2")).to.equal(2)
+			expect(api.max("2", "1")).to.equal(2)
+			expect(api.max("-1", "2")).to.equal(2)
+			expect(api.max("2", "-1")).to.equal(2)
+		end)
+
+		it("works for numbers + nils", function()
+			expect(api.max(1, nil)).to.equal(1)
+			expect(api.max(nil, 1)).to.equal(1)
+			expect(api.max(-1, nil)).to.equal(0)
+			expect(api.max(nil, -1)).to.equal(0)
+		end)
+
+		it("works for numbers + strings", function()
+			expect(api.max(1, "X")).to.equal(1)
+			expect(api.max("X", 1)).to.equal(1)
+			expect(api.max(-1, "X")).to.equal(0)
+			expect(api.max("X", -1)).to.equal(0)
+		end)
+
+		it("works for nils", function()
+			expect(api.max(nil, nil, nil)).to.equal(0)
+			expect(api.max(nil, nil)).to.equal(0)
+			expect(api.max(nil)).to.equal(0)
+			expect(api.max()).to.equal(0)
+		end)
+	end)
+
+
+	describe("api.mid", function()
+		it("works for numbers", function()
+			expect(api.mid(1, 2, 3)).to.equal(2)
+			expect(api.mid(1, 3, 2)).to.equal(2)
+			expect(api.mid(2, 1, 3)).to.equal(2)
+			expect(api.mid(2, 3, 1)).to.equal(2)
+			expect(api.mid(3, 1, 2)).to.equal(2)
+			expect(api.mid(3, 2, 1)).to.equal(2)
+		end)
+	end)
+
+
+	describe("api.atan2", function()
+		it("works for numbers", function()
+			expect(api.atan2(1, 0)).to.equal(0)
+			expect(api.atan2(0, -1)).to.equal(0.25)
+			expect(api.atan2(-1, 0)).to.equal(0.5)
+			expect(api.atan2(0, 1)).to.equal(0.75)
+		end)
+	end)
+
+
+	describe("api.band", function()
+		it("works for single bit shifts", function()
+			expect(bit.band(0x01, bit.lshift(1, 0))).to_not.equal(0)
+			expect(bit.band(0x02, bit.lshift(1, 1))).to_not.equal(0)
+			expect(bit.band(0x04, bit.lshift(1, 2))).to_not.equal(0)
+		end)
+
+		it("works for multi bit shifts", function()
+			expect(bit.band(0x05, bit.lshift(1, 2))).to_not.equal(0)
+			expect(bit.band(0x05, bit.lshift(1, 0))).to_not.equal(0)
+			expect(bit.band(0x05, bit.lshift(1, 3))).to.equal(0)
+		end)
+	end)
+
+
+	describe("api.all", function()
+		it("works for table with some nil values", function()
+			local iter = api.all({nil, nil, 11, nil, 22, 33, 33, b = 42, 44})
+			expect(iter()).to.equal(11)
+			expect(iter()).to.equal(22)
+			expect(iter()).to.equal(33)
+			expect(iter()).to.equal(33)
+			expect(iter()).to.equal(44)
+			expect(iter()).to.equal(nil)
+		end)
+	end)
+
+
+	describe("api.add", function()
+		it("works for nil array", function()
+			expect(api.add(nil, 1)).to.equal(nil)
+		end)
+
+		it("works for adding numbers", function()
+			local array = {}
+			expect(api.add(array, 1)).to.equal(1)
+			expect(api.add(array, 2)).to.equal(2)
+			expect(api.add(array, 3)).to.equal(3)
+			expect(api.add(array, 1)).to.equal(1)
+			expect(api.add(array, 2)).to.equal(2)
+			expect(api.add(array, 3)).to.equal(3)
+			expect(array).to.equal({1,2,3,1,2,3})
+		end)
+	end)
+
+
+	describe("api.del", function()
+		it("works for removing matching value at the start", function()
+			local array = {1, 2, 3, 1, 2, 3}
+			expect(api.del(array, 1)).to.equal(1)
+			expect(array).to.equal({2, 3, 1, 2, 3})
+		end)
+
+		it("works for removing matching value in the middle", function()
+			local array = {2, 3, 1, 2, 3}
+			expect(api.del(array, 3)).to.equal(3)
+			expect(array).to.equal({2, 1, 2, 3})
+		end)
+
+		it("works for removing matching value at the end", function()
+			local array = {2, 1, 2, 3}
+			expect(api.del(array, 3)).to.equal(3)
+			expect(array).to.equal({2, 1, 2})
+		end)
+
+		it("works for removing missing value", function()
+			local array = {2, 1, 2}
+			expect(api.del(array, 3)).to.equal(nil)
+			expect(array).to.equal({2, 1, 2})
+		end)
+	end)
+
+
+	describe("api.tostr", function()
+		it("works for empty and nil", function()
+			expect(api.tostr()).to.equal("")
+			expect(api.tostr("")).to.equal("")
+			expect(api.tostr(nil)).to.equal("[nil]")
+			expect(api.tostr(nil, nil)).to.equal("[nil]")
+
+			expect(api.tostr(nil, 1)).to.equal("[nil]")
+			expect(api.tostr(nil, 2)).to.equal("[nil]")
+			expect(api.tostr(nil, 3)).to.equal("[nil]")
+		end)
+
+		it("works for booleans", function()
+			expect(api.tostr(true)).to.equal("true")
+			expect(api.tostr(false)).to.equal("false")
+
+			expect(api.tostr(false), 1).to.equal("false")
+			expect(api.tostr(false), 2).to.equal("false")
+			expect(api.tostr(false), 3).to.equal("false")
+		end)
+
+		it("works for strings", function()
+			expect(api.tostr("test")).to.equal("test")
+			expect(api.tostr("string with spaces")).to.equal("string with spaces")
+
+			expect(api.tostr("test"), 1).to.equal("test")
+			expect(api.tostr("test"), 2).to.equal("test")
+			expect(api.tostr("test"), 3).to.equal("test")
+		end)
+
+		it("works for tables", function()
+			expect(api.tostr({})).to.equal("[table]")
+			expect(api.tostr({nil})).to.equal("[table]")
+			expect(api.tostr({"test"})).to.equal("[table]")
+			expect(api.tostr({42})).to.equal("[table]")
+
+			expect(api.tostr({42}), 1).to.equal("[table]")
+			expect(api.tostr({42}), 2).to.equal("[table]")
+			expect(api.tostr({42}), 3).to.equal("[table]")
+		end)
+
+		it("works for numbers", function()
+			expect(api.tostr(1)).to.equal("1")
+			expect(api.tostr(255)).to.equal("255")
+			expect(api.tostr(255, nil)).to.equal("255")
+			expect(api.tostr(255, 0)).to.equal("255")
+		end)
+
+		it("works for numbers with format", function()
+			expect(api.tostr(255, 1)).to.equal("0x00ff.0000")
+			expect(api.tostr(255, true)).to.equal("0x00ff.0000")
+			expect(api.tostr(255, 2)).to.equal("16711680")
+			expect(api.tostr(255, 3)).to.equal("0x00ff0000")
+			expect(api.tostr(255, 4)).to.equal("255")
+			expect(api.tostr(255, 5)).to.equal("0x00ff.0000")
+			expect(api.tostr(255, 6)).to.equal("16711680")
+			expect(api.tostr(255, 7)).to.equal("0x00ff0000")
+		end)
+
+		it("works for numbers with negative format", function()
+			expect(api.tostr(255, -1)).to.equal("0x00ff0000")
+			expect(api.tostr(255, -2)).to.equal("16711680")
+			expect(api.tostr(255, -3)).to.equal("0x00ff.0000")
+			expect(api.tostr(255, -4)).to.equal("255")
+			expect(api.tostr(255, -5)).to.equal("0x00ff0000")
+			expect(api.tostr(255, -6)).to.equal("16711680")
+			expect(api.tostr(255, -7)).to.equal("0x00ff.0000")
+		end)
+	end)
+end)
+
+
+-- restore print
+print = print_org -- luacheck: globals print
+
+-- show error if tests failed
+if failcount > 0 then
+	error("\n\n" .. failcount .. " test(s) failed:" .. failmsg)
+else
+	print("\nAll tests PASSED!\n")
 end
 
 
-do -- test api.max
-	-- works for numbers
-	assert(api.min(1, 2) == 1)
-	assert(api.max(1, 2) == 2)
-	assert(api.max(2, 1) == 2)
-	assert(api.max(-1, 2) == 2)
-	assert(api.max(2, -1) == 2)
-
-	-- works for strings
-	assert(api.max("1", "2") == 2)
-	assert(api.max("2", "1") == 2)
-	assert(api.max("-1", "2") == 2)
-	assert(api.max("2", "-1") == 2)
-
-	-- works for numbers + nils
-	assert(api.max(1, nil) == 1)
-	assert(api.max(nil, 1) == 1)
-	assert(api.max(-1, nil) == 0)
-	assert(api.max(nil, -1) == 0)
-
-	-- works for numbers + strings
-	assert(api.max(1, "X") == 1)
-	assert(api.max("X", 1) == 1)
-	assert(api.max(-1, "X") == 0)
-	assert(api.max("X", -1) == 0)
-
-	-- works for nils
-	assert(api.max(nil, nil, nil) == 0)
-	assert(api.max(nil, nil) == 0)
-	assert(api.max(nil) == 0)
-	assert(api.max() == 0)
-end
-
-
-do -- test api.mid
-	assert(api.mid(1, 2, 3) == 2)
-	assert(api.mid(1, 3, 2) == 2)
-	assert(api.mid(2, 1, 3) == 2)
-	assert(api.mid(2, 3, 1) == 2)
-	assert(api.mid(3, 1, 2) == 2)
-	assert(api.mid(3, 2, 1) == 2)
-end
-
-
-do -- test api.atan2
-	assert(api.atan2(1, 0) == 0)
-	assert(api.atan2(0, -1) == 0.25)
-	assert(api.atan2(-1, 0) == 0.5)
-	assert(api.atan2(0, 1) == 0.75)
-end
-
-
-do -- test api.band
-	-- works for single bit shifts
-	assert(bit.band(0x01, bit.lshift(1, 0)) ~= 0)
-	assert(bit.band(0x02, bit.lshift(1, 1)) ~= 0)
-	assert(bit.band(0x04, bit.lshift(1, 2)) ~= 0)
-
-	-- works for multi bit shifts
-	assert(bit.band(0x05, bit.lshift(1, 2)) ~= 0)
-	assert(bit.band(0x05, bit.lshift(1, 0)) ~= 0)
-	assert(bit.band(0x05, bit.lshift(1, 3)) == 0)
-end
-
-
-do -- test api.all
-	-- works for table with some nil values
-	local iter = api.all({nil, nil, 11, nil, 22, 33, 33, b = 42, 44})
-	assert(iter() == 11)
-	assert(iter() == 22)
-	assert(iter() == 33)
-	assert(iter() == 33)
-	assert(iter() == 44)
-	assert(iter() == nil)
-end
-
-
-do -- test api.add
-	-- works for nil array
-	assert(api.add(nil, 1) == nil)
-
-	-- works for adding numbers
-	local array = {}
-	assert(api.add(array, 1) == 1)
-	assert(api.add(array, 2) == 2)
-	assert(api.add(array, 3) == 3)
-	assert(api.add(array, 1) == 1)
-	assert(api.add(array, 2) == 2)
-	assert(api.add(array, 3) == 3)
-	assert(array[1] == 1)
-	assert(array[2] == 2)
-	assert(array[3] == 3)
-	assert(array[4] == 1)
-	assert(array[5] == 2)
-	assert(array[6] == 3)
-	assert(array[7] == nil)
-end
-
-
-do -- test api.del
-	local array = {1, 2, 3, 1, 2, 3}
-	assert(array[1] == 1)
-	assert(array[2] == 2)
-	assert(array[3] == 3)
-	assert(array[4] == 1)
-	assert(array[5] == 2)
-	assert(array[6] == 3)
-	assert(array[7] == nil)
-
-	-- works for removing matching value at the start
-	assert(api.del(array, 1) == 1)
-	assert(array[1] == 2)
-	assert(array[2] == 3)
-	assert(array[3] == 1)
-	assert(array[4] == 2)
-	assert(array[5] == 3)
-	assert(array[6] == nil)
-
-	-- works for removing matching value in the middle
-	assert(api.del(array, 3) == 3)
-	assert(array[1] == 2)
-	assert(array[2] == 1)
-	assert(array[3] == 2)
-	assert(array[4] == 3)
-	assert(array[5] == nil)
-
-	-- works for removing matching value at the end
-	assert(api.del(array, 3) == 3)
-	assert(array[1] == 2)
-	assert(array[2] == 1)
-	assert(array[3] == 2)
-	assert(array[4] == nil)
-
-	-- works for removing missing value
-	assert(api.del(array, 3) == nil)
-	assert(array[1] == 2)
-	assert(array[2] == 1)
-	assert(array[3] == 2)
-	assert(array[4] == nil)
-end
-
-
-do -- test api.tostr
-	-- works for empty and nil
-	assert(api.tostr() == "")
-	assert(api.tostr("") == "")
-	assert(api.tostr(nil) == "[nil]")
-	assert(api.tostr(nil, nil) == "[nil]")
-
-	assert(api.tostr(nil, 1) == "[nil]")
-	assert(api.tostr(nil, 2) == "[nil]")
-	assert(api.tostr(nil, 3) == "[nil]")
-
-	-- works for booleans
-	assert(api.tostr(true) == "true")
-	assert(api.tostr(false) == "false")
-
-	assert(api.tostr(false, 1) == "false")
-	assert(api.tostr(false, 2) == "false")
-	assert(api.tostr(false, 3) == "false")
-
-	-- works for strings
-	assert(api.tostr("test") == "test")
-	assert(api.tostr("string with spaces") == "string with spaces")
-
-	assert(api.tostr("test", 1) == "test")
-	assert(api.tostr("test", 2) == "test")
-	assert(api.tostr("test", 3) == "test")
-
-	-- works for tables
-	assert(api.tostr({}) == "[table]")
-	assert(api.tostr({nil}) == "[table]")
-	assert(api.tostr({"test"}) == "[table]")
-	assert(api.tostr({42}) == "[table]")
-
-	assert(api.tostr({42}, 1) == "[table]")
-	assert(api.tostr({42}, 2) == "[table]")
-	assert(api.tostr({42}, 3) == "[table]")
-
-	-- works for numbers
-	assert(api.tostr(1) == "1")
-	assert(api.tostr(255) == "255")
-	assert(api.tostr(255, nil) == "255")
-	assert(api.tostr(255, 0) == "255")
-
-	-- works for numbers with format
-	assert(api.tostr(255, 1) == "0x00ff.0000")
-	assert(api.tostr(255, true) == "0x00ff.0000")
-	assert(api.tostr(255, 2) == "16711680")
-	assert(api.tostr(255, 3) == "0x00ff0000")
-	assert(api.tostr(255, 4) == "255")
-	assert(api.tostr(255, 5) == "0x00ff.0000")
-	assert(api.tostr(255, 6) == "16711680")
-	assert(api.tostr(255, 7) == "0x00ff0000")
-
-	-- works for numbers with negative format
-	assert(api.tostr(255, -1) == "0x00ff0000")
-	assert(api.tostr(255, -2) == "16711680")
-	assert(api.tostr(255, -3) == "0x00ff.0000")
-	assert(api.tostr(255, -4) == "255")
-	assert(api.tostr(255, -5) == "0x00ff0000")
-	assert(api.tostr(255, -6) == "16711680")
-	assert(api.tostr(255, -7) == "0x00ff.0000")
-end
+print("")
+print("-----------------")
+print("running picolove:")
+print("-----------------")

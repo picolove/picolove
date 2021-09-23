@@ -719,8 +719,12 @@ local function isCtrlOrGuiDown()
 		love.keyboard.isDown("rgui"))
 end
 
+local function isAltDown()
+	return love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")
+end
+
 function love.keypressed(key)
-	if key == "r" and isCtrlOrGuiDown() then
+	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
 		api.reload()
 		api.run()
 	elseif key == "escape" and
@@ -731,9 +735,9 @@ function love.keypressed(key)
 		api.load(initialcartname)
 		api.run()
 		return
-	elseif key == "q" and isCtrlOrGuiDown() then
+	elseif key == "q" and isCtrlOrGuiDown() and not isAltDown() then
 		love.event.quit()
-	elseif key == "v" and isCtrlOrGuiDown() then
+	elseif key == "v" and isCtrlOrGuiDown() and not isAltDown() then
 		pico8.clipboard = love.system.getClipboardText()
 	elseif pico8.can_pause and (key == "pause" or key == "p") then
 		paused = not paused

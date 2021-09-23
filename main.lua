@@ -758,10 +758,7 @@ function love.keypressed(key)
 		end
 		video_frames = nil
 		log("saved video to", basename)
-	elseif
-		key == "return" and
-			(love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))
-	 then
+	elseif key == "return" and isAltDown() then
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 		return
 	else

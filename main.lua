@@ -714,9 +714,9 @@ local function update_audio(time)
 end
 
 local function isCtrlOrGuiDown()
-	return (love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or
+	return love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or
 		love.keyboard.isDown("rctrl") or
-		love.keyboard.isDown("rgui"))
+		love.keyboard.isDown("rgui")
 end
 
 local function isAltDown()

@@ -5,7 +5,7 @@ project_name := "picolove"
 lua_files = $(wildcard *.lua)
 
 run:
-	@love .
+	@love . --test
 
 all: format lint test build
 
@@ -13,12 +13,12 @@ all: format lint test build
 # setup environment variable with path to love executable first
 9:
 	@echo "Love 9 support is WIP"
-	@"${LOVE9}" .
+	@"${LOVE9}" . --test
 10:
-	@"${LOVE10}" .
+	@"${LOVE10}" . --test
 11:
 	@echo "Love 11 support is WIP"
-	@"${LOVE11}" .
+	@"${LOVE11}" . --test
 
 lint:
 	luacheck .

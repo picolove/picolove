@@ -463,7 +463,7 @@ function api.tonum(val)
 		return val and 1 or 0
 	end
 
-	local result = tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+	local result = tonumber(val)
 	if result ~= nil then
 		return result
 	end

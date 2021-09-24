@@ -9,8 +9,6 @@ local bit = require("bit")
 local api = require("api")
 local cart = require("cart")
 
-require("test")
-
 cartname = nil -- used by api.reload
 local initialcartname = nil -- used by esc
 local love_args = nil -- luacheck: no unused
@@ -496,6 +494,10 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 			elseif argv[argpos] == "-global_api" then
 				paramcount = 1
 				local n = argv[argpos + 1]
+
+			elseif argv[argpos] == "--test" then -- picolove commands
+				paramcount = 0
+				require("test")
 			else
 				if initialcartname == nil or initialcartname == "" then
 					initialcartname = argv[argc]

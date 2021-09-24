@@ -461,8 +461,11 @@ end
 function api.tonum(val)
 	if type(val) == "boolean" then
 		return val and 1 or 0
-	else
-		return tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+	end
+
+	local result = tonumber(val) -- not a direct assignment to prevent usage of the radix argument
+	if result ~= nil then
+		return result
 	end
 end
 

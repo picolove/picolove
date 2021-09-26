@@ -458,14 +458,39 @@ function api.cursor(x, y, col)
 	pico8.cursor = {x, y}
 end
 
-function api.tonum(val)
-	if type(val) == "boolean" then
-		return val and 1 or 0
+function api.tonum(val, format)
+	local kind = type(val)
+	if kind ~= "number" and kind ~= "string" and kind ~= "boolean" then
+		return
+	elseif kind == "number" then
+		return val
 	end
 
-	local result = tonumber(val)
+	if type(format) == "string" then
+		format = tonumber(format)
+	elseif type(format) ~= "number" then
+		format = nil
+	end
+
+	local base = 10
+	local shift = false
+	local zeroreturn = false
+	if type(format) == "number" then
+		base = bit.band(format, 1) ~= 0 and 16 or 10
+		shift = bit.band(format, 2) ~= 0
+		zeroreturn = bit.band(format, 4) ~= 0
+	end
+
+	if kind == "boolean" then
+		val = val and 1 or 0
+		return shift and 0 or val
+	end
+
+	local result = tonumber(val, base)
 	if result ~= nil then
-		return result
+		return shift and result / 0x10000 or result
+	elseif zeroreturn then
+		return 0
 	end
 end
 

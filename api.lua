@@ -495,7 +495,12 @@ function api.tonum(val, format)
 end
 
 function api.chr(num)
-	return tostring(string.char(num))
+	local n = tonumber(num)
+	if n == nil then
+		return
+	end
+	n = n % 256
+	return tostring(string.char(n))
 end
 
 function api.ord(...)

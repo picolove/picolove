@@ -515,6 +515,35 @@ describe("picolove api", function()
 			expect(api.tonum("4?4", 4)).to.equal(0)
 		end)
 	end)
+
+	-- TODO: test special chars and chars currently autoreplaces with "8"
+	describe("api.chr", function()
+		it("works for numbers", function()
+			expect(api.chr(42)).to.equal("*")
+		end)
+
+		it("works for strings", function()
+			expect(api.chr("42")).to.equal("*")
+		end)
+
+		it("works for number > 255", function()
+			expect(api.chr(42 + 256)).to.equal("*")
+		end)
+
+		it("works for stirng > 255", function()
+			expect(api.chr("298")).to.equal("*")
+		end)
+
+		it("works for other types", function()
+			expect(api.chr(true)).to.equal(nil)
+			expect(api.chr(false)).to.equal(nil)
+			expect(api.chr("true")).to.equal(nil)
+			expect(api.chr("false")).to.equal(nil)
+			expect(api.chr("test")).to.equal(nil)
+			expect(api.chr({})).to.equal(nil)
+			expect(api.chr(function() end)).to.equal(nil)
+		end)
+	end)
 end)
 
 

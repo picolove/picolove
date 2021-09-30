@@ -1,6 +1,6 @@
 local api = require("api")
 -- hide warnings during test run
---log = print
+log_org = log
 log = function() end
 
 local lust = require("lust")
@@ -547,8 +547,9 @@ describe("picolove api", function()
 end)
 
 
--- restore print
+-- restore functions
 print = print_org -- luacheck: globals print
+log = log_org -- luacheck: globals log
 
 -- show error if tests failed
 if failcount > 0 then

@@ -519,11 +519,11 @@ describe("picolove api", function()
 
 	-- TODO: test special chars and chars currently autoreplaces with "8"
 	describe("api.chr", function()
-		it("works for numbers", function()
+		it("works for printable numbers", function()
 			expect(api.chr(42)).to.equal("*")
 		end)
 
-		it("works for strings", function()
+		it("works for printable strings", function()
 			expect(api.chr("42")).to.equal("*")
 		end)
 

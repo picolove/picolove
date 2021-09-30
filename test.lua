@@ -1,7 +1,4 @@
 local api = require("api")
--- hide warnings during test run
-log_org = log
-log = function() end
 
 local lust = require("lust")
 local describe, it, expect, before, after, spy = -- luacheck: no unused
@@ -40,6 +37,10 @@ local function print_nocolor(text)
 end
 print = function() end -- luacheck: globals print
 print = print_nocolor -- luacheck: globals print
+
+-- hide warnings during test run
+local log_org = log
+log = function() end
 
 
 print("")

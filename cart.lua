@@ -448,6 +448,7 @@ function cart.load_p8(filename)
 	end
 
 	lua = patch_lua(lua)
+	lua = lua .. "\n_picolove_end()"
 
 	log("finished loading cart", filename)
 

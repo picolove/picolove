@@ -50,6 +50,14 @@ end
 api.warning = warning
 api.setfps = setfps
 
+function api._picolove_end()
+	if not pico8.cart._update and
+		not pico8.cart._update60 and
+		not pico8.cart._draw then
+		printh("cart finished")
+	end
+end
+
 function api._getpicoloveversion()
 	return __picolove_version
 end

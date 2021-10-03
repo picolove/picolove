@@ -128,8 +128,6 @@ local function _allow_shutdown(value)
 end
 
 log = print
---log = function() end
-
 -- TODO: move into separate file
 local major, minor, revision = love.getVersion()
 
@@ -388,7 +386,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	pico8.display_shader =
 		love.graphics.newShader(
 		[[
-
 extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {

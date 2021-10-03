@@ -1307,6 +1307,7 @@ api.flr = math.floor
 api.ceil = math.ceil
 
 function api.sgn(x)
+	x = tonumber(x) or 0
 	return x < 0 and -1 or 1
 end
 

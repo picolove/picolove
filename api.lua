@@ -54,7 +54,7 @@ function api._picolove_end()
 	if not pico8.cart._update and
 		not pico8.cart._update60 and
 		not pico8.cart._draw then
-		printh("cart finished")
+		api.printh("cart finished")
 	end
 end
 

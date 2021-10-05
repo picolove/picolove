@@ -411,31 +411,31 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 		while argpos <= argc do
 			if argv[argpos] == "-width" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-height" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-windowed" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-volume" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-joystick" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-pixel_perfect" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-preblit_scale" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-draw_rect" then
 				paramcount = 4
-				local x = argv[argpos + 1]
-				local y = argv[argpos + 2]
-				local w = argv[argpos + 3]
-				local h = argv[argpos + 4]
+				--local x = argv[argpos + 1]
+				--local y = argv[argpos + 2]
+				--local w = argv[argpos + 3]
+				--local h = argv[argpos + 4]
 			elseif argv[argpos] == "-run" then
 				paramcount = 1
 				local filename = argv[argpos + 1]
@@ -446,51 +446,51 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 				initialcartname = filename
 			elseif argv[argpos] == "-export" then
 				paramcount = 1
-				local paramstr = argv[argpos + 1]
+				--local paramstr = argv[argpos + 1]
 			elseif argv[argpos] == "-p" then
 				paramcount = 1
-				local paramstr = argv[argpos + 1]
+				--local paramstr = argv[argpos + 1]
 			elseif argv[argpos] == "-splore" then
 				paramcount = 0
 			elseif argv[argpos] == "-home" then
 				paramcount = 1
-				local path = argv[argpos + 1]
+				--local path = argv[argpos + 1]
 			elseif argv[argpos] == "-root_path" then
 				paramcount = 1
-				local path = argv[argpos + 1]
+				--local path = argv[argpos + 1]
 			elseif argv[argpos] == "-desktop" then
 				paramcount = 1
-				local path = argv[argpos + 1]
+				--local path = argv[argpos + 1]
 			elseif argv[argpos] == "-screenshot_scale" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-gif_scale" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-gif_len" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-gui_theme" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-timeout" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-software_blit" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-foreground_sleep_ms" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-background_sleep_ms" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-accept_future" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 			elseif argv[argpos] == "-global_api" then
 				paramcount = 1
-				local n = argv[argpos + 1]
+				--local n = argv[argpos + 1]
 
 			elseif argv[argpos] == "--test" then -- picolove commands
 				paramcount = 0

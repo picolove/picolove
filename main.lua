@@ -1060,7 +1060,7 @@ function patch_lua(lua)
 	lua = lua:gsub("(%S+)%s*([%+-%*/%%])=", "%1 = %1 %2 ")
 	lua = lua:gsub("(%S+)%s*(%.%.)=", "%1 = %1 %2 ")
 
-	lua = lua:gsub("@%s*([^\n\r%s]*)", "peek(%1)")
+	--lua = lua:gsub("@%s*([^\n\r%s]*)", "peek(%1)")
 
 	--[[
 	2\2

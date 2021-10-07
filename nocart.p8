@@ -1,6 +1,13 @@
 pico-8 cartridge // http://www.pico-8.com
 version 32
 __lua__
+-- pico-8 compatibility
+_allow_pause = _allow_pause or function() end
+_allow_shutdown = _allow_shutdown or function() end
+_getpicoloveversion = _getpicoloveversion or function() return "" end
+_getcursorx =  _getcursorx or function() return peek(0x5f26) end
+_getcursory =  _getcursory or function() return peek(0x5f27) - 6 end
+
 function _init()
 	_allow_pause(false)
 	_allow_shutdown(true)

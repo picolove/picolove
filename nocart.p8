@@ -1,5 +1,5 @@
-pico-8 cartridge // http://www.pico-8.com
-version 32
+pico-8 cartridge
+version 33
 __lua__
 -- pico-8 compatibility
 _allow_pause = _allow_pause or function() end

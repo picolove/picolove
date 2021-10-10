@@ -226,6 +226,45 @@ describe("picolove api", function()
 	end)
 
 
+	describe("api.deli", function()
+		it("works for removing index at the start", function()
+			local array = {1, 2, 3, 1, 2, 3}
+			expect(api.deli(array, 1)).to.equal(1)
+			expect(array).to.equal({2, 3, 1, 2, 3})
+		end)
+
+		it("works for removing index in the middle", function()
+			local array = {2, 3, 1, 2, 3}
+			expect(api.deli(array, 2)).to.equal(3)
+			expect(array).to.equal({2, 1, 2, 3})
+		end)
+
+		it("works for removing index at the end", function()
+			local array = {2, 1, 2, 3}
+			expect(api.deli(array, 4)).to.equal(3)
+			expect(array).to.equal({2, 1, 2})
+		end)
+
+		it("works for removing missing index", function()
+			local array = {2, 1, 2}
+			expect(api.deli(array, 7)).to.equal(nil)
+			expect(array).to.equal({2, 1, 2})
+		end)
+
+		it("works for removing missing negative index", function()
+			local array = {2, 1, 2}
+			expect(api.deli(array, -1)).to.equal(nil)
+			expect(array).to.equal({2, 1, 2})
+		end)
+
+		it("works for removing missing zero index", function()
+			local array = {2, 1, 2}
+			expect(api.deli(array, 0)).to.equal(nil)
+			expect(array).to.equal({2, 1, 2})
+		end)
+	end)
+
+
 	describe("api.tostr", function()
 		it("works for empty and nil", function()
 			expect(api.tostr()).to.equal("")

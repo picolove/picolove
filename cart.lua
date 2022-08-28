@@ -1,9 +1,9 @@
 local api = require("api")
 
 local compression_map = {}
-for entry in ("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(
-	"."
-) do
+for entry in
+	("\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_"):gmatch(".")
+do
 	table.insert(compression_map, entry)
 end
 
@@ -72,10 +72,10 @@ function cart.load_p8(filename)
 			editor_mode = 0,
 			speed = 16,
 			loop_start = 0,
-			loop_end = 0
+			loop_end = 0,
 		}
 		for j = 0, 31 do
-			pico8.sfx[i][j] = {0, 0, 0, 0}
+			pico8.sfx[i][j] = { 0, 0, 0, 0 }
 		end
 	end
 	pico8.music = {}
@@ -85,7 +85,7 @@ function cart.load_p8(filename)
 			[0] = 1,
 			[1] = 2,
 			[2] = 3,
-			[3] = 4
+			[3] = 4,
 		}
 	end
 
@@ -147,8 +147,7 @@ function cart.load_p8(filename)
 							local spriteCounter = 0
 							for yy = 0, 15 do
 								for xx = 0, 15 do
-									pico8.quads[spriteCounter] =
-										love.graphics.newQuad(
+									pico8.quads[spriteCounter] = love.graphics.newQuad(
 										xx * 8,
 										yy * 8,
 										8,
@@ -178,8 +177,7 @@ function cart.load_p8(filename)
 					-- music
 					local _music = math.floor((inbyte - 0x3100) / 4)
 					pico8.music[_music][inbyte % 4] = bit.band(byte, 0x7F)
-					pico8.music[_music].loop =
-						bit.bor(
+					pico8.music[_music].loop = bit.bor(
 						bit.rshift(bit.band(byte, 0x80), 7 - inbyte % 4),
 						pico8.music[_music].loop
 					)
@@ -193,7 +191,7 @@ function cart.load_p8(filename)
 							bit.band(note, 0x3f),
 							bit.rshift(bit.band(note, 0x1c0), 6),
 							bit.rshift(bit.band(note, 0xe00), 9),
-							bit.rshift(bit.band(note, 0x7000), 12)
+							bit.rshift(bit.band(note, 0x7000), 12),
 						}
 					elseif step == 64 then
 						pico8.sfx[_sfx].editor_mode = byte
@@ -245,7 +243,7 @@ function cart.load_p8(filename)
 
 		-- check for header and version
 		local header = "pico%-8 cartridge"
-		local header_len = #header - 1  -- subtract escape char
+		local header_len = #header - 1 -- subtract escape char
 		local version_header = "\nversion"
 
 		local header_start = data:find(header)
@@ -384,7 +382,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-		--assert(tiles + shared == 128 * 64, string.format("%d + %d != %d", tiles, shared, 128 * 64))
+			--assert(tiles + shared == 128 * 64, string.format("%d + %d != %d", tiles, shared, 128 * 64))
 		end
 
 		-- load sfx
@@ -407,7 +405,7 @@ function cart.load_p8(filename)
 					local instr = tonumber(line:sub(i + 2, i + 2), 16)
 					local vol = tonumber(line:sub(i + 3, i + 3), 16)
 					local fx = tonumber(line:sub(i + 4, i + 4), 16)
-					pico8.sfx[_sfx][step] = {note, instr, vol, fx}
+					pico8.sfx[_sfx][step] = { note, instr, vol, fx }
 					step = step + 1
 
 					if step == 32 then
@@ -434,7 +432,7 @@ function cart.load_p8(filename)
 					[0] = tonumber(line:sub(4, 5), 16),
 					[1] = tonumber(line:sub(6, 7), 16),
 					[2] = tonumber(line:sub(8, 9), 16),
-					[3] = tonumber(line:sub(10, 11), 16)
+					[3] = tonumber(line:sub(10, 11), 16),
 				}
 
 				_music = _music + 1
@@ -443,7 +441,7 @@ function cart.load_p8(filename)
 				end
 			end
 
-		--assert(_music == 64, string.format("%d", _music))
+			--assert(_music == 64, string.format("%d", _music))
 		end
 	end
 

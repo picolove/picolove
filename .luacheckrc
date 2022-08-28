@@ -36,4 +36,5 @@ ignore = {
 exclude_files = {
   "lib",
   "spec",
+  ".DS_Store",
 }

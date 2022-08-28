@@ -1,8 +1,6 @@
 .PHONY: run all 9 10 11 lint build clean format test
 
 project_name := "picolove"
-# ignore subfolders for now
-lua_files = $(wildcard *.lua)
 
 run:
 	@love . --test
@@ -24,7 +22,9 @@ lint:
 	luacheck .
 
 format:
-	@$(foreach file,$(lua_files),luafmt -l 80 -w replace -i 2 --use-tabs $(file);)
+	@sed -i s/0x1234\.abcd/0x1234abcd/g test.lua
+	stylua .
+	@sed -i s/0x1234abcd/0x1234\.abcd/g test.lua
 
 clean:
 	@echo "deleting \"build/${project_name}.love\" ..."

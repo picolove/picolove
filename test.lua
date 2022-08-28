@@ -2,7 +2,7 @@ local api = require("api")
 
 local lust = require("lust")
 local describe, it, expect, before, after, spy = -- luacheck: no unused
-lust.describe, lust.it, lust.expect, lust.before, lust.after, lust.spy
+	lust.describe, lust.it, lust.expect, lust.before, lust.after, lust.spy
 
 local failcount = 0
 local failmsg = ""
@@ -29,9 +29,9 @@ local print_org = print
 local function print_nocolor(text)
 	local count
 
-	text = text:gsub('\27%[%d+m', '')
-	text = text:gsub('\t', '        ')
-	text, count = text:gsub('^(%s+)%s%s%sFAIL', '!!!%1FAIL')
+	text = text:gsub("\27%[%d+m", "")
+	text = text:gsub("\t", "        ")
+	text, count = text:gsub("^(%s+)%s%s%sFAIL", "!!!%1FAIL")
 	print_org(text)
 	cache_errors(text, count)
 end
@@ -42,18 +42,15 @@ print = print_nocolor -- luacheck: globals print
 local log_org = log
 log = function() end
 
-
 print("")
 print("--------------")
 print("running tests:")
 print("--------------")
 
 describe("picolove api", function()
-	before(function()
-	end)
+	before(function() end)
 
-	after(function()
-	end)
+	after(function() end)
 
 	describe("api.min", function()
 		it("works for numbers", function()
@@ -92,7 +89,6 @@ describe("picolove api", function()
 		end)
 	end)
 
-
 	describe("api.max", function()
 		it("works for numbers", function()
 			expect(api.max(1, 2)).to.equal(2)
@@ -130,7 +126,6 @@ describe("picolove api", function()
 		end)
 	end)
 
-
 	describe("api.mid", function()
 		it("works for numbers", function()
 			expect(api.mid(1, 2, 3)).to.equal(2)
@@ -142,7 +137,6 @@ describe("picolove api", function()
 		end)
 	end)
 
-
 	describe("api.atan2", function()
 		it("works for numbers", function()
 			expect(api.atan2(1, 0)).to.equal(0)
@@ -151,7 +145,6 @@ describe("picolove api", function()
 			expect(api.atan2(0, 1)).to.equal(0.75)
 		end)
 	end)
-
 
 	describe("api.band", function()
 		it("works for single bit shifts", function()
@@ -167,10 +160,9 @@ describe("picolove api", function()
 		end)
 	end)
 
-
 	describe("api.all", function()
 		it("works for table with some nil values", function()
-			local iter = api.all({nil, nil, 11, nil, 22, 33, 33, b = 42, 44})
+			local iter = api.all({ nil, nil, 11, nil, 22, 33, 33, b = 42, 44 })
 			expect(iter()).to.equal(11)
 			expect(iter()).to.equal(22)
 			expect(iter()).to.equal(33)
@@ -179,7 +171,6 @@ describe("picolove api", function()
 			expect(iter()).to.equal(nil)
 		end)
 	end)
-
 
 	describe("api.add", function()
 		it("works for nil array", function()
@@ -194,76 +185,73 @@ describe("picolove api", function()
 			expect(api.add(array, 1)).to.equal(1)
 			expect(api.add(array, 2)).to.equal(2)
 			expect(api.add(array, 3)).to.equal(3)
-			expect(array).to.equal({1,2,3,1,2,3})
+			expect(array).to.equal({ 1, 2, 3, 1, 2, 3 })
 		end)
 	end)
-
 
 	describe("api.del", function()
 		it("works for removing matching value at the start", function()
-			local array = {1, 2, 3, 1, 2, 3}
+			local array = { 1, 2, 3, 1, 2, 3 }
 			expect(api.del(array, 1)).to.equal(1)
-			expect(array).to.equal({2, 3, 1, 2, 3})
+			expect(array).to.equal({ 2, 3, 1, 2, 3 })
 		end)
 
 		it("works for removing matching value in the middle", function()
-			local array = {2, 3, 1, 2, 3}
+			local array = { 2, 3, 1, 2, 3 }
 			expect(api.del(array, 3)).to.equal(3)
-			expect(array).to.equal({2, 1, 2, 3})
+			expect(array).to.equal({ 2, 1, 2, 3 })
 		end)
 
 		it("works for removing matching value at the end", function()
-			local array = {2, 1, 2, 3}
+			local array = { 2, 1, 2, 3 }
 			expect(api.del(array, 3)).to.equal(3)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 
 		it("works for removing missing value", function()
-			local array = {2, 1, 2}
+			local array = { 2, 1, 2 }
 			expect(api.del(array, 3)).to.equal(nil)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 	end)
-
 
 	describe("api.deli", function()
 		it("works for removing index at the start", function()
-			local array = {1, 2, 3, 1, 2, 3}
+			local array = { 1, 2, 3, 1, 2, 3 }
 			expect(api.deli(array, 1)).to.equal(1)
-			expect(array).to.equal({2, 3, 1, 2, 3})
+			expect(array).to.equal({ 2, 3, 1, 2, 3 })
 		end)
 
 		it("works for removing index in the middle", function()
-			local array = {2, 3, 1, 2, 3}
+			local array = { 2, 3, 1, 2, 3 }
 			expect(api.deli(array, 2)).to.equal(3)
-			expect(array).to.equal({2, 1, 2, 3})
+			expect(array).to.equal({ 2, 1, 2, 3 })
 		end)
 
 		it("works for removing index at the end", function()
-			local array = {2, 1, 2, 3}
+			local array = { 2, 1, 2, 3 }
 			expect(api.deli(array, 4)).to.equal(3)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 
 		it("works for removing missing index", function()
-			local array = {2, 1, 2}
+			local array = { 2, 1, 2 }
 			expect(api.deli(array, 7)).to.equal(nil)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 
 		it("works for removing missing negative index", function()
-			local array = {2, 1, 2}
+			local array = { 2, 1, 2 }
 			expect(api.deli(array, -1)).to.equal(nil)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 
 		it("works for removing missing zero index", function()
-			local array = {2, 1, 2}
+			local array = { 2, 1, 2 }
 			expect(api.deli(array, 0)).to.equal(nil)
-			expect(array).to.equal({2, 1, 2})
+			expect(array).to.equal({ 2, 1, 2 })
 		end)
 	end)
-
 
 	describe("api.tostr", function()
 		it("works for empty and nil", function()
@@ -297,13 +285,13 @@ describe("picolove api", function()
 
 		it("works for tables", function()
 			expect(api.tostr({})).to.equal("[table]")
-			expect(api.tostr({nil})).to.equal("[table]")
-			expect(api.tostr({"test"})).to.equal("[table]")
-			expect(api.tostr({42})).to.equal("[table]")
+			expect(api.tostr({ nil })).to.equal("[table]")
+			expect(api.tostr({ "test" })).to.equal("[table]")
+			expect(api.tostr({ 42 })).to.equal("[table]")
 
-			expect(api.tostr({42}), 1).to.equal("[table]")
-			expect(api.tostr({42}), 2).to.equal("[table]")
-			expect(api.tostr({42}), 3).to.equal("[table]")
+			expect(api.tostr({ 42 }), 1).to.equal("[table]")
+			expect(api.tostr({ 42 }), 2).to.equal("[table]")
+			expect(api.tostr({ 42 }), 3).to.equal("[table]")
 		end)
 
 		it("works for numbers", function()
@@ -381,8 +369,8 @@ describe("picolove api", function()
 			expect(hasnoreturn("test")).to.equal(false)
 			expect(hasnoreturn(nil)).to.equal(false)
 			expect(hasnoreturn({})).to.equal(false)
-			expect(hasnoreturn({1})).to.equal(false)
-			expect(hasnoreturn({"test"})).to.equal(false)
+			expect(hasnoreturn({ 1 })).to.equal(false)
+			expect(hasnoreturn({ "test" })).to.equal(false)
 
 			expect(hasnoreturn(api.tonum(""))).to.equal(true)
 			expect(hasnoreturn(api.tonum("false"))).to.equal(true)
@@ -693,7 +681,6 @@ describe("picolove api", function()
 	end)
 end)
 
-
 -- restore functions
 print = print_org -- luacheck: globals print
 log = log_org -- luacheck: globals log
@@ -704,7 +691,6 @@ if failcount > 0 then
 else
 	print("\nAll tests PASSED!\n")
 end
-
 
 print("")
 print("-----------------")

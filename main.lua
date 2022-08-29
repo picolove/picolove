@@ -20,22 +20,22 @@ pico8 = {
 	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
-		{0, 0, 0, 255},
-		{29, 43, 83, 255},
-		{126, 37, 83, 255},
-		{0, 135, 81, 255},
-		{171, 82, 54, 255},
-		{95, 87, 79, 255},
-		{194, 195, 199, 255},
-		{255, 241, 232, 255},
-		{255, 0, 77, 255},
-		{255, 163, 0, 255},
-		{255, 240, 36, 255},
-		{0, 231, 86, 255},
-		{41, 173, 255, 255},
-		{131, 118, 156, 255},
-		{255, 119, 168, 255},
-		{255, 204, 170, 255}
+		{ 0, 0, 0, 255 },
+		{ 29, 43, 83, 255 },
+		{ 126, 37, 83, 255 },
+		{ 0, 135, 81, 255 },
+		{ 171, 82, 54, 255 },
+		{ 95, 87, 79, 255 },
+		{ 194, 195, 199, 255 },
+		{ 255, 241, 232, 255 },
+		{ 255, 0, 77, 255 },
+		{ 255, 163, 0, 255 },
+		{ 255, 240, 36, 255 },
+		{ 0, 231, 86, 255 },
+		{ 41, 173, 255, 255 },
+		{ 131, 118, 156, 255 },
+		{ 255, 119, 168, 255 },
+		{ 255, 204, 170, 255 },
 	},
 	color = nil,
 	spriteflags = {},
@@ -50,32 +50,32 @@ pico8 = {
 	clipboard = "",
 	keypressed = {
 		[0] = {},
-		[1] = {}
+		[1] = {},
 	},
 	keymap = {
 		[0] = {
-			[0] = {"left", "kp4"},
-			[1] = {"right", "kp6"},
-			[2] = {"up", "kp8"},
-			[3] = {"down", "kp5"},
-			[4] = {"z", "c", "n", "kp-", "kp1", "insert"},
-			[5] = {"x", "v", "m", "8", "kp2", "delete"},
-			[6] = {"return", "escape"},
-			[7] = {}
+			[0] = { "left", "kp4" },
+			[1] = { "right", "kp6" },
+			[2] = { "up", "kp8" },
+			[3] = { "down", "kp5" },
+			[4] = { "z", "c", "n", "kp-", "kp1", "insert" },
+			[5] = { "x", "v", "m", "8", "kp2", "delete" },
+			[6] = { "return", "escape" },
+			[7] = {},
 		},
 		[1] = {
-			[0] = {"s"},
-			[1] = {"f"},
-			[2] = {"e"},
-			[3] = {"d"},
-			[4] = {"tab", "lshift", "w"},
-			[5] = {"q", "a"},
+			[0] = { "s" },
+			[1] = { "f" },
+			[2] = { "e" },
+			[3] = { "d" },
+			[4] = { "tab", "lshift", "w" },
+			[5] = { "q", "a" },
 			[6] = {},
-			[7] = {}
-		}
+			[7] = {},
+		},
 	},
 	mwheel = 0,
-	cursor = {0, 0},
+	cursor = { 0, 0 },
 	camera_x = 0,
 	camera_y = 0,
 	can_pause = true,
@@ -89,7 +89,7 @@ pico8 = {
 	text_shader = nil,
 	quads = {},
 	spritesheet_data = nil,
-	spritesheet = nil
+	spritesheet = nil,
 }
 
 local flr, abs = math.floor, math.abs
@@ -111,7 +111,7 @@ local bits = 16
 
 currentDirectory = "/"
 local glyphs =
-	'abcdefghijklmnopqrstuvwxyz"\'`-_/1234567890!?[](){}.,;:<>+=%#^*~ '
+	"abcdefghijklmnopqrstuvwxyz\"'`-_/1234567890!?[](){}.,;:<>+=%#^*~ "
 
 local function _allow_pause(value)
 	if type(value) ~= "boolean" then
@@ -179,17 +179,17 @@ function _load(_cartname)
 		return false
 	end
 
-	local exts = {"", ".p8", ".p8.png", ".png"}
+	local exts = { "", ".p8", ".p8.png", ".png" }
 	local cart_no_ext = _cartname
 
 	if _cartname:sub(-3) == ".p8" then
-		exts = {".p8", ".p8.png"}
+		exts = { ".p8", ".p8.png" }
 		cart_no_ext = _cartname:sub(1, -4)
 	elseif _cartname:sub(-7) == ".p8.png" then
-		exts = {".p8.png"}
+		exts = { ".p8.png" }
 		cart_no_ext = _cartname:sub(1, -8)
 	elseif _cartname:sub(-4) == ".png" then
-		exts = {".png", ".p8.png"}
+		exts = { ".png", ".p8.png" }
 		cart_no_ext = _cartname:sub(1, -5)
 	end
 
@@ -263,8 +263,8 @@ function love.load(argv)
 	-- tri/2
 	osc[5] = function(x)
 		x = x * 4
-		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 0.5) % 2) - 1) - 0.5) / 2 - 0.1) *
-			0.7
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 0.5) % 2) - 1) - 0.5) / 2 - 0.1)
+			* 0.7
 	end
 	-- noise
 	osc[6] = function()
@@ -277,15 +277,17 @@ function love.load(argv)
 			lsample = sample
 			sample = (lsample + scale * (math.random() * 2 - 1)) / (1 + scale)
 			lastx = x
-			return math.min(math.max((lsample + sample) * 4 / 3 * (1.75 - scale), -1), 1) *
-				0.7
+			return math.min(
+				math.max((lsample + sample) * 4 / 3 * (1.75 - scale), -1),
+				1
+			) * 0.7
 		end
 	end
 	-- detuned tri
 	osc[7] = function(x)
 		x = x * 2
-		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 127 / 128) % 2) - 1) - 0.5) / 2) -
-			1 / 4
+		return (abs((x % 2) - 1) - 0.5 + (abs(((x * 127 / 128) % 2) - 1) - 0.5) / 2)
+			- 1 / 4
 	end
 	-- saw from 0 to 1, used for arppregiator
 	osc["saw_lfo"] = function(x)
@@ -296,7 +298,7 @@ function love.load(argv)
 		[0] = QueueableSource:new(8),
 		QueueableSource:new(8),
 		QueueableSource:new(8),
-		QueueableSource:new(8)
+		QueueableSource:new(8),
 	}
 
 	for i = 0, 3 do
@@ -306,7 +308,7 @@ function love.load(argv)
 	for i = 0, 3 do
 		pico8.audio_channels[i] = {
 			oscpos = 0,
-			noise = osc[6]()
+			noise = osc[6](),
 		}
 	end
 
@@ -339,21 +341,16 @@ function love.load(argv)
 		pico8.display_palette[i] = pico8.palette[i]
 	end
 
-	pico8.draw_shader =
-		love.graphics.newShader(
-		[[
+	pico8.draw_shader = love.graphics.newShader([[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(color.r*16.0);
 	return vec4(vec3(palette[index]/16.0),1.0);
-}]]
-	)
+}]])
 	pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
-	pico8.sprite_shader =
-		love.graphics.newShader(
-		[[
+	pico8.sprite_shader = love.graphics.newShader([[
 extern float palette[16];
 extern float transparent[16];
 
@@ -361,14 +358,11 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(floor(Texel(texture, texture_coords).r*16.0));
 	float alpha = transparent[index];
 	return vec4(vec3(palette[index]/16.0),alpha);
-}]]
-	)
+}]])
 	pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
 
-	pico8.text_shader =
-		love.graphics.newShader(
-		[[
+	pico8.text_shader = love.graphics.newShader([[
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
@@ -379,21 +373,17 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	int index = int(color.r*16.0);
 	// lookup the color in the palette by index
 	return vec4(vec3(palette[index]/16.0),1.0);
-}]]
-	)
+}]])
 	pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
-	pico8.display_shader =
-		love.graphics.newShader(
-		[[
+	pico8.display_shader = love.graphics.newShader([[
 extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
 	int index = int(Texel(texture, texture_coords).r*15.0);
 	// lookup the color in the palette by index
 	return palette[index]/256.0;
-}]]
-	)
+}]])
 	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 
 	-- load the cart
@@ -410,32 +400,32 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 		-- TODO: implement commandline options
 		while argpos <= argc do
 			if argv[argpos] == "-width" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-height" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-windowed" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-volume" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-joystick" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-pixel_perfect" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-preblit_scale" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-draw_rect" then
-				paramcount = 4
 				--local x = argv[argpos + 1]
 				--local y = argv[argpos + 2]
 				--local w = argv[argpos + 3]
 				--local h = argv[argpos + 4]
+				paramcount = 4
 			elseif argv[argpos] == "-run" then
 				paramcount = 1
 				local filename = argv[argpos + 1]
@@ -445,53 +435,52 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 				local filename = argv[argpos + 1]
 				initialcartname = filename
 			elseif argv[argpos] == "-export" then
-				paramcount = 1
 				--local paramstr = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-p" then
-				paramcount = 1
 				--local paramstr = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-splore" then
 				paramcount = 0
 			elseif argv[argpos] == "-home" then
-				paramcount = 1
 				--local path = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-root_path" then
-				paramcount = 1
 				--local path = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-desktop" then
-				paramcount = 1
 				--local path = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-screenshot_scale" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-gif_scale" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-gif_len" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-gui_theme" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-timeout" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-software_blit" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-foreground_sleep_ms" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-background_sleep_ms" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-accept_future" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
+				paramcount = 1
 			elseif argv[argpos] == "-global_api" then
-				paramcount = 1
 				--local n = argv[argpos + 1]
-
+				paramcount = 1
 			elseif argv[argpos] == "--test" then -- picolove commands
 				paramcount = 0
 				require("test")
@@ -533,7 +522,7 @@ function new_sandbox()
 		_textinput = nil,
 		-- used for repl
 		_allow_pause = _allow_pause,
-		_allow_shutdown = _allow_shutdown
+		_allow_shutdown = _allow_shutdown,
 	}
 	for k, v in pairs(picolove_functions) do
 		cart_env[k] = v
@@ -625,7 +614,8 @@ function flip_screen()
 	love.graphics.present()
 
 	if video_frames then
-		local tmp = love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
+		local tmp =
+			love.graphics.newCanvas(pico8.resolution[1], pico8.resolution[2])
 		love.graphics.setCanvas(tmp)
 		love.graphics.draw(pico8.screen, 0, 0)
 		table.insert(video_frames, tmp:getImageData())
@@ -660,7 +650,7 @@ local note_map = {
 	"G#",
 	"A-",
 	"A#",
-	"B-"
+	"B-",
 }
 
 local function note_to_string(note) -- luacheck: no unused
@@ -687,9 +677,8 @@ local function update_audio(time)
 
 	for _ = 0, samples - 1 do
 		if pico8.current_music then
-			pico8.current_music.offset =
-				pico8.current_music.offset +
-				7350 / (61 * pico8.current_music.speed * __sample_rate)
+			pico8.current_music.offset = pico8.current_music.offset
+				+ 7350 / (61 * pico8.current_music.speed * __sample_rate)
 			if pico8.current_music.offset >= 32 then
 				local next_track = pico8.current_music.music
 				if pico8.music[next_track].loop == 2 then
@@ -717,8 +706,12 @@ local function update_audio(time)
 			local ch = pico8.audio_channels[channel]
 
 			if ch.bufferpos == 0 or ch.bufferpos == nil then
-				ch.buffer =
-					love.sound.newSoundData(__audio_buffer_size, __sample_rate, bits, channels)
+				ch.buffer = love.sound.newSoundData(
+					__audio_buffer_size,
+					__sample_rate,
+					bits,
+					channels
+				)
 				ch.bufferpos = 0
 			end
 			if ch.sfx and pico8.sfx[ch.sfx] then
@@ -760,11 +753,15 @@ local function update_audio(time)
 					local vol = ch.vol
 					if ch.fx == 1 then
 						-- slide from previous note over the length of a step
-						ch.freq =
-							lerp(note_to_hz(ch.lastnote or 0), note_to_hz(ch.note), ch.offset % 1)
+						ch.freq = lerp(
+							note_to_hz(ch.lastnote or 0),
+							note_to_hz(ch.note),
+							ch.offset % 1
+						)
 					elseif ch.fx == 2 then
 						-- vibrato one semitone?
-						ch.freq = lerp(note_to_hz(ch.note), note_to_hz(ch.note + 0.5), ch.lfo(4))
+						ch.freq =
+							lerp(note_to_hz(ch.note), note_to_hz(ch.note + 0.5), ch.lfo(4))
 					elseif ch.fx == 3 then
 						-- drop/bomb slide from note to c-0
 						local off = ch.offset % 1
@@ -815,9 +812,10 @@ local function update_audio(time)
 end
 
 local function isCtrlOrGuiDown()
-	return love.keyboard.isDown("lctrl") or love.keyboard.isDown("lgui") or
-		love.keyboard.isDown("rctrl") or
-		love.keyboard.isDown("rgui")
+	return love.keyboard.isDown("lctrl")
+		or love.keyboard.isDown("lgui")
+		or love.keyboard.isDown("rctrl")
+		or love.keyboard.isDown("rgui")
 end
 
 local function isAltDown()
@@ -828,11 +826,13 @@ function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
 		api.reload()
 		api.run()
-	elseif key == "escape" and
-		cartname ~= nil and
-		cartname ~= initialcartname and
-		cartname ~= "nocart.p8" and
-		cartname ~= "editor.p8" then
+	elseif
+		key == "escape"
+		and cartname ~= nil
+		and cartname ~= initialcartname
+		and cartname ~= "nocart.p8"
+		and cartname ~= "editor.p8"
+	then
 		api.load(initialcartname)
 		api.run()
 		return
@@ -1004,10 +1004,10 @@ function love.run()
 				if love.draw then
 					love.draw()
 				end
-			--else
-			-- TODO: fix issue with leftover paused menu
-			--api.rectfill(64 - 4 * 4, 60, 64 + 4 * 4 - 2, 64 + 4 + 4, 1)
-			--api.print("paused", 64 - 3 * 4, 64, (host_time * 20) % 8 < 4 and 7 or 13)
+				--else
+				-- TODO: fix issue with leftover paused menu
+				--api.rectfill(64 - 4 * 4, 60, 64 + 4 * 4 - 2, 64 + 4 + 4, 1)
+				--api.print("paused", 64 - 3 * 4, 64, (host_time * 20) % 8 < 4 and 7 or 13)
 			end
 			-- reset mouse wheel
 			pico8.mwheel = 0
@@ -1029,30 +1029,25 @@ function patch_lua(lua)
 	-- 0,0) do
 	-- end
 	lua = lua:gsub("while%s*(.-)%s*do", function(a)
-		a=a:gsub("%s*\n%s*", " ")
+		a = a:gsub("%s*\n%s*", " ")
 		return "while " .. a .. " do"
-	end
-	)
+	end)
 	-- rewrite shorthand if statements eg. if (not b) i=1 j=2
-	lua =
-		lua:gsub(
-		"if%s*(%b())%s*([^\n]*)\n",
-		function(a, b)
-			local nl = a:find("\n", nil, true)
-			local th = b:find("%f[%w]then%f[%W]")
-			local an = b:find("%f[%w]and%f[%W]")
-			local o = b:find("%f[%w]or%f[%W]")
-			local ce = b:find("--", nil, true)
-			if not (nl or th or an or o) then
-				if ce then
-					local c, t = b:match("(.-)(%s-%-%-.*)")
-					return "if " .. a:sub(2, -2) .. " then " .. c .. " end" .. t .. "\n"
-				else
-					return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
-				end
+	lua = lua:gsub("if%s*(%b())%s*([^\n]*)\n", function(a, b)
+		local nl = a:find("\n", nil, true)
+		local th = b:find("%f[%w]then%f[%W]")
+		local an = b:find("%f[%w]and%f[%W]")
+		local o = b:find("%f[%w]or%f[%W]")
+		local ce = b:find("--", nil, true)
+		if not (nl or th or an or o) then
+			if ce then
+				local c, t = b:match("(.-)(%s-%-%-.*)")
+				return "if " .. a:sub(2, -2) .. " then " .. c .. " end" .. t .. "\n"
+			else
+				return "if " .. a:sub(2, -2) .. " then " .. b .. " end\n"
 			end
 		end
-	)
+	end)
 	-- rewrite assignment operators
 	-- TODO: handle edge case "if x then i += 1 % 2 end" with % as +-*/%(^.:#)[
 	--lua = lua:gsub("([\n\r]%s*)(%a[%a%d]*)%s*([%+-%*/%%])=(%s*%S*)([^\n\r]*)", "%1%2 = %2 %3 (%4)%5")
@@ -1077,26 +1072,22 @@ function patch_lua(lua)
 	lua = lua:gsub("([\n\r]%s*)?([^\n\r]*)", "%1print(%2)")
 	lua = lua:gsub("^(%s*)?([^\n\r]*)", "%1print(%2)")
 	-- convert binary literals to hex literals
-	lua =
-		lua:gsub(
-		"([^%w_])0[bB]([01.]+)",
-		function(a, b)
-			local p1, p2 = b, ""
-			if b:find(".", nil, true) then
-				p1, p2 = b:match("(.-)%.(.*)")
-			end
-			-- pad to 4 characters
-			p2 = p2 .. string.rep("0", 3 - ((#p2 - 1) % 4))
-			p1, p2 = tonumber(p1, 2), tonumber(p2, 2)
-			if p1 then
-				if p2 then
-					return string.format("%s0x%x.%x", a, p1, p2)
-				else
-					return string.format("%s0x%x", a, p1)
-				end
+	lua = lua:gsub("([^%w_])0[bB]([01.]+)", function(a, b)
+		local p1, p2 = b, ""
+		if b:find(".", nil, true) then
+			p1, p2 = b:match("(.-)%.(.*)")
+		end
+		-- pad to 4 characters
+		p2 = p2 .. string.rep("0", 3 - ((#p2 - 1) % 4))
+		p1, p2 = tonumber(p1, 2), tonumber(p2, 2)
+		if p1 then
+			if p2 then
+				return string.format("%s0x%x.%x", a, p1, p2)
+			else
+				return string.format("%s0x%x", a, p1)
 			end
 		end
-	)
+	end)
 
 	return lua
 end

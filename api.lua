@@ -13,7 +13,7 @@ local function warning(msg)
 end
 
 local function _horizontal_line(lines, x0, y, x1)
-	table.insert(lines, {x0 + 0.5, y + 0.5, x1 + 1.5, y + 0.5})
+	table.insert(lines, { x0 + 0.5, y + 0.5, x1 + 1.5, y + 0.5 })
 end
 
 local function _plot4points(lines, cx, cy, x, y)
@@ -51,9 +51,11 @@ api.warning = warning
 api.setfps = setfps
 
 function api._picolove_end()
-	if not pico8.cart._update and
-		not pico8.cart._update60 and
-		not pico8.cart._draw then
+	if
+		not pico8.cart._update
+		and not pico8.cart._update60
+		and not pico8.cart._draw
+	then
 		api.printh("cart finished")
 	end
 end
@@ -108,10 +110,10 @@ end
 function api.clip(x, y, w, h)
 	if type(x) == "number" then
 		love.graphics.setScissor(x, y, w, h)
-		pico8.clip = {x, y, w, h}
+		pico8.clip = { x, y, w, h }
 	else
 		love.graphics.setScissor(0, 0, pico8.resolution[1], pico8.resolution[2])
-		pico8.clip = {0, 0, pico8.resolution[1], pico8.resolution[2]}
+		pico8.clip = { 0, 0, pico8.resolution[1], pico8.resolution[2] }
 	end
 end
 
@@ -120,12 +122,14 @@ function api.cls(col)
 	col = col + 1 -- TODO: fix workaround
 
 	love.graphics.clear(col * 16, 0, 0, 255)
-	pico8.cursor = {0, 0}
+	pico8.cursor = { 0, 0 }
 end
 
 function api.folder(dir)
 	if dir == nil then
-		love.system.openURL("file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory)
+		love.system.openURL(
+			"file://" .. love.filesystem.getWorkingDirectory() .. currentDirectory
+		)
 	elseif dir == "bbs" then
 		api.print("not implemented", 14)
 	elseif dir == "backups" then
@@ -133,7 +137,9 @@ function api.folder(dir)
 	elseif dir == "config" then
 		api.print("not implemented", 14)
 	elseif dir == "desktop" then
-		love.system.openURL("file://" .. love.filesystem.getUserDirectory() .. "Desktop")
+		love.system.openURL(
+			"file://" .. love.filesystem.getUserDirectory() .. "Desktop"
+		)
 	else
 		api.print("useage: folder [location]", 14)
 		api.print("locations:", 6)
@@ -164,7 +170,9 @@ function api._completecommand(command, path)
 	if #files == 0 then
 		result = path
 	elseif #files == 1 then
-		if love.filesystem.isDirectory(currentDirectory .. startDir .. files[1]) then
+		if
+			love.filesystem.isDirectory(currentDirectory .. startDir .. files[1])
+		then
 			result = files[1]:lower() .. "/"
 		else
 			result = files[1]:lower()
@@ -195,11 +203,11 @@ function api._completecommand(command, path)
 			local output = {}
 			for _, file in ipairs(files) do
 				if love.filesystem.isDirectory(currentDirectory .. file) then
-					output[#output + 1] = {name = file:lower(), color = 14}
+					output[#output + 1] = { name = file:lower(), color = 14 }
 				elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
-					output[#output + 1] = {name = file:lower(), color = 6}
+					output[#output + 1] = { name = file:lower(), color = 6 }
 				else
-					output[#output + 1] = {name = file:lower(), color = 5}
+					output[#output + 1] = { name = file:lower(), color = 5 }
 				end
 			end
 
@@ -247,11 +255,11 @@ function api.ls()
 	local output = {}
 	for _, file in ipairs(files) do
 		if love.filesystem.isDirectory(currentDirectory .. file) then
-			output[#output + 1] = {name = file:lower(), color = 14}
+			output[#output + 1] = { name = file:lower(), color = 14 }
 		elseif file:sub(-3) == ".p8" or file:sub(-4) == ".png" then
-			output[#output + 1] = {name = file:lower(), color = 6}
+			output[#output + 1] = { name = file:lower(), color = 6 }
 		else
-			output[#output + 1] = {name = file:lower(), color = 5}
+			output[#output + 1] = { name = file:lower(), color = 5 }
 		end
 	end
 	local count = 0
@@ -342,7 +350,13 @@ function api.cd(name)
 	end
 
 	if not failed then
-		api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5 + api.flr(#output/32) * 6, 0)
+		api.rectfill(
+			0,
+			api._getcursory(),
+			128,
+			api._getcursory() + 5 + api.flr(#output / 32) * 6,
+			0
+		)
 		api.color(12)
 		for i = 1, #output, 32 do
 			api.print(output:sub(i, i + 32))
@@ -387,7 +401,12 @@ function api.pset(x, y, col)
 end
 
 function api.pget(x, y)
-	if x >= 0 and x < pico8.resolution[1] and y >= 0 and y < pico8.resolution[2] then
+	if
+		x >= 0
+		and x < pico8.resolution[1]
+		and y >= 0
+		and y < pico8.resolution[2]
+	then
 		love.graphics.setCanvas()
 		local __screen_img = pico8.screen:newImageData()
 		love.graphics.setCanvas(pico8.screen)
@@ -464,7 +483,7 @@ function api.cursor(x, y, col)
 	end
 	x = flr(tonumber(x) or 0) % 256
 	y = flr(tonumber(y) or 0) % 256
-	pico8.cursor = {x, y}
+	pico8.cursor = { x, y }
 end
 
 function api.tonum(val, format)
@@ -596,8 +615,7 @@ function api.spr(n, x, y, w, h, flip_x, flip_y)
 		if pico8.quads[id] then
 			q = pico8.quads[id]
 		else
-			q =
-				love.graphics.newQuad(
+			q = love.graphics.newQuad(
 				flr(n % 16) * 8,
 				flr(n / 16) * 8,
 				8 * w,
@@ -694,15 +712,15 @@ function api.circ(ox, oy, r, col)
 	local decisionOver2 = 1 - x
 
 	while y <= x do
-		table.insert(points, {ox + x, oy + y})
-		table.insert(points, {ox + y, oy + x})
-		table.insert(points, {ox - x, oy + y})
-		table.insert(points, {ox - y, oy + x})
+		table.insert(points, { ox + x, oy + y })
+		table.insert(points, { ox + y, oy + x })
+		table.insert(points, { ox - x, oy + y })
+		table.insert(points, { ox - y, oy + x })
 
-		table.insert(points, {ox - x, oy - y})
-		table.insert(points, {ox - y, oy - x})
-		table.insert(points, {ox + x, oy - y})
-		table.insert(points, {ox + y, oy - x})
+		table.insert(points, { ox - x, oy - y })
+		table.insert(points, { ox - y, oy - x })
+		table.insert(points, { ox + x, oy - y })
+		table.insert(points, { ox + y, oy - x })
 		y = y + 1
 		if decisionOver2 < 0 then
 			decisionOver2 = decisionOver2 + 2 * y + 1
@@ -768,7 +786,7 @@ function api.line(x0, y0, x1, y1, col)
 	local dy = y1 - y0
 	local stepx, stepy
 
-	local points = {{x0, y0}}
+	local points = { { x0, y0 } }
 
 	if dx == 0 then
 		-- simple case draw a vertical line
@@ -777,7 +795,7 @@ function api.line(x0, y0, x1, y1, col)
 			y0, y1 = y1, y0
 		end
 		for y = y0, y1 do
-			table.insert(points, {x0, y})
+			table.insert(points, { x0, y })
 		end
 	elseif dy == 0 then
 		-- simple case draw a horizontal line
@@ -786,7 +804,7 @@ function api.line(x0, y0, x1, y1, col)
 			x0, x1 = x1, x0
 		end
 		for x = x0, x1 do
-			table.insert(points, {x, y0})
+			table.insert(points, { x, y0 })
 		end
 	else
 		if dy < 0 then
@@ -812,7 +830,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				x0 = x0 + stepx
 				fraction = fraction + dy
-				table.insert(points, {flr(x0), flr(y0)})
+				table.insert(points, { flr(x0), flr(y0) })
 			end
 		else
 			local fraction = dx - bit.rshift(dy, 1)
@@ -823,7 +841,7 @@ function api.line(x0, y0, x1, y1, col)
 				end
 				y0 = y0 + stepy
 				fraction = fraction + dx
-				table.insert(points, {flr(x0), flr(y0)})
+				table.insert(points, { flr(x0), flr(y0) })
 			end
 		end
 	end
@@ -1038,7 +1056,7 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 		music = n,
 		offset = 0,
 		channel_mask = channel_mask or 15,
-		speed = music_speed
+		speed = music_speed,
 	}
 	for i = 0, 3 do
 		if pico8.music[n][i] < 64 then
@@ -1611,7 +1629,7 @@ function api.dset(index, value)
 	pico8.cartdata[index] = value
 end
 
-local tfield = {[0] = "year", "month", "day", "hour", "min", "sec"}
+local tfield = { [0] = "year", "month", "day", "hour", "min", "sec" }
 function api.stat(x)
 	-- TODO: implement this
 	if x == 0 then
@@ -1710,7 +1728,7 @@ function api.all(a)
 	return function()
 		len = len - 1
 		i = #a - len
-		while (a[i] == nil and len > 0) do
+		while a[i] == nil and len > 0 do
 			len = len - 1
 			i = #a - len
 		end
@@ -1725,7 +1743,7 @@ function api.foreach(a, f)
 	end
 
 	local len = #a
-	for i=1, len do
+	for i = 1, len do
 		if a[i] ~= nil then
 			f(a[i])
 		end
@@ -1790,7 +1808,7 @@ function api.deli(...)
 	end
 
 	local len = #a
-	for i=1, len do
+	for i = 1, len do
 		if i == index then
 			return table.remove(a, i)
 		end

@@ -20,22 +20,22 @@ pico8 = {
 	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
-		{ 0, 0, 0, 255 },
-		{ 29, 43, 83, 255 },
-		{ 126, 37, 83, 255 },
-		{ 0, 135, 81, 255 },
-		{ 171, 82, 54, 255 },
-		{ 95, 87, 79, 255 },
-		{ 194, 195, 199, 255 },
-		{ 255, 241, 232, 255 },
-		{ 255, 0, 77, 255 },
-		{ 255, 163, 0, 255 },
-		{ 255, 240, 36, 255 },
-		{ 0, 231, 86, 255 },
-		{ 41, 173, 255, 255 },
-		{ 131, 118, 156, 255 },
-		{ 255, 119, 168, 255 },
-		{ 255, 204, 170, 255 },
+		{ 0, 0, 0, 255 },       -- 0 - black
+		{ 29, 43, 83, 255 },    -- 1 - dark blue
+		{ 126, 37, 83, 255 },   -- 2 - dark purple
+		{ 0, 135, 81, 255 },    -- 3 - dark green
+		{ 171, 82, 54, 255 },   -- 4 - brown
+		{ 95, 87, 79, 255 },    -- 5 - dark gray
+		{ 194, 195, 199, 255 }, -- 6 - light gray
+		{ 255, 241, 232, 255 }, -- 7 - white
+		{ 255, 0, 77, 255 },    -- 8 - red
+		{ 255, 163, 0, 255 },   -- 9 - orange
+		{ 255, 240, 36, 255 },  -- 10 - yellow
+		{ 0, 231, 86, 255 },    -- 11 - light green
+		{ 131, 118, 156, 255 }, -- 12 - light blue
+		{ 41, 173, 255, 255 },  -- 13 - light purple
+		{ 255, 119, 168, 255 }, -- 14 - pink
+		{ 255, 204, 170, 255 }, -- 15 - tan
 	},
 	color = nil,
 	spriteflags = {},
@@ -171,7 +171,7 @@ function restore_clip()
 end
 
 function setColor(c)
-	love.graphics.setColor(c * 16, 0, 0, 255)
+	love.graphics.setColor((c * 16)/255, 0, 0, 1.0)
 end
 
 function _load(_cartname)
@@ -195,7 +195,8 @@ function _load(_cartname)
 
 	local file_found = false
 	for i = 1, #exts do
-		if love.filesystem.isFile(currentDirectory .. cart_no_ext .. exts[i]) then
+		local thefile = love.filesystem.getInfo(currentDirectory .. cart_no_ext .. exts[i])
+		if thefile then
 			file_found = true
 			_cartname = cart_no_ext .. exts[i]
 			break
@@ -345,8 +346,8 @@ function love.load(argv)
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(color.r*16.0);
-	return vec4(vec3(palette[index]/16.0),1.0);
+	int index = int(color.r * 16.0);
+	return vec4(vec3(palette[index] / 16.0),1.0);
 }]])
 	pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
@@ -355,9 +356,9 @@ extern float palette[16];
 extern float transparent[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(floor(Texel(texture, texture_coords).r*16.0));
+	int index = int(floor((Texel(texture, texture_coords).r * 255.0) / 16.0));
 	float alpha = transparent[index];
-	return vec4(vec3(palette[index]/16.0),alpha);
+	return vec4(palette[index] / 16.0, 0.0, 0.0, alpha);
 }]])
 	pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
@@ -370,9 +371,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	if(texcolor.a == 0.0) {
 		return vec4(0.0,0.0,0.0,0.0);
 	}
-	int index = int(color.r*16.0);
+	int index = int(color.r * 16.0);
 	// lookup the color in the palette by index
-	return vec4(vec3(palette[index]/16.0),1.0);
+	return vec4(vec3(palette[index] / 16.0),1.0);
 }]])
 	pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
@@ -380,9 +381,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*15.0);
+	int index = int(Texel(texture, texture_coords).r  * 15.0);
 	// lookup the color in the palette by index
-	return palette[index]/256.0;
+	return palette[index] / 256.0;
 }]])
 	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 
@@ -587,7 +588,8 @@ function flip_screen()
 	love.graphics.origin()
 	love.graphics.setScissor()
 
-	love.graphics.setBackgroundColor(3, 5, 10)
+	love.graphics.setBackgroundColor(3/255, 5/255, 10/255)
+	
 	love.graphics.clear()
 
 	local screen_w, screen_h = love.graphics.getDimensions()

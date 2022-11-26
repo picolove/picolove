@@ -121,7 +121,8 @@ function api.cls(col)
 	col = flr(tonumber(col) or 0) % 16
 	col = col + 1 -- TODO: fix workaround
 
-	love.graphics.clear(col * 16, 0, 0, 255)
+	--love.graphics.clear(col * 16, 0, 0, 255)
+	love.graphics.clear((col * 16)/255, 0, 0, 1)
 	pico8.cursor = { 0, 0 }
 end
 
@@ -906,7 +907,8 @@ end
 
 function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	love.graphics.setShader(pico8.sprite_shader)
-	love.graphics.setColor(255, 255, 255, 255)
+	--love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 	cel_x = flr(cel_x or 0)
 	cel_y = flr(cel_y or 0)
 	sx = flr(sx or 0)

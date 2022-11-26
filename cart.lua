@@ -90,6 +90,7 @@ function cart.load_p8(filename)
 	end
 
 	local fileheader = love.filesystem.read(filename, 8)
+	
 	if fileheader == "\137PNG\r\n\26\n" then
 		local data = love.image.newImageData(filename)
 		if data:getWidth() ~= 160 or data:getHeight() ~= 205 then
@@ -113,6 +114,7 @@ function cart.load_p8(filename)
 				g = bit.band(g, 0x0003)
 				b = bit.band(b, 0x0003)
 				a = bit.band(a, 0x0003)
+				
 				data:setPixel(
 					x,
 					y,
@@ -285,7 +287,9 @@ function cart.load_p8(filename)
 				local col = 0
 				for v in line:gmatch(".") do
 					v = tonumber(v, 16)
-					pico8.spritesheet_data:setPixel(col, row, v * 16, v * 16, v * 16, 255)
+					local r = (v * 16) / 255.0
+					
+					pico8.spritesheet_data:setPixel(col, row,  r, 0.0, 0.0, 255.0 / 255.0)
 
 					col = col + 1
 					if col == 128 then

@@ -5,7 +5,7 @@ Run PICO-8 games and computer programs with free and open-source software.
 
 On github at: https://github.com/picolove/picolove
 
-Requires LÖVE 0.10.2
+Requires LÖVE 0.11.3
 
 What it is:
 

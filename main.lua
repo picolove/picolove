@@ -204,7 +204,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
-		api.print("could not load", 6)
+		api.print("could not load, " .. _cartname, 6)
 		return false
 	end
 
@@ -501,7 +501,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	_load(initialcartname)
 	api.run()
-	cartname = nil
 end
 
 function new_sandbox()
@@ -553,9 +552,9 @@ end
 
 function love.update(_)
 	update_buttons()
-	if pico8.cart._update60 then
+	if pico8.cart and pico8.cart._update60 then
 		pico8.cart._update60()
-	elseif pico8.cart._update then
+	elseif pico8.cart and pico8.cart._update then
 		pico8.cart._update()
 	end
 end
@@ -568,7 +567,7 @@ function love.draw()
 	love.graphics.setShader(pico8.draw_shader)
 
 	-- run the cart's draw function
-	if pico8.cart._draw then
+	if pico8.cart and pico8.cart._draw then
 		pico8.cart._draw()
 	end
 
@@ -824,6 +823,19 @@ local function isAltDown()
 	return love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")
 end
 
+local _hasEditor = nil
+local function hasEditor()
+	local fstat = love.filesystem.getInfo('editor.p8')
+	if not fstat then
+		_hasEditor = false
+		print('no info present')
+		return false
+	end
+	_hasEditor = fstat.type == 'file'
+	print('HasEditor=' .. tostring(_hasEditor))
+	return _hasEditor
+end
+
 function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
 		api.reload()
@@ -835,7 +847,13 @@ function love.keypressed(key)
 		and cartname ~= "nocart.p8"
 		and cartname ~= "editor.p8"
 	then
-		api.load(initialcartname)
+		local cart = initialcartname
+
+		if hasEditor() then
+			cart = 'nocart.p8'
+		end
+
+		api.load(cart)
 		api.run()
 		return
 	elseif key == "q" and isCtrlOrGuiDown() and not isAltDown() then

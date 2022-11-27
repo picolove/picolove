@@ -1391,6 +1391,15 @@ function api.save()
 	-- TODO: implement this
 end
 
+function api.codes()
+	print('Code ' .. loaded_code)
+	local result = {}
+	for line in loaded_code:gmatch '[^\n]+' do
+		table.insert(result, line)
+	end
+	return result
+end
+
 function api.run()
 	if not cartname then
 		return

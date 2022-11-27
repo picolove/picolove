@@ -7,6 +7,7 @@ _allow_shutdown = _allow_shutdown or function() end
 _getpicoloveversion = _getpicoloveversion or function() return "" end
 _getcursorx =  _getcursorx or function() return peek(0x5f26) end
 _getcursory =  _getcursory or function() return peek(0x5f27) - 6 end
+_draw_help = false
 
 function _init()
 	_allow_pause(false)
@@ -192,8 +193,7 @@ function _keydown(key)
 
 		elseif linebuffer == "help" or
 			linebuffer:sub(1, 5) == "help " and #linebuffer > 5  then
-			help()
-
+			_draw_help = true
 		elseif linebuffer == "shutdown" or linebuffer == ":q" or
 			linebuffer == "exit" or linebuffer == "quit" then
 			shutdown()
@@ -228,9 +228,9 @@ function _keydown(key)
 		elseif linebuffer == "reboot" then
 			reboot()
 
-		elseif linebuffer:sub(1, 5) == "save " then
+		elseif linebuffer:sub(1, 5) == "save" then
 			-- TODO
-			print('Not implemented yet')
+			print('not implemented yet')
 		else
 			color(pencolor)
 			_call(linebuffer)
@@ -267,19 +267,32 @@ function _touchup()
 end
 
 function _draw()
-	-- stay on screen
-	if _getcursory() > 121 then
-		print("") -- scroll text
-		cursor(0, 120)
-	end
-	-- delete text and carret
-	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 4, _getcursory() + 5, 0)
-	-- render text
-	print("> " .. linebuffer, 0, _getcursory(), 7)
-	-- render carret
-	if tc % 16 < 8 then
-		rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
-	end
+	
+	cls()
+	help()
+
+	-- -- stay on screen
+	-- if _getcursory() > 121 then
+	-- 	print("") -- scroll text
+	-- 	cursor(0, 120)
+	-- end
+
+	-- -- delete text and carret
+	-- rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 4, _getcursory() + 5, 0)
+
+
+	-- -- render text
+	-- print("> " .. linebuffer, 0, _getcursory(), 7)
+	-- -- render carret
+	-- if tc % 16 < 8 then
+	-- 	rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
+	-- end
+
+
+	-- -- draw help
+	-- --if _draw_help then
+	-- --	_draw_help = false
+	-- --end
 end
 
 __gfx__

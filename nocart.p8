@@ -267,32 +267,30 @@ function _touchup()
 end
 
 function _draw()
+
+	-- stay on screen
+	if _getcursory() > 121 then
+		print("") -- scroll text
+		cursor(0, 120)
+	end
+
+	-- delete text and carret
+	rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 4, _getcursory() + 5, 0)
 	
-	cls()
-	help()
+	if _draw_help then
+		local oldy = _getcursory()
+		cursor(0, 0)
+		help()
+		_draw_help = false
+	end
 
-	-- -- stay on screen
-	-- if _getcursory() > 121 then
-	-- 	print("") -- scroll text
-	-- 	cursor(0, 120)
-	-- end
+	-- render text
+	print("> " .. linebuffer, 0, _getcursory(), 7)
+	-- render carret
+	if tc % 16 < 8 then
+		rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
+	end
 
-	-- -- delete text and carret
-	-- rectfill(0, _getcursory(), (#linebuffer + 2) * 4 + 4, _getcursory() + 5, 0)
-
-
-	-- -- render text
-	-- print("> " .. linebuffer, 0, _getcursory(), 7)
-	-- -- render carret
-	-- if tc % 16 < 8 then
-	-- 	rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
-	-- end
-
-
-	-- -- draw help
-	-- --if _draw_help then
-	-- --	_draw_help = false
-	-- --end
 end
 
 __gfx__

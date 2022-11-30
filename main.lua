@@ -880,7 +880,6 @@ function love.keypressed(key)
 		and _state == 'running'
 		and hasEditor()
 	then
-		print('Loading cart ' .. tostring(cartname) .. ' initial=' .. initialcartname)
 		local cart = initialcartname
 
 		if hasEditor() then
@@ -915,6 +914,7 @@ function love.keypressed(key)
 		video_frames = nil
 		log("saved video to", basename)
 	elseif key == "return" and isAltDown() then
+		love.graphics.setCanvas()
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 		return
 	else

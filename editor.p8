@@ -178,9 +178,10 @@ function normalmode._keydown(key)
 		updatecaret()
 	elseif key == "j" then
 		carety += 1
-		if carety*6 > 128-(6+7) then
+		if carety*6 >= 128-(2*6+7) then
 			scrolly-=1
 		end
+		scrolly=max(-(128-2*6+7)/6, scrolly)
 		updatecaret()
 	elseif key == "k" then
 		carety -= 1

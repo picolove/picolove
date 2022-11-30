@@ -1306,7 +1306,9 @@ end
 function api.reload(dest_addr, source_addr, len, filepath) -- luacheck: no unused
 	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
 	-- FIXME: doesn't handle filepaths
-	_load(cartname)
+	--local name = filepath:match( "([^/]+)\\..+$" )
+	print('Reloading Name=' .. initialcartname)
+	_load(initialcartname)
 end
 
 function api.cstore(dest_addr, source_addr, len) -- luacheck: no unused
@@ -1389,13 +1391,23 @@ end
 
 function api.save()
 	-- TODO: implement this
+	_save(initialcartname)
 end
 
-function api.codes()
-	print('Code ' .. loaded_code)
-	local result = {}
-	for line in loaded_code:gmatch '[^\n]+' do
-		table.insert(result, line)
+function api.codes(replace)
+	local result = replace or {}
+	if not replace then
+		for line in carts[initialcartname].loaded_code:gmatch '[^\n]+' do
+			table.insert(result, line)
+		end
+	else
+		local lua = ""
+		for _, line in pairs(replace) do
+			lua = lua .. "\n" .. line
+		end
+		pico8.loaded_code = lua
+		carts[initialcartname].loaded_code = lua
+		print('\n---Setting code for ' .. initialcartname .. ' to:\n' .. lua .. '\n\n')
 	end
 	return result
 end
@@ -1411,7 +1423,13 @@ function api.run()
 	love.graphics.origin()
 
 	api.clip()
-	pico8.cart = new_sandbox()
+	pico8.last_cart = pico8.cart
+	if cartname == 'editor.p8' then
+		print('Creating an editor sandbox last cart ' .. tostring(pico8.last_cart))
+		pico8.cart = new_editor_sandbox(cartname, pico8.last_cart)
+	else
+		pico8.cart = new_sandbox(cartname)
+	end
 
 	pico8.can_pause = true
 	pico8.can_shutdown = false
@@ -1424,10 +1442,10 @@ function api.run()
 		pico8.cartdata[i] = 0
 	end
 
-	local ok, f, e = pcall(load, loaded_code, cartname)
+	local ok, f, e = pcall(load, pico8.loaded_code, cartname)
 	if not ok or f == nil then
 		log("=======8<========")
-		log(loaded_code)
+		log(pico8.loaded_code)
 		log("=======>8========")
 		error("Error loading lua: " .. tostring(e))
 	else

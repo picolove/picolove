@@ -15,7 +15,7 @@ local normalmode = {}
 local inputmode = {}
 local commandmode = {}
 
-local mode = inputmode
+local mode = normalmode
 local nextmode = mode
 
 local commandline = ""
@@ -23,12 +23,49 @@ local commandlinecaret = 1
 
 local isctrldown = false
 local isshiftdown = false
+local scrolly = 0
 
 local prevkey = nil
+
+local hands = {
+	[1] = {
+		"00100000",
+		"01700000",
+		"01700000",
+		"11717170",
+		"71777771",
+		"07777771",
+		"00177611",
+		"00177710",
+	},
+	[2] = {
+		"00000000",
+		"00000000",
+		"01100000",
+		"11717170",
+		"71777771",
+		"07777771",
+		"00177611",
+		"00177710",
+	},
+	[3] = {
+		"01000000",
+		"17100000",
+		"17710000",
+		"17771000",
+		"17777000",
+		"17711000",
+		"01171000",
+		"00000000",
+	}
+}
 
 function resetblink()
 	tc = 0
 end
+
+printh('Editor: editing ' .. cartname)
+load(cartname)
 
 function _init()
 	tc = 0
@@ -37,7 +74,6 @@ function _init()
 	poke(24365,1) -- mouse+key kit
 
 	content = codes()
-
 end
 
 function setmode(mode)
@@ -52,6 +88,9 @@ function _update()
 end
 
 function returntomain()
+	printh('Returning to main')
+	codes(content)
+	save()
 	load("nocart.p8")
 	run()
 end
@@ -139,9 +178,15 @@ function normalmode._keydown(key)
 		updatecaret()
 	elseif key == "j" then
 		carety += 1
+		if carety*6 > 128-(6+7) then
+			scrolly-=1
+		end
 		updatecaret()
 	elseif key == "k" then
 		carety -= 1
+		if carety <= 0 and scrolly < 0 then
+			scrolly += 1
+		end
 		updatecaret()
 	elseif key == "l" then
 		if caretx == #content[carety] and carety < #content then
@@ -382,6 +427,17 @@ end
 function _touchup()
 end
 
+function _draw_strings(str, x, y)
+  for dx=1,8 do
+    for dy=1,8 do
+		local cnum = tonum(str[dy]:sub(dx,dx))
+		if cnum > 0 then
+			pset(x+dx, y+dy, cnum)
+		end
+    end
+  end
+end
+
 function _draw()
 	-- render background
 	cls(1)
@@ -392,7 +448,9 @@ function _draw()
 	-- render dummy content
 	color(6)
 	for i,v in ipairs(content) do
-		print(v, 1, 3 + i*6)
+		if i+scrolly > 0 then
+			print(v, 1, (scrolly*6) + 3 + (i)*6)
+		end
 	end
 
 	-- render toolbar
@@ -405,7 +463,7 @@ function _draw()
 	mode._drawstatusline()
 
  local mx, my = stat(32)-1, stat(33)-1
- spr(1, mx, my)
+ _draw_strings(hands[3], mx, my)
 end
 
 __gfx__

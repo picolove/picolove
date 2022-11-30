@@ -230,7 +230,7 @@ function _keydown(key)
 
 		elseif linebuffer:sub(1, 5) == "save" then
 			-- TODO
-			print('not implemented yet')
+			save()
 		else
 			color(pencolor)
 			_call(linebuffer)

@@ -10,7 +10,7 @@ local api = require("api")
 local cart = require("cart")
 
 cartname = nil -- used by api.reload
-local initialcartname = nil -- used by esc
+initialcartname = nil -- used by esc
 local love_args = nil -- luacheck: no unused
 
 pico8 = {
@@ -90,11 +90,11 @@ pico8 = {
 	quads = {},
 	spritesheet_data = nil,
 	spritesheet = nil,
+	loaded_code = nil,
 }
 
 local flr, abs = math.floor, math.abs
 
-loaded_code = nil
 
 local __audio_buffer_size = 1024
 
@@ -174,6 +174,8 @@ function setColor(c)
 	love.graphics.setColor((c * 16)/255, 0, 0, 1.0)
 end
 
+carts = {}
+
 function _load(_cartname)
 	if type(_cartname) ~= "string" then
 		return false
@@ -214,10 +216,26 @@ function _load(_cartname)
 	api.camera()
 	restore_clip()
 	cartname = _cartname
-	if cart.load_p8(currentDirectory .. _cartname) then
+	
+	local success, cartdata = cart.load_p8(currentDirectory .. _cartname)
+
+	if success then
 		api.print("loaded " .. _cartname, 6)
+		local existingCode = nil
+		if carts[_cartname] and carts[_cartname].loaded_code then
+			existingCode = carts[_cartname].loaded_code
+		end
+		carts[_cartname] = cartdata
+		carts[_cartname].loaded_code = existingCode or carts[_cartname].loaded_code
+		pico8.loaded_code = carts[_cartname].loaded_code
+		carts[_cartname].cartname = cartname
 	end
+	
 	return true
+end
+
+function _save(_cartname)
+	cart.save_p8(_cartname, carts[_cartname])
 end
 
 function love.resize(w, h)
@@ -503,7 +521,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.run()
 end
 
-function new_sandbox()
+function new_sandbox(cartname)
 	local cart_env = {}
 
 	for k, v in pairs(api) do
@@ -527,6 +545,20 @@ function new_sandbox()
 	for k, v in pairs(picolove_functions) do
 		cart_env[k] = v
 	end
+
+	assert(cartname, 'Must have a cartname to create a sandbox')
+	cart_env.cartname = cartname
+
+	return cart_env
+end
+
+function new_editor_sandbox(cartname, last)
+	local cart_env = new_sandbox(cartname)
+
+	assert(initialcartname, 'Cannot set editor sandbox cart name initialcartname was nil')
+	cart_env.cartname = initialcartname
+	assert(last, 'Must have a last cart to edit')
+	cart_env.last_cart = last
 
 	return cart_env
 end
@@ -824,6 +856,7 @@ local function isAltDown()
 end
 
 local _hasEditor = nil
+local _state = "running"
 local function hasEditor()
 	local fstat = love.filesystem.getInfo('editor.p8')
 	if not fstat then
@@ -832,25 +865,27 @@ local function hasEditor()
 		return false
 	end
 	_hasEditor = fstat.type == 'file'
-	print('HasEditor=' .. tostring(_hasEditor))
 	return _hasEditor
 end
 
 function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
-		api.reload()
+		_state='running'
 		api.run()
 	elseif
 		key == "escape"
 		and cartname ~= nil
-		and cartname ~= initialcartname
 		and cartname ~= "nocart.p8"
 		and cartname ~= "editor.p8"
+		and _state == 'running'
+		and hasEditor()
 	then
+		print('Loading cart ' .. tostring(cartname) .. ' initial=' .. initialcartname)
 		local cart = initialcartname
 
 		if hasEditor() then
 			cart = 'nocart.p8'
+			_state = 'editing'
 		end
 
 		api.load(cart)

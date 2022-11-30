@@ -3,7 +3,6 @@ std = "luajit+love"
 globals = {
   -- variables
   "pico8",
-  "cartname",
   "__pico_resolution",
   "__picolove_version",
   "currentDirectory",
@@ -11,7 +10,6 @@ globals = {
   "scale",
   "xpadding",
   "ypadding",
-  "loaded_code",
   "love.graphics.point",
   "love.handlers",
   "love.graphics.newScreenshot",

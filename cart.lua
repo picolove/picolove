@@ -52,6 +52,8 @@ local cart = {}
 function cart.load_p8(filename)
 	log("Loading", filename)
 
+	local g_pico8 = pico8
+	local pico8 = {}
 	local lua = ""
 	pico8.quads = {}
 	pico8.spritesheet_data = love.image.newImageData(128, 128)
@@ -454,9 +456,22 @@ function cart.load_p8(filename)
 
 	log("finished loading cart", filename)
 
-	loaded_code = lua
+	pico8.loaded_code = lua
 
-	return true
+	for k, v in pairs(pico8) do
+		g_pico8[k] = v
+	end
+
+	return true, pico8
+end
+
+function cart.save_p8(filename, cartdata)
+	assert(cartdata, 'Must have card data to save')
+	for k, v in pairs(cartdata) do
+		print('Key=' .. k)
+	end
+	print('Saving ' .. cartdata.cartname)
+	love.filesystem.write(filename .. '.tmp.p8', cartdata.loaded_code)
 end
 
 return cart

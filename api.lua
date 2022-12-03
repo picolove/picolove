@@ -1053,6 +1053,7 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 			end
 		end
 	end
+	-- TODO: Fails when an audio channel has nothing to play
 	pico8.audio_channels[music_channel].loop = false
 	pico8.current_music = {
 		music = n,
@@ -1425,7 +1426,6 @@ function api.run()
 	api.clip()
 	pico8.last_cart = pico8.cart
 	if cartname == 'editor.p8' then
-		print('Creating an editor sandbox last cart ' .. tostring(pico8.last_cart))
 		pico8.cart = new_editor_sandbox(cartname, pico8.last_cart)
 	else
 		pico8.cart = new_sandbox(cartname)
@@ -1457,8 +1457,6 @@ function api.run()
 		ok, e = pcall(f)
 		if not ok then
 			error("Error running lua: " .. tostring(e))
-		else
-			log("lua completed")
 		end
 	end
 

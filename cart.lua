@@ -50,8 +50,6 @@ end
 local cart = {}
 
 function cart.load_p8(filename)
-	log("Loading", filename)
-
 	local g_pico8 = pico8
 	local pico8 = {}
 	local lua = ""
@@ -221,7 +219,7 @@ function cart.load_p8(filename)
 		end
 
 		-- decompress code
-		log("version", version)
+		
 		if version > 8 then
 			api.print(string.format("unknown file version %d", version), 3)
 		end
@@ -271,7 +269,6 @@ function cart.load_p8(filename)
 
 		local version_str = data:sub(header_end, next_line - 1)
 		local version = tonumber(version_str)
-		log("version", version)
 
 		-- extract the lua
 		lua = data:match("\n__lua__.-\n(.-)\n__") or ""
@@ -452,11 +449,9 @@ function cart.load_p8(filename)
 	end
 
 	lua = patch_lua(lua)
-	lua = lua .. "\n_picolove_end()"
-
-	log("finished loading cart", filename)
-
 	pico8.loaded_code = lua
+
+	lua = lua .. "\n_picolove_end()"
 
 	for k, v in pairs(pico8) do
 		g_pico8[k] = v
@@ -467,11 +462,135 @@ end
 
 function cart.save_p8(filename, cartdata)
 	assert(cartdata, 'Must have card data to save')
-	for k, v in pairs(cartdata) do
-		print('Key=' .. k)
-	end
 	print('Saving ' .. cartdata.cartname)
-	love.filesystem.write(filename .. '.tmp.p8', cartdata.loaded_code)
+	local version = 38
+	printobj(cartdata)
+	love.filesystem.write(
+		filename .. '.tmp.p8',
+		"pico-8 cartridge // http://www.pico-8.com\n" ..
+		"version " .. tostring(version) .. "\n" ..
+		cart.generateCodeString(cartdata) ..
+		cart.generateSpriteString(cartdata) ..
+		cart.generateSpriteFlagString(cartdata) ..
+		cart.generateMapString(cartdata) ..
+		cart.generateSfxString(cartdata) ..
+		cart.generateMusic(cartdata)
+	)
 end
+
+function cart.generateCodeString(cartdata)
+	local str = "__lua__\n" .. cartdata.loaded_code .. "\n"
+	return str
+end
+
+function cart.generateSpriteString(cartdata)
+	local str =  "__gfx__\n"
+	if not cartdata.spritesheet_data then return '' end
+
+	return str
+end
+
+function cart.generateSpriteFlagString(cartdata)
+	local str = "__gff__\n"
+
+	if not cartdata.spriteflags then return '' end
+
+	local flags = cartdata.spriteflags
+
+	for i=0, 510 do
+		if i > 0 and (i+1) % 256 == 0 then 
+			str = str .. '\n'
+		end
+		str = str .. tostring(flags[i] or '0')
+	end
+
+	return str .. '\n'
+end
+
+function cart.generateMapString(cartdata)
+	local str = "__map__\n"
+
+	if not cartdata.map then return '' end
+
+	local map = cartdata.map
+
+	for r=0,63 do
+		for c=0,127 do
+			str = str .. tostring(string.format("%02x",map[r][c] or 0))
+		end		
+		str = str .. '\n'
+	end
+
+	return str
+end
+
+function cart.generateSfxString(cartdata)
+	local str = "__sfx__\n"
+			
+	if not cartdata.sfx then return '' end
+
+	return str
+end
+
+function cart.generateMusic(cartdata)
+	local str = "__music__\n"
+	
+	if not cartdata.music then return '' end
+
+	return str
+end
+
+function nline(str, nl) if nl == 'true' then return str .. '\n' else return str end end
+function obj2str(obj, indent, nl)
+	if type(obj) ~= 'table' then
+		return tostring(obj)
+	end
+
+	indent = indent or 2
+	nl = nl or 'true'
+	local str = ''
+	local MAX_KEYS = 100
+	local maxKeys = MAX_KEYS
+	if nl == 'false' then str = str .. '{' end
+	for k, v in pairs(obj) do
+		if nl then
+			for ni=1,indent do
+				str = str .. '  '
+			end
+		end
+
+		if type(v) == 'table' and #v == 0 then			
+			str = str .. k .. ':'
+			str = nline(str, nl)
+			str = str .. obj2str(v, indent + 1, nl)
+			str = nline(str, nl)
+		elseif type(v) == 'table' and #v >= 1 then
+			str = str .. k .. ': ['
+			for i, v in ipairs(v) do
+				str = str .. i .. '=' .. obj2str(v, indent, 'false') .. ','
+			end
+			str = str .. ']'
+			str = nline(str, nl)
+		else
+			str = str .. k .. '="' .. tostring(v):gsub('\n','\\n') .. '", '
+			str = nline(str, nl)
+		end
+		
+		if maxKeys <= 0 and nl then
+			if nl then
+				for ni=1,indent do
+					str = str .. '  '
+				end
+			end
+			str = str .. "<..more than " .. MAX_KEYS .. " keys..>"
+			break
+		end
+		maxKeys = maxKeys - 1
+	end
+	if nl == 'false' then str = str .. '}' end
+
+	return str
+end
+function printobj(obj) local k = obj2str(obj) print(k) return k end
 
 return cart

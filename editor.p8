@@ -61,10 +61,11 @@ local hands = {
 }
 
 function resetblink()
+	
 	tc = 0
 end
 
-printh('Editor: editing ' .. cartname)
+
 load(cartname)
 music(-1, 300)
 
@@ -78,9 +79,11 @@ function _init()
 end
 
 function setmode(mode)
+	
 	nextmode = mode
 end
 function updatemode()
+	
 	mode = nextmode
 end
 
@@ -89,7 +92,7 @@ function _update()
 end
 
 function returntomain()
-	printh('Returning to main')
+	
 	codes(content)
 	save()
 	load("nocart.p8")
@@ -97,6 +100,7 @@ function returntomain()
 end
 
 function updatecaret()
+	
 	local posaftertext = 1
 	if nextmode ~= inputmode then
 		posaftertext = 0
@@ -108,6 +112,7 @@ function updatecaret()
 end
 
 function normalmode._keydown(key)
+	
 	if prevkey ~= nil then
 		if key == "lshift" or key == "rshift" or
 			key == "lctrl" or key == "rctrl" or
@@ -270,8 +275,10 @@ function normalmode._keydown(key)
 	end
 end
 function normalmode._keyup(key)
+	
 end
 function normalmode._textinput(text)
+	
 	if text == ":" then
 		commandline = ":"
 		setmode(commandmode)
@@ -286,6 +293,7 @@ function normalmode._textinput(text)
 	end
 end
 function normalmode._drawstatusline()
+	
 	print("line " .. carety .. "/" .. #content, 1, 122, 2)
 	print("        6/8192  ", 65, 122, 2)
 	print("-", 123, 120, 6)
@@ -293,6 +301,7 @@ function normalmode._drawstatusline()
 	print("-", 123, 124, 2)
 end
 function normalmode._drawcaret()
+	
 	if nextmode == inputmode then
 		nextmode._drawcaret()
 	elseif tc % 16 < 8 or tc < 16 then
@@ -306,6 +315,7 @@ end
 
 
 function inputmode._keydown(key)
+	
 	if key == "escape" or (isctrldown and key == "c") then
 		caretx -= 1
 		setmode(normalmode)
@@ -325,16 +335,20 @@ function inputmode._keydown(key)
 	end
 end
 function inputmode._keyup(key)
+	
 end
 function inputmode._textinput(text)
+	
 	content[carety] = content[carety]:sub(1, caretx - 1) .. text .. content[carety]:sub(caretx)
 	caretx += 1
 	updatecaret()
 end
 function inputmode._drawstatusline()
+	
 	print("-- insert --", 1, 122, 2)
 end
 function inputmode._drawcaret()
+	
 	if nextmode == normalmode then
 		nextmode._drawcaret()
 	elseif tc % 16 < 8 or tc < 16 then
@@ -348,6 +362,7 @@ end
 
 
 function commandmode._keydown(key)
+	
 	if key == "escape" then
 		commandlinecaret = 1
 		setmode(normalmode)

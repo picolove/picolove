@@ -205,8 +205,8 @@ function _keydown(key)
 
 		elseif linebuffer == "run" then
 			printh("Running " .. initialcartname)
-			cls()
 			load(initialcartname)
+			run()
 
 		elseif linebuffer == "cd" or linebuffer:sub(1, 3) == "cd " then
 			cd(linebuffer:sub(4))

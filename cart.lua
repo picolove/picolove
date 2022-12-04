@@ -466,7 +466,7 @@ function cart.save_p8(filename, cartdata)
 	local version = 38
 	
 	love.filesystem.write(
-		filename .. '.tmp.p8',
+		filename,
 		"pico-8 cartridge // http://www.pico-8.com\n" ..
 		"version " .. tostring(version) .. "\n" ..
 		cart.generateCodeString(cartdata) ..

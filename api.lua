@@ -1408,7 +1408,6 @@ function api.codes(replace)
 		end
 		pico8.loaded_code = lua
 		carts[initialcartname].loaded_code = lua
-		print('\n---Setting code for ' .. initialcartname .. ' to:\n' .. lua .. '\n\n')
 	end
 	return result
 end

@@ -895,7 +895,7 @@ function love.keypressed(key)
 		love.event.quit()
 	elseif key == "v" and isCtrlOrGuiDown() and not isAltDown() then
 		pico8.clipboard = love.system.getClipboardText()
-	elseif pico8.can_pause and (key == "pause" or key == "p") then
+	elseif pico8.can_pause and (key == "pause" or key == "p") and (hasEditor() and not _state == 'running') then
 		paused = not paused
 	elseif key == "f1" or key == "f6" then
 		-- screenshot

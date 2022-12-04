@@ -66,6 +66,7 @@ end
 
 printh('Editor: editing ' .. cartname)
 load(cartname)
+music(-1, 300)
 
 function _init()
 	tc = 0

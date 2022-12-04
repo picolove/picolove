@@ -548,6 +548,7 @@ function new_sandbox(cartname)
 
 	assert(cartname, 'Must have a cartname to create a sandbox')
 	cart_env.cartname = cartname
+	cart_env.initialcartname = initialcartname
 
 	return cart_env
 end

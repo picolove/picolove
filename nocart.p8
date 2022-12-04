@@ -204,7 +204,9 @@ function _keydown(key)
 			folder(linebuffer:sub(8))
 
 		elseif linebuffer == "run" then
-			run()
+			printh("Running " .. initialcartname)
+			cls()
+			load(initialcartname)
 
 		elseif linebuffer == "cd" or linebuffer:sub(1, 3) == "cd " then
 			cd(linebuffer:sub(4))
@@ -229,7 +231,6 @@ function _keydown(key)
 			reboot()
 
 		elseif linebuffer:sub(1, 5) == "save" then
-			-- TODO
 			save()
 		else
 			color(pencolor)

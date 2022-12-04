@@ -464,7 +464,7 @@ function cart.save_p8(filename, cartdata)
 	assert(cartdata, 'Must have card data to save')
 	print('Saving ' .. cartdata.cartname)
 	local version = 38
-	printobj(cartdata)
+	
 	love.filesystem.write(
 		filename .. '.tmp.p8',
 		"pico-8 cartridge // http://www.pico-8.com\n" ..
@@ -487,6 +487,17 @@ function cart.generateSpriteString(cartdata)
 	local str =  "__gfx__\n"
 	if not cartdata.spritesheet_data then return '' end
 
+	local sprite = cartdata.spritesheet_data
+
+	for y=0,sprite:getHeight()-4 do
+		for x=0,sprite:getWidth()-1 do
+			local color = sprite:getPixel(x,y)
+			local hex = math.floor(color * 255) / 16
+			str = str .. string.format("%x", hex)
+		end
+		str = str .. '\n'
+	end
+
 	return str
 end
 
@@ -497,11 +508,11 @@ function cart.generateSpriteFlagString(cartdata)
 
 	local flags = cartdata.spriteflags
 
-	for i=0, 510 do
-		if i > 0 and (i+1) % 256 == 0 then 
+	for i=0, 255 do
+		if i > 0 and (i) % 128 == 0 then 
 			str = str .. '\n'
 		end
-		str = str .. tostring(flags[i] or '0')
+		str = str .. string.format('%02x', flags[i] or 0)
 	end
 
 	return str .. '\n'
@@ -514,7 +525,7 @@ function cart.generateMapString(cartdata)
 
 	local map = cartdata.map
 
-	for r=0,63 do
+	for r=0,31 do
 		for c=0,127 do
 			str = str .. tostring(string.format("%02x",map[r][c] or 0))
 		end		
@@ -529,6 +540,36 @@ function cart.generateSfxString(cartdata)
 			
 	if not cartdata.sfx then return '' end
 
+	local sfx = cartdata.sfx
+
+	local _sfx = 0
+
+	for _, fx in pairs(sfx) do
+		local soundStr = ''
+
+		soundStr = soundStr .. string.format('%02x', fx.editor_mode)
+		soundStr = soundStr .. string.format('%02x', fx.speed)
+		soundStr = soundStr .. string.format('%02x', fx.loop_start)
+		soundStr = soundStr .. string.format('%02x', fx.loop_end)
+		
+		local hadNote = false
+		for i = 1, 32 do
+			local note = fx[i-1]
+			-- write note into 5 characters
+
+			hadNote = hadNote or note[1] > 0
+
+			soundStr = soundStr .. string.format('%02x', note[1])
+			soundStr = soundStr .. string.format('%x', note[2])
+			soundStr = soundStr .. string.format('%x', note[3])
+			soundStr = soundStr .. string.format('%x', note[4])
+		end
+		
+		if hadNote then
+		str = str .. soundStr .. '\n'
+		end
+	end
+
 	return str
 end
 
@@ -537,7 +578,27 @@ function cart.generateMusic(cartdata)
 	
 	if not cartdata.music then return '' end
 
-	return str
+	local music = cartdata.music
+
+	local inLoop = false
+	for i, stanza in pairs(music) do
+		if stanza.loop == 1 and not inLoop then
+			inLoop = true
+		end
+		if inLoop then
+			str = str .. string.format("%02x", stanza.loop) .. ' '
+			str = str .. string.format("%02x", stanza[0])
+			str = str .. string.format("%02x", stanza[1])
+			str = str .. string.format("%02x", stanza[2])
+			str = str .. string.format("%02x", stanza[3])
+			str = str .. '\n'
+		end
+		if stanza.loop == 2 then
+			inLoop = false
+		end
+	end
+
+	return str .. '\n'
 end
 
 function nline(str, nl) if nl == 'true' then return str .. '\n' else return str end end
@@ -553,7 +614,7 @@ function obj2str(obj, indent, nl)
 	local maxKeys = MAX_KEYS
 	if nl == 'false' then str = str .. '{' end
 	for k, v in pairs(obj) do
-		if nl then
+		if nl == 'true' then
 			for ni=1,indent do
 				str = str .. '  '
 			end
@@ -566,8 +627,11 @@ function obj2str(obj, indent, nl)
 			str = nline(str, nl)
 		elseif type(v) == 'table' and #v >= 1 then
 			str = str .. k .. ': ['
-			for i, v in ipairs(v) do
-				str = str .. i .. '=' .. obj2str(v, indent, 'false') .. ','
+			for i, o in ipairs(v) do
+				str = str .. i .. '=' .. obj2str(o, indent, 'false') 
+				if i ~= #v then
+				 str = str .. ','
+				end
 			end
 			str = str .. ']'
 			str = nline(str, nl)
@@ -587,7 +651,10 @@ function obj2str(obj, indent, nl)
 		end
 		maxKeys = maxKeys - 1
 	end
-	if nl == 'false' then str = str .. '}' end
+	if nl == 'false' then 
+		str = str:sub(1,#str-2)
+		str = str .. '}' 
+	end
 
 	return str
 end

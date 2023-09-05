@@ -1,0 +1,5 @@
+LICENCE.md
+font.png
+icon.png
+lib/*.lua
+nocart.p8

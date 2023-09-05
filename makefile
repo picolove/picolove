@@ -35,8 +35,8 @@ test:
 
 build: clean
 	@echo "building \"build/${project_name}.love\" ..."
-	@zip -9 -r build/"${project_name}".love ./nocart.p8
-	@zip -9 -r -x@excludelist.txt build/${project_name}.love .
+	@zip -9 -r -i@includelist.txt    build/${project_name}.love .
+	@zip -9 -r -i"*.lua" -x"*/*.lua" build/${project_name}.love .
 
 run_build:
 	@echo "executing \"build/${project_name}.love\" ..."

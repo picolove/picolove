@@ -270,11 +270,11 @@ function cart.load_p8(filename)
 		log("version", version)
 
 		-- extract the lua
-		lua = data:match("\n__lua__.-\n(.-)\n__") or ""
+		lua = data:match("\n__lua__.-\n(.-)\n-__.+__\n") or ""
 
 		-- load the sprites into an imagedata
 		-- generate a quad for each sprite index
-		local gfxdata = data:match("\n__gfx__.-\n(.-\n)\n-__")
+		local gfxdata = data:match("\n__gfx__.-\n(.-)\n-__.+__\n")
 
 		local shared = 0
 
@@ -329,7 +329,7 @@ function cart.load_p8(filename)
 		pico8.spritesheet = love.graphics.newImage(pico8.spritesheet_data)
 
 		-- load the sprite flags
-		local gffdata = data:match("\n__gff__.-\n(.-\n)\n-__")
+		local gffdata = data:match("\n__gff__.-\n(.-)\n-__.+__\n")
 
 		if gffdata then
 			local sprite = 0
@@ -356,7 +356,7 @@ function cart.load_p8(filename)
 		end
 
 		-- convert the tile data to a table
-		local mapdata = data:match("\n__map__.-\n(.-\n)\n-__")
+		local mapdata = data:match("\n__map__.-\n(.-)\n-__.+__\n")
 
 		if mapdata then
 			local row = 0
@@ -386,7 +386,7 @@ function cart.load_p8(filename)
 		end
 
 		-- load sfx
-		local sfxdata = data:match("\n__sfx__.-\n(.-\n)\n-__")
+		local sfxdata = data:match("\n__sfx__.-\n(.-)\n-__.+__\n")
 
 		if sfxdata then
 			local _sfx = 0
@@ -421,7 +421,7 @@ function cart.load_p8(filename)
 		end
 
 		-- load music
-		local musicdata = data:match("\n__music__.-\n(.-\n)\n-__")
+		local musicdata = data:match("\n__music__.-\n(.-)\n-__.+__\n")
 
 		if musicdata then
 			local _music = 0

@@ -1,4 +1,4 @@
-.PHONY: run all 9 10 11 lint build clean format test
+.PHONY: run all 9 10 11 lint format clean test build run_build
 
 project_name := "picolove"
 

@@ -1646,7 +1646,7 @@ function api.stat(x)
 	elseif x == 4 then
 		return pico8.clipboard
 	elseif x == 5 then
-		return 33 -- pico-8 version - using latest
+		return 41 -- pico-8 version - using latest
 	elseif x == 7 then
 		return pico8.fps -- current fps
 	elseif x == 8 then

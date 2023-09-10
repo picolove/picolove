@@ -124,7 +124,8 @@ function api.cls(col)
 	col = flr(tonumber(col) or 0) % 16
 	col = col + 1 -- TODO: fix workaround
 
-	love.graphics.clear(col * 16, 0, 0, 255)
+	--love.graphics.clear(col * 16, 0, 0, 255)
+	love.graphics.clear((col * 16)/255, 0, 0, 1)
 	pico8.cursor = { 0, 0 }
 end
 
@@ -909,7 +910,8 @@ end
 
 function api.map(cel_x, cel_y, sx, sy, cel_w, cel_h, bitmask)
 	love.graphics.setShader(pico8.sprite_shader)
-	love.graphics.setColor(255, 255, 255, 255)
+	--love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 	cel_x = flr(cel_x or 0)
 	cel_y = flr(cel_y or 0)
 	sx = flr(sx or 0)
@@ -1054,6 +1056,7 @@ function api.music(n, fade_len, channel_mask) -- luacheck: no unused
 			end
 		end
 	end
+	-- TODO: Fails when an audio channel has nothing to play
 	pico8.audio_channels[music_channel].loop = false
 	pico8.current_music = {
 		music = n,
@@ -1307,7 +1310,9 @@ end
 function api.reload(dest_addr, source_addr, len, filepath) -- luacheck: no unused
 	-- FIXME: doesn't handle ranges, we should keep a "cart rom"
 	-- FIXME: doesn't handle filepaths
-	_load(cartname)
+	--local name = filepath:match( "([^/]+)\\..+$" )
+	print('Reloading Name=' .. initialcartname)
+	_load(initialcartname)
 end
 
 function api.cstore(dest_addr, source_addr, len) -- luacheck: no unused
@@ -1390,6 +1395,24 @@ end
 
 function api.save()
 	-- TODO: implement this
+	_save(initialcartname)
+end
+
+function api.codes(replace)
+	local result = replace or {}
+	if not replace then
+		for line in carts[initialcartname].loaded_code:gmatch '[^\n]+' do
+			table.insert(result, line)
+		end
+	else
+		local lua = ""
+		for _, line in pairs(replace) do
+			lua = lua .. "\n" .. line
+		end
+		pico8.loaded_code = lua
+		carts[initialcartname].loaded_code = lua
+	end
+	return result
 end
 
 function api.run()
@@ -1403,7 +1426,12 @@ function api.run()
 	love.graphics.origin()
 
 	api.clip()
-	pico8.cart = new_sandbox()
+	pico8.last_cart = pico8.cart
+	if cartname == 'editor.p8' then
+		pico8.cart = new_editor_sandbox(cartname, pico8.last_cart)
+	else
+		pico8.cart = new_sandbox(cartname)
+	end
 
 	pico8.can_pause = true
 	pico8.can_shutdown = false
@@ -1416,10 +1444,10 @@ function api.run()
 		pico8.cartdata[i] = 0
 	end
 
-	local ok, f, e = pcall(load, loaded_code, cartname)
+	local ok, f, e = pcall(load, pico8.loaded_code, cartname)
 	if not ok or f == nil then
 		log("=======8<========")
-		log(loaded_code)
+		log(pico8.loaded_code)
 		log("=======>8========")
 		error("Error loading lua: " .. tostring(e))
 	else
@@ -1431,8 +1459,6 @@ function api.run()
 		ok, e = pcall(f)
 		if not ok then
 			error("Error running lua: " .. tostring(e))
-		else
-			log("lua completed")
 		end
 	end
 
@@ -1490,7 +1516,7 @@ function api.help()
 
 	api.rectfill(0, api._getcursory(), 128, 128, 0)
 	api.print("")
-	api.color(12)
+	api.color(13)
 	api.print("commands")
 	api.print("")
 	api.color(6)
@@ -1504,7 +1530,7 @@ function api.help()
 	api.print("alt+enter to toggle fullscreen")
 	api.print("alt+f4 or " .. commandKey .. "+q to fastquit")
 	api.print("")
-	api.color(12)
+	api.color(13)
 	api.print("see readme.md for more info")
 	api.print("or visit: github.com/picolove")
 	api.print("")

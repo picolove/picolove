@@ -50,8 +50,8 @@ end
 local cart = {}
 
 function cart.load_p8(filename)
-	log("Loading", filename)
-
+	local g_pico8 = pico8
+	local pico8 = {}
 	local lua = ""
 	pico8.quads = {}
 	pico8.spritesheet_data = love.image.newImageData(128, 128)
@@ -90,6 +90,7 @@ function cart.load_p8(filename)
 	end
 
 	local fileheader = love.filesystem.read(filename, 8)
+	
 	if fileheader == "\137PNG\r\n\26\n" then
 		local data = love.image.newImageData(filename)
 		if data:getWidth() ~= 160 or data:getHeight() ~= 205 then
@@ -113,6 +114,7 @@ function cart.load_p8(filename)
 				g = bit.band(g, 0x0003)
 				b = bit.band(b, 0x0003)
 				a = bit.band(a, 0x0003)
+				
 				data:setPixel(
 					x,
 					y,
@@ -217,7 +219,7 @@ function cart.load_p8(filename)
 		end
 
 		-- decompress code
-		log("version", version)
+		
 		if version > 8 then
 			api.print(string.format("unknown file version %d", version), 3)
 		end
@@ -267,7 +269,6 @@ function cart.load_p8(filename)
 
 		local version_str = data:sub(header_end, next_line - 1)
 		local version = tonumber(version_str)
-		log("version", version)
 
 		-- extract the lua
 		lua = data:match("\n__lua__.-\n(.-)\n-__.+__\n") or ""
@@ -285,7 +286,9 @@ function cart.load_p8(filename)
 				local col = 0
 				for v in line:gmatch(".") do
 					v = tonumber(v, 16)
-					pico8.spritesheet_data:setPixel(col, row, v * 16, v * 16, v * 16, 255)
+					local r = (v * 16) / 255.0
+					
+					pico8.spritesheet_data:setPixel(col, row,  r, 0.0, 0.0, 255.0 / 255.0)
 
 					col = col + 1
 					if col == 128 then
@@ -446,13 +449,215 @@ function cart.load_p8(filename)
 	end
 
 	lua = patch_lua(lua)
+	pico8.loaded_code = lua
+
 	lua = lua .. "\n_picolove_end()"
 
-	log("finished loading cart", filename)
+	for k, v in pairs(pico8) do
+		g_pico8[k] = v
+	end
 
-	loaded_code = lua
-
-	return true
+	return true, pico8
 end
+
+function cart.save_p8(filename, cartdata)
+	assert(cartdata, 'Must have card data to save')
+	print('Saving ' .. cartdata.cartname)
+	local version = 38
+	
+	love.filesystem.write(
+		filename,
+		"pico-8 cartridge // http://www.pico-8.com\n" ..
+		"version " .. tostring(version) .. "\n" ..
+		cart.generateCodeString(cartdata) ..
+		cart.generateSpriteString(cartdata) ..
+		cart.generateSpriteFlagString(cartdata) ..
+		cart.generateMapString(cartdata) ..
+		cart.generateSfxString(cartdata) ..
+		cart.generateMusic(cartdata)
+	)
+end
+
+function cart.generateCodeString(cartdata)
+	local str = "__lua__\n" .. cartdata.loaded_code .. "\n"
+	return str
+end
+
+function cart.generateSpriteString(cartdata)
+	local str =  "__gfx__\n"
+	if not cartdata.spritesheet_data then return '' end
+
+	local sprite = cartdata.spritesheet_data
+
+	for y=0,sprite:getHeight()-4 do
+		for x=0,sprite:getWidth()-1 do
+			local color = sprite:getPixel(x,y)
+			local hex = math.floor(color * 255) / 16
+			str = str .. string.format("%x", hex)
+		end
+		str = str .. '\n'
+	end
+
+	return str
+end
+
+function cart.generateSpriteFlagString(cartdata)
+	local str = "__gff__\n"
+
+	if not cartdata.spriteflags then return '' end
+
+	local flags = cartdata.spriteflags
+
+	for i=0, 255 do
+		if i > 0 and (i) % 128 == 0 then 
+			str = str .. '\n'
+		end
+		str = str .. string.format('%02x', flags[i] or 0)
+	end
+
+	return str .. '\n'
+end
+
+function cart.generateMapString(cartdata)
+	local str = "__map__\n"
+
+	if not cartdata.map then return '' end
+
+	local map = cartdata.map
+
+	for r=0,31 do
+		for c=0,127 do
+			str = str .. tostring(string.format("%02x",map[r][c] or 0))
+		end		
+		str = str .. '\n'
+	end
+
+	return str
+end
+
+function cart.generateSfxString(cartdata)
+	local str = "__sfx__\n"
+			
+	if not cartdata.sfx then return '' end
+
+	local sfx = cartdata.sfx
+
+	local _sfx = 0
+
+	for _, fx in pairs(sfx) do
+		local soundStr = ''
+
+		soundStr = soundStr .. string.format('%02x', fx.editor_mode)
+		soundStr = soundStr .. string.format('%02x', fx.speed)
+		soundStr = soundStr .. string.format('%02x', fx.loop_start)
+		soundStr = soundStr .. string.format('%02x', fx.loop_end)
+		
+		local hadNote = false
+		for i = 1, 32 do
+			local note = fx[i-1]
+			-- write note into 5 characters
+
+			hadNote = hadNote or note[1] > 0
+
+			soundStr = soundStr .. string.format('%02x', note[1])
+			soundStr = soundStr .. string.format('%x', note[2])
+			soundStr = soundStr .. string.format('%x', note[3])
+			soundStr = soundStr .. string.format('%x', note[4])
+		end
+		
+		if hadNote then
+		str = str .. soundStr .. '\n'
+		end
+	end
+
+	return str
+end
+
+function cart.generateMusic(cartdata)
+	local str = "__music__\n"
+	
+	if not cartdata.music then return '' end
+
+	local music = cartdata.music
+
+	local inLoop = false
+	for i, stanza in pairs(music) do
+		if stanza.loop == 1 and not inLoop then
+			inLoop = true
+		end
+		if inLoop then
+			str = str .. string.format("%02x", stanza.loop) .. ' '
+			str = str .. string.format("%02x", stanza[0])
+			str = str .. string.format("%02x", stanza[1])
+			str = str .. string.format("%02x", stanza[2])
+			str = str .. string.format("%02x", stanza[3])
+			str = str .. '\n'
+		end
+		if stanza.loop == 2 then
+			inLoop = false
+		end
+	end
+
+	return str .. '\n'
+end
+
+function nline(str, nl) if nl == 'true' then return str .. '\n' else return str end end
+function obj2str(obj, indent, nl)
+	if type(obj) ~= 'table' then
+		return tostring(obj)
+	end
+
+	indent = indent or 2
+	nl = nl or 'true'
+	local str = ''
+	local MAX_KEYS = 100
+	local maxKeys = MAX_KEYS
+	if nl == 'false' then str = str .. '{' end
+	for k, v in pairs(obj) do
+		if nl == 'true' then
+			for ni=1,indent do
+				str = str .. '  '
+			end
+		end
+
+		if type(v) == 'table' and #v == 0 then			
+			str = str .. k .. ':'
+			str = nline(str, nl)
+			str = str .. obj2str(v, indent + 1, nl)
+			str = nline(str, nl)
+		elseif type(v) == 'table' and #v >= 1 then
+			str = str .. k .. ': ['
+			for i, o in ipairs(v) do
+				str = str .. i .. '=' .. obj2str(o, indent, 'false') 
+				if i ~= #v then
+				 str = str .. ','
+				end
+			end
+			str = str .. ']'
+			str = nline(str, nl)
+		else
+			str = str .. k .. '="' .. tostring(v):gsub('\n','\\n') .. '", '
+			str = nline(str, nl)
+		end
+		
+		if maxKeys <= 0 and nl then
+			if nl then
+				for ni=1,indent do
+					str = str .. '  '
+				end
+			end
+			str = str .. "<..more than " .. MAX_KEYS .. " keys..>"
+			break
+		end
+		maxKeys = maxKeys - 1
+	end
+	if nl == 'false' then 
+		str = str:sub(1,#str-2)
+		str = str .. '}' 
+	end
+
+	return str
+end
+function printobj(obj) local k = obj2str(obj) print(k) return k end
 
 return cart

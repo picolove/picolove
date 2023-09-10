@@ -10,7 +10,7 @@ local api = require("api")
 local cart = require("cart")
 
 cartname = nil -- used by api.reload
-local initialcartname = nil -- used by esc
+initialcartname = nil -- used by esc
 local love_args = nil -- luacheck: no unused
 
 pico8 = {
@@ -20,22 +20,22 @@ pico8 = {
 	resolution = __pico_resolution,
 	screen = nil,
 	palette = {
-		{ 0, 0, 0, 255 },
-		{ 29, 43, 83, 255 },
-		{ 126, 37, 83, 255 },
-		{ 0, 135, 81, 255 },
-		{ 171, 82, 54, 255 },
-		{ 95, 87, 79, 255 },
-		{ 194, 195, 199, 255 },
-		{ 255, 241, 232, 255 },
-		{ 255, 0, 77, 255 },
-		{ 255, 163, 0, 255 },
-		{ 255, 240, 36, 255 },
-		{ 0, 231, 86, 255 },
-		{ 41, 173, 255, 255 },
-		{ 131, 118, 156, 255 },
-		{ 255, 119, 168, 255 },
-		{ 255, 204, 170, 255 },
+		{ 0, 0, 0, 255 },       -- 0 - black
+		{ 29, 43, 83, 255 },    -- 1 - dark blue
+		{ 126, 37, 83, 255 },   -- 2 - dark purple
+		{ 0, 135, 81, 255 },    -- 3 - dark green
+		{ 171, 82, 54, 255 },   -- 4 - brown
+		{ 95, 87, 79, 255 },    -- 5 - dark gray
+		{ 194, 195, 199, 255 }, -- 6 - light gray
+		{ 255, 241, 232, 255 }, -- 7 - white
+		{ 255, 0, 77, 255 },    -- 8 - red
+		{ 255, 163, 0, 255 },   -- 9 - orange
+		{ 255, 240, 36, 255 },  -- 10 - yellow
+		{ 0, 231, 86, 255 },    -- 11 - light green
+		{ 131, 118, 156, 255 }, -- 12 - light blue
+		{ 41, 173, 255, 255 },  -- 13 - light purple
+		{ 255, 119, 168, 255 }, -- 14 - pink
+		{ 255, 204, 170, 255 }, -- 15 - tan
 	},
 	color = nil,
 	spriteflags = {},
@@ -90,11 +90,11 @@ pico8 = {
 	quads = {},
 	spritesheet_data = nil,
 	spritesheet = nil,
+	loaded_code = nil,
 }
 
 local flr, abs = math.floor, math.abs
 
-loaded_code = nil
 
 local __audio_buffer_size = 1024
 
@@ -171,8 +171,10 @@ function restore_clip()
 end
 
 function setColor(c)
-	love.graphics.setColor(c * 16, 0, 0, 255)
+	love.graphics.setColor((c * 16)/255, 0, 0, 1.0)
 end
+
+carts = {}
 
 function _load(_cartname)
 	if type(_cartname) ~= "string" then
@@ -195,7 +197,8 @@ function _load(_cartname)
 
 	local file_found = false
 	for i = 1, #exts do
-		if love.filesystem.isFile(currentDirectory .. cart_no_ext .. exts[i]) then
+		local thefile = love.filesystem.getInfo(currentDirectory .. cart_no_ext .. exts[i])
+		if thefile then
 			file_found = true
 			_cartname = cart_no_ext .. exts[i]
 			break
@@ -203,7 +206,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
-		api.print("could not load", 6)
+		api.print("could not load, " .. _cartname, 6)
 		return false
 	end
 
@@ -213,10 +216,26 @@ function _load(_cartname)
 	api.camera()
 	restore_clip()
 	cartname = _cartname
-	if cart.load_p8(currentDirectory .. _cartname) then
+	
+	local success, cartdata = cart.load_p8(currentDirectory .. _cartname)
+
+	if success then
 		api.print("loaded " .. _cartname, 6)
+		local existingCode = nil
+		if carts[_cartname] and carts[_cartname].loaded_code then
+			existingCode = carts[_cartname].loaded_code
+		end
+		carts[_cartname] = cartdata
+		carts[_cartname].loaded_code = existingCode or carts[_cartname].loaded_code
+		pico8.loaded_code = carts[_cartname].loaded_code
+		carts[_cartname].cartname = cartname
 	end
+	
 	return true
+end
+
+function _save(_cartname)
+	cart.save_p8(_cartname, carts[_cartname])
 end
 
 function love.resize(w, h)
@@ -345,8 +364,8 @@ function love.load(argv)
 extern float palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(color.r*16.0);
-	return vec4(vec3(palette[index]/16.0),1.0);
+	int index = int(color.r * 16.0);
+	return vec4(vec3(palette[index] / 16.0),1.0);
 }]])
 	pico8.draw_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
@@ -355,9 +374,9 @@ extern float palette[16];
 extern float transparent[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(floor(Texel(texture, texture_coords).r*16.0));
+	int index = int(floor((Texel(texture, texture_coords).r * 255.0) / 16.0));
 	float alpha = transparent[index];
-	return vec4(vec3(palette[index]/16.0),alpha);
+	return vec4(palette[index] / 16.0, 0.0, 0.0, alpha);
 }]])
 	pico8.sprite_shader:send("palette", shdr_unpack(pico8.draw_palette))
 	pico8.sprite_shader:send("transparent", shdr_unpack(pico8.pal_transparent))
@@ -370,9 +389,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	if(texcolor.a == 0.0) {
 		return vec4(0.0,0.0,0.0,0.0);
 	}
-	int index = int(color.r*16.0);
+	int index = int(color.r * 16.0);
 	// lookup the color in the palette by index
-	return vec4(vec3(palette[index]/16.0),1.0);
+	return vec4(vec3(palette[index] / 16.0),1.0);
 }]])
 	pico8.text_shader:send("palette", shdr_unpack(pico8.draw_palette))
 
@@ -380,9 +399,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 extern vec4 palette[16];
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-	int index = int(Texel(texture, texture_coords).r*15.0);
+	int index = int(Texel(texture, texture_coords).r  * 15.0);
 	// lookup the color in the palette by index
-	return palette[index]/256.0;
+	return palette[index] / 256.0;
 }]])
 	pico8.display_shader:send("palette", shdr_unpack(pico8.display_palette))
 
@@ -500,10 +519,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
 	_load(initialcartname)
 	api.run()
-	cartname = nil
 end
 
-function new_sandbox()
+function new_sandbox(cartname)
 	local cart_env = {}
 
 	for k, v in pairs(api) do
@@ -527,6 +545,21 @@ function new_sandbox()
 	for k, v in pairs(picolove_functions) do
 		cart_env[k] = v
 	end
+
+	assert(cartname, 'Must have a cartname to create a sandbox')
+	cart_env.cartname = cartname
+	cart_env.initialcartname = initialcartname
+
+	return cart_env
+end
+
+function new_editor_sandbox(cartname, last)
+	local cart_env = new_sandbox(cartname)
+
+	assert(initialcartname, 'Cannot set editor sandbox cart name initialcartname was nil')
+	cart_env.cartname = initialcartname
+	assert(last, 'Must have a last cart to edit')
+	cart_env.last_cart = last
 
 	return cart_env
 end
@@ -552,9 +585,9 @@ end
 
 function love.update(_)
 	update_buttons()
-	if pico8.cart._update60 then
+	if pico8.cart and pico8.cart._update60 then
 		pico8.cart._update60()
-	elseif pico8.cart._update then
+	elseif pico8.cart and pico8.cart._update then
 		pico8.cart._update()
 	end
 end
@@ -567,7 +600,7 @@ function love.draw()
 	love.graphics.setShader(pico8.draw_shader)
 
 	-- run the cart's draw function
-	if pico8.cart._draw then
+	if pico8.cart and pico8.cart._draw then
 		pico8.cart._draw()
 	end
 
@@ -587,7 +620,8 @@ function flip_screen()
 	love.graphics.origin()
 	love.graphics.setScissor()
 
-	love.graphics.setBackgroundColor(3, 5, 10)
+	love.graphics.setBackgroundColor(3/255, 5/255, 10/255)
+	
 	love.graphics.clear()
 
 	local screen_w, screen_h = love.graphics.getDimensions()
@@ -822,25 +856,46 @@ local function isAltDown()
 	return love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")
 end
 
+local _hasEditor = nil
+local _state = "running"
+local function hasEditor()
+	local fstat = love.filesystem.getInfo('editor.p8')
+	if not fstat then
+		_hasEditor = false
+		print('no info present')
+		return false
+	end
+	_hasEditor = fstat.type == 'file'
+	return _hasEditor
+end
+
 function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
-		api.reload()
+		_state='running'
 		api.run()
 	elseif
 		key == "escape"
 		and cartname ~= nil
-		and cartname ~= initialcartname
 		and cartname ~= "nocart.p8"
 		and cartname ~= "editor.p8"
+		and _state == 'running'
+		and hasEditor()
 	then
-		api.load(initialcartname)
+		local cart = initialcartname
+
+		if hasEditor() then
+			cart = 'nocart.p8'
+			_state = 'editing'
+		end
+
+		api.load(cart)
 		api.run()
 		return
 	elseif key == "q" and isCtrlOrGuiDown() and not isAltDown() then
 		love.event.quit()
 	elseif key == "v" and isCtrlOrGuiDown() and not isAltDown() then
 		pico8.clipboard = love.system.getClipboardText()
-	elseif pico8.can_pause and (key == "pause" or key == "p") then
+	elseif pico8.can_pause and (key == "pause" or key == "p") and (hasEditor() and not _state == 'running') then
 		paused = not paused
 	elseif key == "f1" or key == "f6" then
 		-- screenshot
@@ -860,6 +915,7 @@ function love.keypressed(key)
 		video_frames = nil
 		log("saved video to", basename)
 	elseif key == "return" and isAltDown() then
+		love.graphics.setCanvas()
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 		return
 	else

@@ -228,9 +228,12 @@ function _keydown(key)
 		elseif linebuffer == "reboot" then
 			reboot()
 
-		elseif linebuffer:sub(1, 5) == "save " then
+		elseif linebuffer == "save" then
 			-- TODO
-
+			print('not implemented yet')
+		elseif linebuffer:sub(1, 5) == "save " and #linebuffer > 5 then
+			-- TODO
+			print('not implemented yet')
 		else
 			color(pencolor)
 			_call(linebuffer)

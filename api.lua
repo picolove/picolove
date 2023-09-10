@@ -96,6 +96,9 @@ end
 --------------------------------------------------------------------------------
 -- PICO-8 API
 
+-- TODO: only apply if fps is 15, 30 or 60
+api._set_fps = setfps
+
 function api.flip()
 	flip_screen()
 	love.timer.sleep(pico8.frametime)

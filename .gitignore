@@ -1,7 +1,9 @@
 *.p8
+*.p8.png
 !nocart.p8
 !editor.p8
 !test/*.p8
+*.lnk
 .DS_Store
 build/**/*.love
 luacov.report.out

@@ -431,6 +431,8 @@ local function tostring(str)
 	--return (tostring_org(str):gsub("[^%z\32-\127]", "8"))
 end
 
+api.tostring = tostring
+
 function api.print(...)
 	--TODO: support printing special pico8 chars
 

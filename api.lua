@@ -273,7 +273,7 @@ function api.ls()
 			api.print(item.name:sub(j, j + 32), item.color)
 			flip_screen()
 			count = count + 1
-			if count == 20 then
+			if count == 19 then
 				api.rectfill(0, api._getcursory(), 128, api._getcursory() + 5, 0)
 				api.print("--more--", 12)
 				flip_screen()

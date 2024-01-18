@@ -1,4 +1,5 @@
-.PHONY: run all 9 10 11 lint format clean test build run_build
+.PHONY: run all 9 10 11 lint format clean test build run_build dev
+.SILENT: dev
 
 project_name := "picolove"
 
@@ -6,6 +7,9 @@ run:
 	@love . --test
 
 all: format lint test build
+
+dev:
+	while true; do $(MAKE) -s run; done
 
 # run specific love version
 # setup environment variable with path to love executable first

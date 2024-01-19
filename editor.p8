@@ -10,6 +10,9 @@ local content = {
 	"-- press esc to quit"
 }
 
+local viewy = 0
+local viewylen = 19
+
 local caretx = 1
 local carety = 1
 local caretbig = false
@@ -62,6 +65,11 @@ function updatecaret()
 	end
 
 	carety = max(min(carety, #content), 1)
+	if carety <= viewy then
+		viewy = carety - 1
+	elseif carety >= (viewy + viewylen) then
+		viewy = carety - viewylen
+	end
 	caretx = max(min(caretx, #content[carety] + posaftertext), 1)
 	caretbig = caretx == 1 or caretx <= #content[carety]
 end
@@ -288,9 +296,9 @@ function normalmode._drawcaret()
 		nextmode._drawcaret()
 	elseif tc % 16 < 8 or tc < 16 then
 		if caretbig then
-			rectfill(caretx*4-4, carety*6 + 2, caretx*4, carety*6 + 2 + 5, 8)
+			rectfill(caretx*4 - 4, (carety - viewy)*6 + 2, caretx*4, (carety - viewy)*6 + 2 + 5, 8)
 		else
-			rectfill(caretx*4-4, carety*6 + 3, caretx*4, carety*6 + 3 + 4, 8)
+			rectfill(caretx*4 - 4, (carety - viewy)*6 + 3, caretx*4, (carety - viewy)*6 + 3 + 4, 8)
 		end
 	end
 end
@@ -440,8 +448,8 @@ function _draw()
 	mode._drawcaret()
 
 	-- render dummy content
-	color(6)
-	for i,v in ipairs(content) do
+	for i = viewy + 1, min(viewy + 1 + viewylen, #content) do
+		v = content[i]
 		if syntax_is_comment(v) then
 			color(13)
 		elseif syntax_is_function(v) or syntax_is_end(v) then
@@ -449,7 +457,7 @@ function _draw()
 		else
 			color(6)
 		end
-		print(v, 1, 3 + i*6)
+		print(v, 1, 3 + (i - viewy)*6)
 	end
 
 	-- render toolbar

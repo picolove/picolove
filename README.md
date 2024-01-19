@@ -64,6 +64,7 @@ Extra features:
  * `_hasfocus()` window focus state (only false on first blur frame in _draw)
 
 Development requirements:
+
  * Runtime: `LÖVE 0.10.2`
  * Building: `make`
  * Formatting: `sed` and `stylua`
@@ -71,14 +72,16 @@ Development requirements:
  * Packaging: `zip`
 
 Development:
+
  * Run in endless loop: `make dev`
  * Modify code
  * Press ctrl+q to reload
 
 Before pushing:
+
  * Run `make format`
  * Run `make lint`
- * Run `make test`
+ * Run `make test`  
  or
  * Run `make all`
 

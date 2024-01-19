@@ -831,6 +831,9 @@ function love.keypressed(key)
 	if key == "r" and isCtrlOrGuiDown() and not isAltDown() then
 		api.reload()
 		api.run()
+	elseif key == "d" and isCtrlOrGuiDown() and not isAltDown() then
+		log(string.rep("\n", 200))
+		key = ""
 	elseif
 		key == "escape"
 		and cartname ~= nil

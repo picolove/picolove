@@ -281,7 +281,7 @@ function _draw()
 	-- render text
 	print("> " .. linebuffer, 0, _getcursory(), 7)
 	-- render carret
-	if tc % 16 < 8 then
+	if tc % 16 < 8 and _hasfocus() then
 		rectfill((cursorx + 2) * 4, _getcursory(), (cursorx + 2) * 4 + 3, _getcursory() + 4, 8)
 	end
 end

@@ -246,6 +246,7 @@ function normalmode._keydown(key)
 	elseif isshiftdown and key == "g" then
 		carety = #content
 		caretx = 1
+		updatecaret()
 	elseif key == "g" then
 		prevkey = key
 	elseif key == "o" then

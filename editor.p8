@@ -66,6 +66,38 @@ function updatecaret()
 	caretbig = caretx == 1 or caretx <= #content[carety]
 end
 
+function nextwordpos(line, startindex)
+	local char = line:sub(startindex, startindex)
+	local needles
+
+	if char:match("[%w_]") then
+		needles = {"[%s][%p%S]", "[%w_][^_%P]"}
+	elseif char:match("%p") then
+		needles = {"[^_][_%w]"}
+	else
+		needles = {" %S"}
+	end
+
+	local result = #line + 1
+	local resultendpos = nil
+	local pos
+	local endpos
+
+	for _, needle in ipairs(needles) do
+		pos, endpos = line:find(needle, startindex)
+		if pos ~= nil then
+			if pos < result then
+				result = pos
+				resultendpos = endpos
+			end
+		elseif result == #line + 1 then
+			result = pos
+			resultendpos = endpos
+		end
+	end
+	return result, resultendpos
+end
+
 function normalmode._keydown(key)
 	if prevkey ~= nil then
 		if key == "lshift" or key == "rshift" or
@@ -92,7 +124,7 @@ function normalmode._keydown(key)
 			local delstartpos = caretx
 			local delendpos = nil
 
-			local foundpos = content[carety]:find(" ", caretx)
+			local foundpos = nextwordpos(content[carety], caretx)
 
 			if foundpos ~= nil then
 				delendpos = foundpos
@@ -158,7 +190,7 @@ function normalmode._keydown(key)
 	elseif key == "d" then
 		prevkey = key
 	elseif key == "w" then
-		local pos, posend = content[carety]:find(" %S", caretx)
+		local pos, posend = nextwordpos(content[carety], caretx)
 		if pos ~= nil then
 			caretx = posend
 		elseif carety < #content then

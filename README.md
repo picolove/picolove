@@ -5,17 +5,17 @@ Run PICO-8 games and computer programs with free and open-source software.
 
 On github at: https://github.com/picolove/picolove
 
-Requires LÖVE 0.10.2
+Requires LÃ–VE 0.10.2
 
 What it is:
 
- * An implementation of PICO-8's API in LÖVE
+ * An implementation of PICO-8's API in LÃ–VE
 
 What is PICO-8:
 
  * See http://www.lexaloffle.com/pico-8.php
 
-What is LÖVE:
+What is LÃ–VE:
 
  * See https://love2d.org/
 
@@ -65,7 +65,7 @@ Extra features:
 
 Development requirements:
 
- * Runtime: `LÖVE 0.10.2`
+ * Runtime: `LÃ–VE 0.10.2`
  * Building: `make`
  * Formatting: `sed` and `stylua`
  * Linting: `luacheck`

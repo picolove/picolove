@@ -173,6 +173,10 @@ function normalmode._keydown(key)
 
 	elseif key >= "1" and key <= "9" then
 		prevkey = key
+	elseif isshiftdown and key == "h" then
+		caretx = 1
+		carety = viewy + 1
+		updatecaret()
 	elseif key == "h" then
 		if caretx == 1 and carety > 1 then
 			carety -= 1
@@ -186,6 +190,10 @@ function normalmode._keydown(key)
 		updatecaret()
 	elseif key == "k" then
 		carety -= 1
+		updatecaret()
+	elseif isshiftdown and key == "l" then
+		caretx = 1
+		carety = viewy + viewylen
 		updatecaret()
 	elseif key == "l" then
 		if caretx == #content[carety] and carety < #content then

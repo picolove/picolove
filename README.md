@@ -63,6 +63,25 @@ Extra features:
  * `_getpicoloveversion()` returns the version of picolove
  * `_hasfocus()` window focus state (only false on first blur frame in _draw)
 
+Development requirements:
+ * Runtime: `LÖVE 0.10.2`
+ * Building: `make`
+ * Formatting: `sed` and `stylua`
+ * Linting: `luacheck`
+ * Packaging: `zip`
+
+Development:
+ * Run in endless loop: `make dev`
+ * Modify code
+ * Press ctrl+q to reload
+
+Before pushing:
+ * Run `make format`
+ * Run `make lint`
+ * Run `make test`
+ or
+ * Run `make all`
+
 Android Packaging:
 
 Replace the default cartridge (nocart.p8) with your game. Text (P8) or PNG (P8.PNG) is supported.  

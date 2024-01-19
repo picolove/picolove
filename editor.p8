@@ -2,9 +2,12 @@ pico-8 cartridge // http://www.pico-8.com
 version 32
 __lua__
 local content = {
-	"todo: editor",
+	"-- todo: editor",
 	"",
-	"press esc to quit"
+	"function _init()",
+	" print(\"hello world!\")",
+	"end",
+	"-- press esc to quit"
 }
 
 local caretx = 1
@@ -385,6 +388,18 @@ end
 function _touchup()
 end
 
+function syntax_is_comment(str)
+	return str:match("^%s*(.-)$"):sub(1, 2) == "--"
+end
+
+function syntax_is_function(str)
+	return str:match("^%s*(.-)$"):sub(1, 8) == "function"
+end
+
+function syntax_is_end(str)
+	return str:match("^%s*(.-)$"):sub(1, 3) == "end"
+end
+
 function _draw()
 	-- render background
 	cls(1)
@@ -395,6 +410,13 @@ function _draw()
 	-- render dummy content
 	color(6)
 	for i,v in ipairs(content) do
+		if syntax_is_comment(v) then
+			color(13)
+		elseif syntax_is_function(v) or syntax_is_end(v) then
+			color(14)
+		else
+			color(6)
+		end
 		print(v, 1, 3 + i*6)
 	end
 

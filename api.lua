@@ -64,6 +64,10 @@ function api._getpicoloveversion()
 	return __picolove_version
 end
 
+function api._hasfocus()
+	return pico8.has_focus
+end
+
 function api._getcursorx()
 	return pico8.cursor[1]
 end

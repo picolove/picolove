@@ -7,6 +7,7 @@ _allow_shutdown = _allow_shutdown or function() end
 _getpicoloveversion = _getpicoloveversion or function() return "" end
 _getcursorx =  _getcursorx or function() return peek(0x5f26) end
 _getcursory =  _getcursory or function() return peek(0x5f27) - 6 end
+_hasfocus = _hasfocus or function() return true end
 
 function _init()
 	_allow_pause(false)

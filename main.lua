@@ -90,6 +90,7 @@ pico8 = {
 	quads = {},
 	spritesheet_data = nil,
 	spritesheet = nil,
+	has_focus = true,
 }
 
 local flr, abs = math.floor, math.abs
@@ -103,6 +104,7 @@ local osc
 host_time = 0
 local paused = false
 local focus = true
+local focus_start = false
 
 local __audio_channels
 local __sample_rate = 22050
@@ -629,6 +631,9 @@ end
 
 function love.focus(f)
 	focus = f
+	focus_start = true
+
+	pico8.has_focus = f
 end
 
 local function lowpass(y0, y1, cutoff) -- luacheck: no unused
@@ -1008,6 +1013,11 @@ function love.run()
 				-- TODO: fix issue with leftover paused menu
 				--api.rectfill(64 - 4 * 4, 60, 64 + 4 * 4 - 2, 64 + 4 + 4, 1)
 				--api.print("paused", 64 - 3 * 4, 64, (host_time * 20) % 8 < 4 and 7 or 13)
+			elseif not focus and focus_start then
+				if love.draw then
+					love.draw()
+				end
+				focus_start = false
 			end
 			-- reset mouse wheel
 			pico8.mwheel = 0

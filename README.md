@@ -61,6 +61,7 @@ Extra features:
  * `_touchup`, `_touchdown` allow using touch input
  * `_getcursorx()`, `_getcursory()` allow access to the cursor position
  * `_getpicoloveversion()` returns the version of picolove
+ * `_hasfocus()` window focus state (only false on first blur frame in _draw)
 
 Android Packaging:
 

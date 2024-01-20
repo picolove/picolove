@@ -137,7 +137,7 @@ function nextwordpos(line, startindex)
 	for _, needle in ipairs(needles) do
 		pos, endpos = line:find(needle, startindex)
 		if pos ~= nil then
-			if pos < result then
+			if result == nil or pos < result then
 				result = pos
 				resultendpos = endpos
 			end

@@ -5,6 +5,8 @@ Run PICO-8 games and computer programs with free and open-source software.
 
 On github at: https://github.com/picolove/picolove
 
+![Screenshot of PICOLOVE after startup](/assets/screenshot.png?raw=true "PICOLOVE screenshot after startup")
+
 Requires LÖVE 0.10.2
 
 What it is:

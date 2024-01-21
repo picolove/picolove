@@ -1,7 +1,7 @@
 .PHONY: run all 9 10 11 lint format clean test build run_build dev
 .SILENT: dev
 
-project_name := "picolove"
+project_name := picolove
 
 run:
 	@love . --test
@@ -32,16 +32,16 @@ format:
 
 clean:
 	@echo "deleting \"build/${project_name}.love\" ..."
-	@rm -f build/${project_name}.love
+	@rm -f "build/${project_name}.love"
 
 test:
 	# todo implement test running
 
 build: clean
 	@echo "building \"build/${project_name}.love\" ..."
-	@zip -9 -r -i@includelist.txt    build/${project_name}.love .
-	@zip -9 -r -i"*.lua" -x"*/*.lua" build/${project_name}.love .
+	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .
+	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/${project_name}.love" .
 
 run_build:
 	@echo "executing \"build/${project_name}.love\" ..."
-	@love build/${project_name}.love
+	@love "build/${project_name}.love"

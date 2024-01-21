@@ -3,3 +3,4 @@ font.png
 icon.png
 lib/*.lua
 nocart.p8
+editor.p8

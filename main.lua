@@ -845,7 +845,7 @@ function love.keypressed(key)
 		api.run()
 		return
 	elseif key == "q" and isCtrlOrGuiDown() and not isAltDown() then
-		love.event.quit()
+		love.event.quit(2)
 	elseif key == "v" and isCtrlOrGuiDown() and not isAltDown() then
 		pico8.clipboard = love.system.getClipboardText()
 	elseif pico8.can_pause and (key == "pause" or key == "p") then

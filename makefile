@@ -9,7 +9,7 @@ run:
 all: format lint test build
 
 dev:
-	while true; do $(MAKE) -s run; done
+	while true; do $(MAKE) -s run && break; done
 
 # run specific love version
 # setup environment variable with path to love executable first

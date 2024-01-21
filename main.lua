@@ -973,7 +973,7 @@ function love.run()
 						if love.audio then
 							love.audio.stop()
 						end
-						return
+						return a or 0
 					end
 				end
 				love.handlers[name](a, b, c, d, e, f)

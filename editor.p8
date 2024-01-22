@@ -220,7 +220,7 @@ function normalmode._keydown(key)
 		caretx = 1
 		carety = viewy + 1
 		updatecaret()
-	elseif key == "h" then
+	elseif key == "h" or key == "left" then
 		if caretx == 1 and carety > 1 then
 			carety -= 1
 			caretx = #content[carety]
@@ -228,17 +228,17 @@ function normalmode._keydown(key)
 			caretx -= 1
 		end
 		updatecaret()
-	elseif key == "j" then
+	elseif key == "j" or key == "down" then
 		carety += 1
 		updatecaret()
-	elseif key == "k" then
+	elseif key == "k" or key == "up" then
 		carety -= 1
 		updatecaret()
 	elseif isshiftdown and key == "l" then
 		caretx = 1
 		carety = viewy + viewylen
 		updatecaret()
-	elseif key == "l" then
+	elseif key == "l" or key == "right" then
 		if caretx == #content[carety] and carety < #content then
 			carety += 1
 			caretx = 1

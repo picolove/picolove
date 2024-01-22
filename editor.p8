@@ -373,6 +373,28 @@ function inputmode._keydown(key)
 		carety += 1
 		caretx = 1
 		updatecaret()
+	elseif key == "left" then
+		if caretx == 1 and carety > 1 then
+			carety -= 1
+			caretx = #content[carety] + 1
+		else
+			caretx -= 1
+		end
+		updatecaret()
+	elseif key == "down" then
+		carety += 1
+		updatecaret()
+	elseif key == "up" then
+		carety -= 1
+		updatecaret()
+	elseif key == "right" then
+		if caretx == #content[carety] + 1 and carety < #content then
+			carety += 1
+			caretx = 1
+		else
+			caretx += 1
+		end
+		updatecaret()
 	end
 end
 function inputmode._keyup(key)

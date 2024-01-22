@@ -412,9 +412,9 @@ function inputmode._drawcaret()
 		nextmode._drawcaret()
 	elseif tc % 16 < 8 or tc < 16 then
 		if caretbig then
-			rectfill(caretx*4-4, carety*6 + 2, caretx*4-4, carety*6 + 2 + 5, 8)
+			rectfill(caretx*4 - 4, (carety - viewy)*6 + 2, caretx*4 - 4, (carety - viewy)*6 + 2 + 5, 8)
 		else
-			rectfill(caretx*4-4, carety*6 + 3, caretx*4-4, carety*6 + 3 + 4, 8)
+			rectfill(caretx*4 - 4, (carety - viewy)*6 + 3, caretx*4 - 4, (carety - viewy)*6 + 3 + 4, 8)
 		end
 	end
 end

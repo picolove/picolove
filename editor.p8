@@ -373,6 +373,15 @@ function inputmode._keydown(key)
 			carety -= 1
 			updatecaret()
 		end
+	elseif key == "delete" then
+		if caretx <= #content[carety] then
+			content[carety] = content[carety]:sub(1, caretx - 1) .. content[carety]:sub(caretx + 1)
+			updatecaret()
+		elseif carety < #content then
+			content[carety] = content[carety] .. content[carety + 1]
+			deli(content, carety + 1)
+			updatecaret()
+		end
 	elseif key == "return" then
 		add(content, content[carety]:sub(caretx), carety + 1)
 		content[carety] = content[carety]:sub(1, caretx - 1)

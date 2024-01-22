@@ -366,6 +366,12 @@ function inputmode._keydown(key)
 			content[carety] = content[carety]:sub(1, caretx - 2) .. content[carety]:sub(caretx)
 			caretx -= 1
 			updatecaret()
+		elseif carety > 1 then
+			caretx = #content[carety - 1] + 1
+			content[carety - 1] = content[carety - 1] .. content[carety]
+			deli(content, carety)
+			carety -= 1
+			updatecaret()
 		end
 	elseif key == "return" then
 		add(content, content[carety]:sub(caretx), carety + 1)

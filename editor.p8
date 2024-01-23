@@ -246,6 +246,10 @@ function normalmode._keydown(key)
 			caretx += 1
 		end
 		updatecaret()
+	elseif isshiftdown and key == "m" then
+		caretx = 1
+		carety = viewy + ceil(viewylen / 2)
+		updatecaret()
 	elseif key == "d" then
 		prevkey = key
 	elseif key == "w" then

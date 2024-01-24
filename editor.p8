@@ -164,6 +164,11 @@ function normalmode._keydown(key)
 			if foundpos ~= nil then
 				caretx = foundpos
 			end
+		elseif prevkey == "t" then
+			local foundpos = content[carety]:find("[".. key .."]", caretx + 1)
+			if foundpos ~= nil then
+				caretx = foundpos - 1
+			end
 		elseif prevkey == "d" and key == "d" then
 			deli(content, carety)
 			if #content == 0 then
@@ -321,6 +326,8 @@ function normalmode._keydown(key)
 		end
 		updatecaret()
 	elseif key == "f" then
+		prevkey = key
+	elseif key == "t" then
 		prevkey = key
 	end
 end

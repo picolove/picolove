@@ -74,6 +74,7 @@ local isctrldown = false
 local isshiftdown = false
 
 local prevkey = nil
+local previsshiftdown = false
 
 function resetblink()
 	tc = 0
@@ -159,6 +160,13 @@ function normalmode._keydown(key)
 			prevkey = prevkey .. key
 		elseif prevkey == "escape" and key == "escape" then
 			returntomain()
+		elseif previsshiftdown and prevkey == "f" then
+			local revcontent = content[carety]:reverse()
+			local revcaretx = #revcontent - caretx
+			local foundpos = revcontent:find("[".. key .."]", revcaretx + 2)
+			if foundpos ~= nil then
+				caretx = #revcontent - foundpos + 1
+			end
 		elseif prevkey == "f" then
 			local foundpos = content[carety]:find("[".. key .."]", caretx + 1)
 			if foundpos ~= nil then
@@ -327,6 +335,7 @@ function normalmode._keydown(key)
 		updatecaret()
 	elseif key == "f" then
 		prevkey = key
+		previsshiftdown = isshiftdown
 	elseif key == "t" then
 		prevkey = key
 	end

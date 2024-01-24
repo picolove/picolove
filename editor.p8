@@ -172,6 +172,13 @@ function normalmode._keydown(key)
 			if foundpos ~= nil then
 				caretx = foundpos
 			end
+		elseif previsshiftdown and prevkey == "t" then
+			local revcontent = content[carety]:reverse()
+			local revcaretx = #revcontent - caretx
+			local foundpos = revcontent:find("[".. key .."]", revcaretx + 2)
+			if foundpos ~= nil then
+				caretx = #revcontent - foundpos + 2
+			end
 		elseif prevkey == "t" then
 			local foundpos = content[carety]:find("[".. key .."]", caretx + 1)
 			if foundpos ~= nil then
@@ -338,6 +345,7 @@ function normalmode._keydown(key)
 		previsshiftdown = isshiftdown
 	elseif key == "t" then
 		prevkey = key
+		previsshiftdown = isshiftdown
 	end
 end
 function normalmode._keyup(key)

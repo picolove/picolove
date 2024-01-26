@@ -1032,11 +1032,35 @@ function love.run()
 	end
 end
 
-function patch_lua(lua)
+function patch_includes(lua, folder)
+	local startpos = 0
+	local endpos = 0
+	startpos, endpos = string.find(lua, "#include (%S+)", endpos)
+	while startpos ~= nil do
+		local filename = lua:match("#include (%S+)", startpos)
+		local filepath = folder .. "/" .. filename
+		local content, size = love.filesystem.read(filepath)
+		if not content then
+			print("Failed to load file:", filepath)
+		end
+		if content then
+			if content:sub(-1) == "\n" then
+				content = content:sub(1, -2)
+				size = size - 1
+			end
+			lua = lua:sub(1, startpos - 1) .. content .. lua:sub(endpos + 1)
+			endpos = endpos + size - endpos + startpos + 1
+		end
+		startpos, endpos = string.find(lua, "#include (%S+)", endpos)
+	end
+	return lua
+end
+
+function patch_lua(lua, folder)
 	-- patch lua code
+	lua = patch_includes(lua, folder)
 	lua = lua:gsub("!=", "~=")
 	lua = lua:gsub("//", "--")
-	lua = lua:gsub("#include", "--")
 	-- rewrite broken up while statements eg:
 	-- while fn
 	-- (0,0,

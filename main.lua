@@ -1036,6 +1036,7 @@ function patch_lua(lua)
 	-- patch lua code
 	lua = lua:gsub("!=", "~=")
 	lua = lua:gsub("//", "--")
+	lua = lua:gsub("#include", "--")
 	-- rewrite broken up while statements eg:
 	-- while fn
 	-- (0,0,

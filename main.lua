@@ -236,6 +236,9 @@ end
 
 function love.load(argv)
 	love_args = argv
+
+	parse_commandline(argv)
+
 	if love.system.getOS() == "Android" or love.system.getOS() == "iOS" then
 		love.resize(love.graphics.getDimensions())
 	end
@@ -393,8 +396,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.camera()
 	api.pal()
 	api.color(6)
-
-	parse_commandline(argv)
 
 	if initialcartname == nil or initialcartname == "" then
 		initialcartname = "nocart.p8"

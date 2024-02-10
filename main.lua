@@ -408,8 +408,9 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 				--local n = argv[argpos + 1]
 				paramcount = 1
 			elseif argv[argpos] == "-windowed" then
-				--local n = argv[argpos + 1]
 				paramcount = 1
+				local fullscreen = argv[argpos + 1] == "0"
+				love.window.setFullscreen(fullscreen)
 			elseif argv[argpos] == "-volume" then
 				--local n = argv[argpos + 1]
 				paramcount = 1

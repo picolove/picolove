@@ -527,6 +527,7 @@ function parse_commandline(argv)
 				new_height = current_height
 			end
 			love.window.setMode(new_width, new_height, current_flags)
+			love.resize(love.graphics.getDimensions())
 		end
 	end
 

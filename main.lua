@@ -394,6 +394,18 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	api.pal()
 	api.color(6)
 
+	parse_commandline(argv)
+
+	if initialcartname == nil or initialcartname == "" then
+		initialcartname = "nocart.p8"
+	end
+
+	_load(initialcartname)
+	api.run()
+	cartname = nil
+end
+
+function parse_commandline(argv)
 	local argc = #argv
 	local argpos = 2
 	local paramcount = 0
@@ -517,13 +529,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 		end
 	end
 
-	if initialcartname == nil or initialcartname == "" then
-		initialcartname = "nocart.p8"
-	end
-
-	_load(initialcartname)
-	api.run()
-	cartname = nil
 end
 
 function new_sandbox()

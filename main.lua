@@ -530,7 +530,6 @@ function parse_commandline(argv)
 			love.resize(love.graphics.getDimensions())
 		end
 	end
-
 end
 
 function new_sandbox()

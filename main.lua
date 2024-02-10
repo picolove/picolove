@@ -398,15 +398,25 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	local argpos = 2
 	local paramcount = 0
 
+	local new_width = 0
+	local new_height = 0
+	local should_resize = false
+
 	if argc > 1 then
 		-- TODO: implement commandline options
 		while argpos <= argc do
 			if argv[argpos] == "-width" then
-				--local n = argv[argpos + 1]
 				paramcount = 1
+				new_width = tonumber(argv[argpos + 1])
+				if new_width then
+					should_resize = true
+				end
 			elseif argv[argpos] == "-height" then
-				--local n = argv[argpos + 1]
 				paramcount = 1
+				new_height = tonumber(argv[argpos + 1])
+				if new_height then
+					should_resize = true
+				end
 			elseif argv[argpos] == "-windowed" then
 				paramcount = 1
 				local fullscreen = argv[argpos + 1] == "0"
@@ -494,6 +504,16 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 			end
 
 			argpos = argpos + paramcount + 1
+		end
+		if should_resize then
+			local current_width, current_height, current_flags = love.window.getMode()
+			if new_width == 0 then
+				new_width = current_width
+			end
+			if new_height == 0 then
+				new_height = current_height
+			end
+			love.window.setMode(new_width, new_height, current_flags)
 		end
 	end
 

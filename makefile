@@ -27,7 +27,7 @@ lint:
 
 format:
 	@sed -i s/0x1234\.abcd/0x1234abcd/g test.lua
-	- styluai .
+	- stylua .
 	@sed -i s/0x1234abcd/0x1234\.abcd/g test.lua
 
 clean:

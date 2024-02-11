@@ -236,12 +236,15 @@ function api._completecommand(command, path)
 						api.cursor(0, y)
 						api.rectfill(0, y, 127, y + 6, 0)
 						api.color(item.color)
+						local canvas = love.graphics.getCanvas()
+						love.graphics.setCanvas()
 						while true do
 							local e = love.event.wait()
 							if e == "keypressed" then
 								break
 							end
 						end
+						love.graphics.setCanvas(canvas)
 						count = 0
 					end
 				end
@@ -285,6 +288,8 @@ function api.ls()
 				api.cursor(0, y)
 				api.rectfill(0, y, 127, y + 6, 0)
 				api.color(item.color)
+				local canvas = love.graphics.getCanvas()
+				love.graphics.setCanvas()
 				while true do
 					local e, a = love.event.wait()
 					if e == "keypressed" then
@@ -297,6 +302,7 @@ function api.ls()
 						break
 					end
 				end
+				love.graphics.setCanvas(canvas)
 				count = 0
 			end
 		end

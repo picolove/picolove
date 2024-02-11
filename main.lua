@@ -133,6 +133,11 @@ log = print
 -- TODO: move into separate file
 local major, minor, revision = love.getVersion()
 
+-- fixes for 11+
+if major > 0 then
+	require("cindy").applyPatch()
+end
+
 -- fixes for 0.10.2
 if major == 0 and minor == 10 and revision == 2 then
 	-- workaround love2d 0.10.2 shader bug
@@ -1000,7 +1005,13 @@ function love.run()
 						if love.audio then
 							love.audio.stop()
 						end
-						return a or 0
+						if major > 0 then
+							return function()
+								return a or 0
+							end
+						else
+							return a or 0
+						end
 					end
 				end
 				love.handlers[name](a, b, c, d, e, f)

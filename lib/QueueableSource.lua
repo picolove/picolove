@@ -23,7 +23,12 @@ local typecheck = {
 	Returns the correct alFormat enum value for the given SoundData.
 ]]
 local function getALFormat(data)
-	local stereo = data:getChannels() == 2
+	local stereo
+	if data.getChannelCount then
+		stereo = data:getChannelCount() == 2
+	else
+		stereo = data:getChannels() == 2
+	end
 	local deep = data:getBitDepth() == 16
 
 	if (stereo) then

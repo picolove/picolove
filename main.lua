@@ -138,6 +138,7 @@ local major, minor, revision = love.getVersion()
 -- fixes for 11+
 if major > 0 then
 	require("cindy").applyPatch()
+	require("compatfs").applyPatch()
 end
 
 -- fixes for 0.10.2

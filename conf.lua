@@ -10,9 +10,9 @@ function love.conf(t)
 
 	t.identity = "picolove"
 
-	-- 0.9.2  is wip
-	-- 0.10.2 is default
-	-- 11.4   is wip
+	-- 0.9.x  is wip
+	-- 0.10.x is default
+	-- 11.x   is wip
 	if
 		t.version ~= "0.9.0"
 		and t.version ~= "0.9.1"

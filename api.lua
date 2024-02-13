@@ -1395,7 +1395,11 @@ api.shr = bit.rshift
 function api.load(filename)
 	local hasloaded = _load(filename)
 	if hasloaded then
-		love.window.setTitle(string.upper(cartname) .. " (PICOLÖVE)")
+		love.window.setTitle(
+			string.upper(cartname)
+				.. " (PICOLÖVE) - LÖVE "
+				.. __picolove_love_version
+		)
 	end
 	return hasloaded
 end

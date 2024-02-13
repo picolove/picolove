@@ -13,7 +13,20 @@ function love.conf(t)
 	-- 0.9.2  is wip
 	-- 0.10.2 is default
 	-- 11.4   is wip
-	if t.version ~= "0.9.2" and t.version ~= "0.10.2" and t.version ~= "11.5" then
+	if
+		t.version ~= "0.9.0"
+		and t.version ~= "0.9.1"
+		and t.version ~= "0.9.2"
+		and t.version ~= "0.10.0"
+		and t.version ~= "0.10.1"
+		and t.version ~= "0.10.2"
+		and t.version ~= "11.0"
+		and t.version ~= "11.1"
+		and t.version ~= "11.2"
+		and t.version ~= "11.3"
+		and t.version ~= "11.4"
+		and t.version ~= "11.5"
+	then
 		-- show default version if no match
 		t.version = "0.10.2"
 	end

@@ -1,4 +1,4 @@
-__picolove_version = "0.1.0"
+__picolove_version = "0.2.0"
 
 scale = 4
 xpadding = 8.5

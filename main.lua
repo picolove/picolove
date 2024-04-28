@@ -242,6 +242,132 @@ local function note_to_hz(note)
 	return 440 * 2 ^ ((note - 33) / 12)
 end
 
+local function parse_commandline(argv)
+	local argc = #argv
+	local argpos = 2
+	local paramcount = 0
+
+	local new_width = 0
+	local new_height = 0
+	local should_resize = false
+
+	if argc > 1 then
+		-- TODO: implement commandline options
+		while argpos <= argc do
+			if argv[argpos] == "-width" then
+				paramcount = 1
+				new_width = tonumber(argv[argpos + 1])
+				if new_width then
+					should_resize = true
+				end
+			elseif argv[argpos] == "-height" then
+				paramcount = 1
+				new_height = tonumber(argv[argpos + 1])
+				if new_height then
+					should_resize = true
+				end
+			elseif argv[argpos] == "-windowed" then
+				paramcount = 1
+				local fullscreen = argv[argpos + 1] == "0"
+				love.window.setFullscreen(fullscreen)
+			elseif argv[argpos] == "-volume" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-joystick" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-pixel_perfect" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-preblit_scale" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-draw_rect" then
+				--local x = argv[argpos + 1]
+				--local y = argv[argpos + 2]
+				--local w = argv[argpos + 3]
+				--local h = argv[argpos + 4]
+				paramcount = 4
+			elseif argv[argpos] == "-run" then
+				paramcount = 1
+				local filename = argv[argpos + 1]
+				initialcartname = filename
+			elseif argv[argpos] == "-x" then
+				paramcount = 1
+				local filename = argv[argpos + 1]
+				initialcartname = filename
+			elseif argv[argpos] == "-export" then
+				--local paramstr = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-p" then
+				--local paramstr = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-splore" then
+				paramcount = 0
+			elseif argv[argpos] == "-home" then
+				--local path = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-root_path" then
+				--local path = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-desktop" then
+				--local path = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-screenshot_scale" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-gif_scale" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-gif_len" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-gui_theme" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-timeout" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-software_blit" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-foreground_sleep_ms" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-background_sleep_ms" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-accept_future" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "-global_api" then
+				--local n = argv[argpos + 1]
+				paramcount = 1
+			elseif argv[argpos] == "--test" then -- picolove commands
+				paramcount = 0
+				require("test")
+			else
+				if initialcartname == nil or initialcartname == "" then
+					initialcartname = argv[argc]
+				end
+			end
+
+			argpos = argpos + paramcount + 1
+		end
+		if should_resize then
+			local current_width, current_height, current_flags = love.window.getMode()
+			if new_width == 0 then
+				new_width = current_width
+			end
+			if new_height == 0 then
+				new_height = current_height
+			end
+			love.window.setMode(new_width, new_height, current_flags)
+			love.resize(love.graphics.getDimensions())
+		end
+	end
+end
+
 function love.load(argv)
 	love_args = argv
 
@@ -412,132 +538,6 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 	_load(initialcartname)
 	api.run()
 	cartname = nil
-end
-
-function parse_commandline(argv)
-	local argc = #argv
-	local argpos = 2
-	local paramcount = 0
-
-	local new_width = 0
-	local new_height = 0
-	local should_resize = false
-
-	if argc > 1 then
-		-- TODO: implement commandline options
-		while argpos <= argc do
-			if argv[argpos] == "-width" then
-				paramcount = 1
-				new_width = tonumber(argv[argpos + 1])
-				if new_width then
-					should_resize = true
-				end
-			elseif argv[argpos] == "-height" then
-				paramcount = 1
-				new_height = tonumber(argv[argpos + 1])
-				if new_height then
-					should_resize = true
-				end
-			elseif argv[argpos] == "-windowed" then
-				paramcount = 1
-				local fullscreen = argv[argpos + 1] == "0"
-				love.window.setFullscreen(fullscreen)
-			elseif argv[argpos] == "-volume" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-joystick" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-pixel_perfect" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-preblit_scale" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-draw_rect" then
-				--local x = argv[argpos + 1]
-				--local y = argv[argpos + 2]
-				--local w = argv[argpos + 3]
-				--local h = argv[argpos + 4]
-				paramcount = 4
-			elseif argv[argpos] == "-run" then
-				paramcount = 1
-				local filename = argv[argpos + 1]
-				initialcartname = filename
-			elseif argv[argpos] == "-x" then
-				paramcount = 1
-				local filename = argv[argpos + 1]
-				initialcartname = filename
-			elseif argv[argpos] == "-export" then
-				--local paramstr = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-p" then
-				--local paramstr = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-splore" then
-				paramcount = 0
-			elseif argv[argpos] == "-home" then
-				--local path = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-root_path" then
-				--local path = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-desktop" then
-				--local path = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-screenshot_scale" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-gif_scale" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-gif_len" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-gui_theme" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-timeout" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-software_blit" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-foreground_sleep_ms" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-background_sleep_ms" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-accept_future" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "-global_api" then
-				--local n = argv[argpos + 1]
-				paramcount = 1
-			elseif argv[argpos] == "--test" then -- picolove commands
-				paramcount = 0
-				require("test")
-			else
-				if initialcartname == nil or initialcartname == "" then
-					initialcartname = argv[argc]
-				end
-			end
-
-			argpos = argpos + paramcount + 1
-		end
-		if should_resize then
-			local current_width, current_height, current_flags = love.window.getMode()
-			if new_width == 0 then
-				new_width = current_width
-			end
-			if new_height == 0 then
-				new_height = current_height
-			end
-			love.window.setMode(new_width, new_height, current_flags)
-			love.resize(love.graphics.getDimensions())
-		end
-	end
 end
 
 function new_sandbox()

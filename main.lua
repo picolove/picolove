@@ -1073,8 +1073,8 @@ function love.run()
 	end
 end
 
-function patch_includes(lua, folder)
-	local startpos = 0
+local function patch_includes(lua, folder)
+	local startpos
 	local endpos = 0
 	startpos, endpos = string.find(lua, "#include (%S+)", endpos)
 	while startpos ~= nil do

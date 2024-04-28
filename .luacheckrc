@@ -6,6 +6,7 @@ globals = {
   "cartname",
   "__pico_resolution",
   "__picolove_version",
+  "__picolove_love_version",
   "currentDirectory",
   "host_time",
   "scale",

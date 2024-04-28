@@ -1,47 +1,50 @@
-.PHONY: run all 9 10 11 lint format clean test build run_build dev
+.PHONY: help run all 9 10 11 lint format clean test build run_build dev
 .SILENT: dev
 
 project_name := picolove
 
-run:
+run: ## run picolove code with tests
 	@love . --test
 
-all: format lint test build
+all: format lint test build ## format, lint, test and build picolove
 
-dev:
+dev: ## run picolove code in loop mode for easy restarting
 	while true; do $(MAKE) -s run && break; done
 
 # run specific love version
 # setup environment variable with path to love executable first
-9:
+9: ## run picolove code with test using love 0.9
 	@echo "Love 9 support is WIP"
 	@"${LOVE9}" . --test
-10:
+10: ## run picolove code with test using love 0.10
 	@"${LOVE10}" . --test
-11:
+11: ## run picolove code with test using love 11
 	@echo "Love 11 support is WIP"
 	@"${LOVE11}" . --test
 
-lint:
+lint: ## run lua source code linter
 	luacheck .
 
-format:
+format: ## format source code
 	@sed -i s/0x1234\.abcd/0x1234abcd/g test.lua
 	- stylua .
 	@sed -i s/0x1234abcd/0x1234\.abcd/g test.lua
 
-clean:
+clean: ## clean build files
 	@echo "deleting \"build/${project_name}.love\" ..."
 	@rm -f "build/${project_name}.love"
 
-test:
+test: ## only run tests (todo)
 	# todo implement test running
 
-build: clean
+build: clean ## build picolove.love file
 	@echo "building \"build/${project_name}.love\" ..."
 	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .
 	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/${project_name}.love" .
 
-run_build:
+run_build: ## run picolove.love file
 	@echo "executing \"build/${project_name}.love\" ..."
 	@love "build/${project_name}.love"
+
+help: ## display help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'

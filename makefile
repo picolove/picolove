@@ -14,12 +14,10 @@ dev: ## run picolove code in loop mode for easy restarting
 # run specific love version
 # setup environment variable with path to love executable first
 9: ## run picolove code with test using love 0.9
-	@echo "Love 9 support is WIP"
 	@"${LOVE9}" . --test
 10: ## run picolove code with test using love 0.10
 	@"${LOVE10}" . --test
 11: ## run picolove code with test using love 11
-	@echo "Love 11 support is WIP"
 	@"${LOVE11}" . --test
 
 lint: ## run lua source code linter

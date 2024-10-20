@@ -7,7 +7,7 @@ On github at: https://github.com/picolove/picolove
 
 ![Screenshot of PICOLOVE after startup](/assets/screenshot.png?raw=true "PICOLOVE screenshot after startup")
 
-Requires LÖVE 0.10.2
+Requires LÖVE 11.5 (default), 0.10.2 or 0.9.2
 
 What it is:
 
@@ -67,7 +67,7 @@ Extra features:
 
 Development requirements:
 
- * Runtime: `LÖVE 0.10.2`
+ * Runtime: `LÖVE 11.5 (default), 0.10.2 or 0.9.2`
  * Building: `make`
  * Formatting: `sed` and `stylua`
  * Linting: `luacheck`

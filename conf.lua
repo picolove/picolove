@@ -16,16 +16,13 @@ function love.conf(t)
 
 	__picolove_love_version = t.version
 
-	-- 0.9.x  is wip
-	-- 0.10.x is default
-	-- 11.x   is wip
 	if
 		not startsWidth(t.version, "0.9.")
 		and not startsWidth(t.version, "0.10.")
 		and not startsWidth(t.version, "11.")
 	then
 		-- show default version if no match
-		t.version = "0.10.2"
+		t.version = "11.5"
 	end
 
 	t.window.title = "PICOLÖVE"

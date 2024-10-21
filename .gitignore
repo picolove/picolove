@@ -5,6 +5,7 @@
 !test/*.p8
 *.lnk
 .DS_Store
-build/**/*.love
+build/
+!build/.gitkeep
 luacov.report.out
 luacov.stats.out

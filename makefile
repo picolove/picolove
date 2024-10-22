@@ -31,6 +31,16 @@ format: ## format source code
 clean: ## clean build files
 	@echo "deleting \"build/${project_name}.love\" ..."
 	@rm -f "build/${project_name}.love"
+	@echo "deleting \"build/love/\" ..."
+	@rm -rf "build/love"
+	@echo "deleting \"build/lovejs/\" ..."
+	@rm -rf "build/lovejs"
+	@echo "deleting \"build/macos/\" ..."
+	@rm -rf "build/macos"
+	@echo "deleting \"build/win32/\" ..."
+	@rm -rf "build/win32"
+	@echo "deleting \"build/win64/\" ..."
+	@rm -rf "build/win64"
 
 test: ## only run tests (todo)
 	# todo implement test running

@@ -213,6 +213,7 @@ function _load(_cartname)
 	end
 
 	if not file_found then
+		api.rectfill(0, pico8.cursor[2], 127, pico8.cursor[2] + 5, 0)
 		api.print("could not load", 6)
 		return false
 	end

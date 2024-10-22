@@ -1,0 +1,11 @@
+name = "picolove"
+default_targets = ["win32", "win64", "lovejs", "macos"]
+#default_targets = ["win32", "win64", "appimage", "lovejs", "macos"]
+build_directory = "build"
+
+keep_game_directory = true
+
+love_files = [
+    "::git-ls-tree::",
+    "-*/.*",
+]

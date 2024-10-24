@@ -45,10 +45,12 @@ clean: ## clean build files
 test: ## only run tests (todo)
 	# todo implement test running
 
+build: build-love ## build project love file and executables
+
 build-makelove: ## build project with makelove
 	@makelove
 
-build: clean ## build project love file
+build-love: clean ## build project love file
 	@echo "building \"build/${project_name}.love\" ..."
 	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .
 	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/${project_name}.love" .

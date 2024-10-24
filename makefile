@@ -54,7 +54,7 @@ clean: ## clean build files
 test: ## only run tests (todo)
 	# todo implement test running
 
-build: build-love ## build project love file and executables
+build: build-makelove ## build project distribution files
 
 build-makelove: clean ## build project with makelove
 	@makelove

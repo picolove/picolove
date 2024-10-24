@@ -3,21 +3,21 @@
 
 project_name := picolove
 
-run: ## run picolove code with tests
+run: ## run project code with tests
 	@love . --test
 
-all: format lint test build ## format, lint, test and build picolove
+all: format lint test build ## format, lint, test and build project
 
-dev: ## run picolove code in loop mode for easy restarting
+dev: ## run project code in loop mode for easy restarting
 	while true; do $(MAKE) -s run && break; done
 
 # run specific love version
 # setup environment variable with path to love executable first
-9: ## run picolove code with test using love 0.9
+9: ## run project code with test using love 0.9
 	@${LOVE9} . --test
-10: ## run picolove code with test using love 0.10
+10: ## run project code with test using love 0.10
 	@${LOVE10} . --test
-11: ## run picolove code with test using love 11
+11: ## run project code with test using love 11
 	@${LOVE11} . --test
 
 lint: ## run lua source code linter
@@ -45,12 +45,12 @@ clean: ## clean build files
 test: ## only run tests (todo)
 	# todo implement test running
 
-build: clean ## build picolove.love file
+build: clean ## build project love file
 	@echo "building \"build/${project_name}.love\" ..."
 	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .
 	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/${project_name}.love" .
 
-run_build: ## run picolove.love file
+run_build: ## run project love file
 	@echo "executing \"build/${project_name}.love\" ..."
 	@love "build/${project_name}.love"
 

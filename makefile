@@ -1,4 +1,4 @@
-.PHONY: help run all 9 10 11 lint format clean test build run_build dev
+.PHONY: help run all 9 10 11 lint format clean test build build-makelove build-love run-build dev
 .SILENT: dev
 
 project_name := picolove

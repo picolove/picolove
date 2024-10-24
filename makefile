@@ -29,6 +29,7 @@ format: ## format source code
 	@sed -i s/0x1234abcd/0x1234\.abcd/g test.lua
 
 clean: ## clean build files
+	@echo "deleting build files ..."
 	@echo "deleting \"build/${project_name}.love\" ..."
 	@rm -f "build/${project_name}.love"
 	@echo "deleting \"build/love/\" ..."
@@ -47,7 +48,7 @@ test: ## only run tests (todo)
 
 build: build-love ## build project love file and executables
 
-build-makelove: ## build project with makelove
+build-makelove: clean ## build project with makelove
 	@makelove
 
 build-love: clean ## build project love file

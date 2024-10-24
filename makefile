@@ -30,8 +30,6 @@ format: ## format source code
 
 clean: ## clean build files
 	@echo "deleting build files ..."
-	@echo "deleting \"build/${project_name}.love\" ..."
-	@rm -f "build/${project_name}.love"
 	@echo "deleting \"build/love/\" ..."
 	@rm -rf "build/love"
 	@echo "deleting \"build/lovejs/\" ..."
@@ -51,14 +49,18 @@ build: build-love ## build project love file and executables
 build-makelove: clean ## build project with makelove
 	@makelove
 
-build-love: clean ## build project love file
-	@echo "building \"build/${project_name}.love\" ..."
-	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .
-	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/${project_name}.love" .
+build-love: clean ## build project love file only with zip
+	@echo "building \"build/love/${project_name}.love\" ..."
+	@if [ ! -d "build/love" ]; then \
+		echo "creating directory \"build/love\""; \
+		mkdir "build/love"; \
+	fi
+	@zip -9 -r -i@includelist.txt    "build/love/${project_name}.love" .
+	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/love/${project_name}.love" .
 
 run_build: ## run project love file
-	@echo "executing \"build/${project_name}.love\" ..."
-	@love "build/${project_name}.love"
+	@echo "executing \"build/love/${project_name}.love\" ..."
+	@love "build/love/${project_name}.love"
 
 help: ## display help
 	@grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'

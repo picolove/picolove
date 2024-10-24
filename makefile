@@ -58,7 +58,7 @@ build-love: clean ## build project love file only with zip
 	@zip -9 -r -i@includelist.txt    "build/love/${project_name}.love" .
 	@zip -9 -r -i"*.lua" -x"*/*.lua" "build/love/${project_name}.love" .
 
-run_build: ## run project love file
+run-build: ## run project love file
 	@echo "executing \"build/love/${project_name}.love\" ..."
 	@love "build/love/${project_name}.love"
 

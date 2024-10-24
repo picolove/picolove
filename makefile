@@ -45,6 +45,9 @@ clean: ## clean build files
 test: ## only run tests (todo)
 	# todo implement test running
 
+build-makelove: ## build project with makelove
+	@makelove
+
 build: clean ## build project love file
 	@echo "building \"build/${project_name}.love\" ..."
 	@zip -9 -r -i@includelist.txt    "build/${project_name}.love" .

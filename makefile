@@ -30,16 +30,26 @@ format: ## format source code
 
 clean: ## clean build files
 	@echo "deleting build files ..."
-	@echo "deleting \"build/love/\" ..."
-	@rm -rf "build/love"
-	@echo "deleting \"build/lovejs/\" ..."
-	@rm -rf "build/lovejs"
-	@echo "deleting \"build/macos/\" ..."
-	@rm -rf "build/macos"
-	@echo "deleting \"build/win32/\" ..."
-	@rm -rf "build/win32"
-	@echo "deleting \"build/win64/\" ..."
-	@rm -rf "build/win64"
+	@if [ -d "build/love" ]; then \
+		echo "deleting \"build/love/\" ..."; \
+		rm -rf "build/love"; \
+	fi
+	@if [ -d "build/lovejs" ]; then \
+		echo "deleting \"build/lovejs/\" ..."; \
+		rm -rf "build/lovejs"; \
+	fi
+	@if [ -d "build/macos" ]; then \
+		echo "deleting \"build/macos/\" ..."; \
+		rm -rf "build/macos"; \
+	fi
+	@if [ -d "build/win32" ]; then \
+		echo "deleting \"build/win32/\" ..."; \
+		rm -rf "build/win32"; \
+	fi
+	@if [ -d "build/win64" ]; then \
+		echo "deleting \"build/win64/\" ..."; \
+		rm -rf "build/win64"; \
+	fi
 
 test: ## only run tests (todo)
 	# todo implement test running

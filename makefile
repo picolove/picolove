@@ -59,7 +59,7 @@ build: build-makelove ## build project distribution files
 build-makelove: clean ## build project with makelove
 	@makelove
 
-build-love: clean ## build project love file only with zip
+build-love: clean ## build project love file with custom script
 	@echo "building \"build/love/${project_name}.love\" ..."
 	@if [ ! -d "build/love" ]; then \
 		echo "creating directory \"build/love\""; \
